@@ -9,7 +9,7 @@ Flask-SocketIO==4.2.1
 Flask-Testing==0.7.1
 Flask-WTF==0.14.2
 greenlet==0.4.15
-gunicorn==18.0
+gunicorn==19.5.0
 itsdangerous==1.1.0
 Jinja2==2.10.1
 Mako==1.0.7
