@@ -39,6 +39,7 @@ def slurm_account_create(ch, method, properties, body):
     username = msg['username']
     try:
         subprocess.call(["sudo", "sacctmgr", "add", "account", username, "-i",  "Descripition: Add user"])
+        subprocess.call(["sudo", "sacctmgr", "add", "user", username, "account="+username, "-i"])
         print("SLURM account for user {} has been added".format(username))
     except:
         print("Failed to create user")
