@@ -37,8 +37,8 @@ def slurm_account_create(ch, method, properties, body):
     msg = json.loads(body)
     print("Message received {}".format(msg))
     username = msg['username']
-    user_uid = msg['uid']
-    user_gid = msg['gid']
+    user_uid = str(msg['uid'])
+    user_gid = str(msg['gid'])
     try:
         subprocess.call(["sudo", "groupadd", "-r", "-g", user_gid, username])
         time.sleep(10)
