@@ -5,6 +5,7 @@ import rabbit_config as rcfg
 import socket
 import subprocess
 import time
+import json
 
 hostname = socket.gethostname().split(".", 1)[0]
 connect_host = rcfg.Server if hostname != rcfg.Server else "localhost"
@@ -22,6 +23,8 @@ parameters = pika.ConnectionParameters(connect_host,
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
+print "connection established. Listening for messages:"
+
 # create exchange to pass messages
 channel.exchange_declare(exchange=rcfg.Exchange, exchange_type='direct')
 
@@ -32,15 +35,16 @@ channel.queue_bind(exchange=rcfg.Exchange, queue=queue_name, routing_key=queue_n
 
 def slurm_account_create(ch, method, properties, body):
     msg = json.loads(body)
+    print("Message received {}".format(msg))
     username = msg['username']
     try:
-        subprocess.call(["sacctmgr", "add", "account", username, "Descripition: Add user"])
+        subprocess.call(["sudo", "sacctmgr", "add", "account", username, "-i",  "Descripition: Add user"])
     except:
         print("Failed to create user")
     
     channel.basic_ack(delivery_tag=method.delivery_tag)
         
-    channel.basic_publish(exchange=rcfg.Exchange, routing_key='warewulf_file_sync', body=json.dumps(msg))
+    channel.basic_publish(exchange=rcfg.Exchange, routing_key=username, body=json.dumps(msg))
     
 
 # ingest messages
