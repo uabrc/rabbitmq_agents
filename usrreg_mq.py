@@ -39,7 +39,7 @@ class UserRegMQ(object):
         self._channel = self._connection.channel()
         self._channel.exchange_declare(
                 exchange=self.EXCHANGE, 
-                exchange_type=self.EXCHANGE_TYPE
+                exchange_type=self.EXCHANGE_TYPE,
                 durable=True)
 
     def disconnect(self):
