@@ -1,3 +1,6 @@
+import json
+import pika
+import socket
 import rabbitmq_config as rcfg
 
 class UserRegMQ(object):
