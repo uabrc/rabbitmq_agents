@@ -42,7 +42,7 @@ class UserRegMQ(object):
                 exchange_type=self.EXCHANGE_TYPE
                 durable=True)
 
-    def close(self):
+    def disconnect(self):
         self._connection.close()
 
     def publish_msg(self, obj):
