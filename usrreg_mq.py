@@ -46,10 +46,6 @@ class UserRegMQ(object):
         self._connection.close()
 
     def publish_msg(self, obj):
-        if self._channel is None or not self._channel.is_open:
-            return
-        
-        # Establish connection to RabbitMQ server
         self.connect()
         self._channel.basic_publish(exchange=self.EXCHANGE, routing_key=obj['routing_key'], body=json.dumps(obj['msg']))
         self.disconnect()
