@@ -3,7 +3,7 @@ import pika
 import sys
 import socket
 import json
-import rabbitmq_config as rcfg
+import rabbit_config as rcfg
 
 if len(sys.argv) < 3:
     sys.stderr.write("Usage: {} TAG USERNAME ".format(sys.argv[0]))
