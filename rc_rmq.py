@@ -3,7 +3,7 @@ import pika
 import socket
 import rabbitmq_config as rcfg
 
-class UserRegMQ(object):
+class RCRMQ(object):
 
     USER = 'guest'
     PASSWORD = 'guest'
