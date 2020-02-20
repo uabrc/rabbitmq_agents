@@ -39,7 +39,7 @@ def ohpc_account_create(ch, method, properties, body):
     print("Message received {}".format(msg))
     username = msg['username']
     try:
-        subprocess.call(["sudo", "useradd", "-m", username])
+        subprocess.call(["sudo", "useradd", username])
         print("User {} has been added to {}".format(username, hostname))
     except:
         print("Failed to create user")
