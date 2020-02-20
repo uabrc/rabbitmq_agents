@@ -2,5 +2,5 @@ Exchange = 'RegUsr'
 User = 'reggie'
 Password = 'CHANGE_IT_TO_YOUR_OWN_PASSWORD'
 VHost = '/'
-Server = 'ood'
+Server = 'ohpc'
 Port = 5672
