@@ -34,12 +34,12 @@ result = channel.queue_declare(queue=queue_name, exclusive=False)
 
 channel.queue_bind(exchange=rcfg.Exchange, queue=queue_name, routing_key=queue_name)
 
-def slurm_account_create(ch, method, properties, body):
+def ohpc_account_create(ch, method, properties, body):
     msg = json.loads(body)
     print("Message received {}".format(msg))
     username = msg['username']
     try:
-        subprocess.call(["sudo", "useradd", "-m", username])
+        subprocess.call(["sudo", "useradd", username])
         print("User {} has been added to {}".format(username, hostname))
     except:
         print("Failed to create user")
@@ -51,7 +51,7 @@ def slurm_account_create(ch, method, properties, body):
 
 
 # ingest messages
-channel.basic_consume(queue=queue_name, on_message_callback=slurm_account_create)
+channel.basic_consume(queue=queue_name, on_message_callback=ohpc_account_create)
 
 # initiate message ingestion
 try:
