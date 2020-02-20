@@ -23,7 +23,7 @@ parameters = pika.ConnectionParameters(connect_host,
 connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
-print "connection established. Listening for messages:"
+print("connection established. Listening for messages:")
 
 # create exchange to pass messages
 channel.exchange_declare(exchange=rcfg.Exchange, exchange_type='direct')
