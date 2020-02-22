@@ -76,7 +76,10 @@ class RCRMQ(object):
         self.connect()
 
         self._consumer_tag = self._channel.basic_consume(self.QUEUE,obj['cb'])
-        self._channel.start_consuming()
+        try:
+            self._channel.start_consuming()
+        except KeyboardInterrupt:
+            self._channel.stop_consuming()
 
         self.disconnect()
 
