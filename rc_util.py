@@ -1,7 +1,7 @@
 from rc_rmq import RCRMQ
 import json
 
-rc_rmq = RCRMQ({'exchange': 'RegUsr'})
+rc_rmq = RCRMQ({'exchange': 'Request'})
 tasks = {'ohpc_account': False, 'ohpc_homedir': False, 'ood_account': False, 'slurm_account': False}
 
 def add_account(username, full='', reason=''):
