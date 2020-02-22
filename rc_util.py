@@ -17,11 +17,9 @@ def add_account(username, full='', reason=''):
 
 def worker(ch, method, properties, body):
     msg = json.loads(body)
-    task = msg['username']
+    task = msg['task']
     print("get msg: {}".format(task))
-
-    tasks[task] = True
-    ch.basic_ack(delivery_tag=method.delivery_tag)
+    tasks[task] = msg['success']
 
     # Check if all tasks are done
     done = True
