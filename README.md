@@ -27,4 +27,21 @@ rc_rmq.publish_msg({
     'content': 'this is warning'
   }
 })
+
+# to consume message from a queue
+# you have to first define callback function
+# with parameters: channel, method, properties, body
+def callback_function(ch, method, properties, body):
+  msg = json.loads(body)
+  print("get msg: {}".format(msg['username')
+
+  # this will stop the consumer
+  rc_rmq.stop_consumer()
+
+# start consume messagre from queue with callback function
+rc_rmq.start_consume({
+  'queue': 'queue_name',
+  'cb': callback_function
+})
+
 ```
