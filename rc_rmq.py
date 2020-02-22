@@ -54,6 +54,9 @@ class RCRMQ(object):
         self._channel.close()
         self._connection.close()
 
+    def delete_queue(self):
+        self._channel.queue_delete(self.QUEUE)
+
     def publish_msg(self, obj):
         if 'routing_key' in obj:
             self.ROUTING_KEY = obj['routing_key']
