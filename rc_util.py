@@ -6,7 +6,7 @@ tasks = {'ohpc_account': False, 'ohpc_homedir': False, 'ood_account': False, 'sl
 
 def add_account(username, full='', reason=''):
   rc_rmq.publish_msg({
-    'routing_key': 'ohpc',
+    'routing_key': 'ohpc_account',
     'msg': {
       "username": username,
       "fullname": full,
