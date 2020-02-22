@@ -2,6 +2,7 @@ from rc_rmq import RCRMQ
 import json
 
 rc_rmq = RCRMQ({'exchange': 'Request'})
+confirm_rmq = RCRMQ({'exchange': 'Confirm'})
 tasks = {'ohpc_account': False, 'ohpc_homedir': False, 'ood_account': False, 'slurm_account': False}
 
 def add_account(username, full='', reason=''):
@@ -28,13 +29,14 @@ def worker(ch, method, properties, body):
         if not status:
             done = False 
     if done:
-        rc_rmq.stop_consume()
+        confirm_rmq.stop_consume()
+        confirm_rmq.delete_queue()
   
 def consume(username, worker, debug=False):
     if debug:
         sleep(5)
     else:
-        rc_rmq.start_consume({
+        confirm_rmq.start_consume({
             'queue': username,
             'cb': worker
         })
