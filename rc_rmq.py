@@ -88,5 +88,3 @@ class RCRMQ(object):
 
     def stop_consume(self):
         self._channel.basic_cancel(self._consumer_tag)
-        if not self.DURABLE:
-            self._channel.queue_delete(self.QUEUE)
