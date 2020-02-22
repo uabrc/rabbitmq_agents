@@ -13,7 +13,7 @@ class RCRMQ(object):
     EXCHANGE = ''
     EXCHANGE_TYPE = 'direct'
     QUEUE = None
-    DURABLE = False
+    DURABLE = True
     ROUTING_KEY = None
 
     def __init__(self, config=None):
