@@ -1,7 +1,7 @@
 from rc_rmq import RCRMQ
 import json
 
-rc_rmq = RCRMQ({'exchange': 'Request'})
+rc_rmq = RCRMQ({'exchange': 'Register'})
 confirm_rmq = RCRMQ({'exchange': 'Confirm'})
 tasks = {'ohpc_account': False, 'ohpc_homedir': False, 'ood_account': False, 'slurm_account': False}
 
@@ -25,6 +25,7 @@ def worker(ch, method, properties, body):
     done = True
     for key, status in tasks.items():
         if not status:
+            print("{} is not done yet.".format(key))
             done = False 
     if done:
         confirm_rmq.stop_consume()
