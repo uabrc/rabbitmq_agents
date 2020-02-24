@@ -30,13 +30,13 @@ def worker(ch, method, properties, body):
         confirm_rmq.stop_consume()
         confirm_rmq.delete_queue()
   
-def consume(username, worker, debug=False):
+def consume(username, callback, debug=False):
     if debug:
         sleep(5)
     else:
         confirm_rmq.start_consume({
             'queue': username,
-            'cb': worker
+            'cb': callback
         })
   
     return { 'success' : True }
