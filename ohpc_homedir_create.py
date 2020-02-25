@@ -21,6 +21,7 @@ def ohpc_homedir_create(ch, method, properties, body):
         exist = os.path.isdir("/home/" + username)
         if not exist:
             subprocess.call(["sudo", "cp", "-r", "/etc/skel", "/home/" + username])
+            subprocess.call(["sudo", "chown", "-R", "{0}:{0}".format(username), "/home/" + username])
             print("Home directory for {} has been created".format(username))
         else:
             print("Home directory already exists, skip")
