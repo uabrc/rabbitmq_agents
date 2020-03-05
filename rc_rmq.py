@@ -1,7 +1,7 @@
 import json
 import pika
 import socket
-import rabbitmq_config as rcfg
+import rabbit_config as rcfg
 
 class RCRMQ(object):
 
