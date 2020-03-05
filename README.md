@@ -6,7 +6,7 @@ It has 2 branches ```develop``` and ```production``` , that houses agents based 
 
 ## Using RCRMQ class
 
-- First, rename `rabbitmq_config.py.example` to `rabbitmq_config.py`
+- First, rename `rabbit_config.py.example` to `rabbit_config.py`
 
 - Modify config file, at least the `Password` needs to be your own passwod
 
