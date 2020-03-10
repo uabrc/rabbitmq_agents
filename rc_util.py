@@ -26,11 +26,11 @@ def worker(ch, method, properties, body):
     for key, status in tasks.items():
         if not status:
             print("{} is not done yet.".format(key))
-            done = False 
+            done = False
     if done:
         confirm_rmq.stop_consume()
         confirm_rmq.delete_queue()
-  
+
 def consume(username, callback, debug=False):
     if debug:
         sleep(5)
@@ -39,5 +39,5 @@ def consume(username, callback, debug=False):
             'queue': username,
             'cb': callback
         })
-  
+
     return { 'success' : True }
