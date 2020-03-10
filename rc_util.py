@@ -1,4 +1,4 @@
-from rc_rmq import RCRMQ
+from .rc_rmq import RCRMQ
 import json
 
 rc_rmq = RCRMQ({'exchange': 'Register'})
