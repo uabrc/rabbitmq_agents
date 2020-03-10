@@ -6,14 +6,14 @@ confirm_rmq = RCRMQ({'exchange': 'Confirm'})
 tasks = {'ohpc_account': False, 'ohpc_homedir': False, 'ood_account': False, 'slurm_account': False}
 
 def add_account(username, full='', reason=''):
-  rc_rmq.publish_msg({
-    'routing_key': 'ohpc_account',
-    'msg': {
-      "username": username,
-      "fullname": full,
-      "reason": reason
-    }
-  })
+    rc_rmq.publish_msg({
+      'routing_key': 'ohpc_account',
+      'msg': {
+        "username": username,
+        "fullname": full,
+        "reason": reason
+      }
+    })
 
 def worker(ch, method, properties, body):
     msg = json.loads(body)
