@@ -15,8 +15,9 @@ class RCRMQ(object):
     QUEUE = None
     DURABLE = True
     ROUTING_KEY = None
+    DEBUG = False
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, debug=False):
         if config:
             if 'exchange' in config:
                 self.EXCHANGE = config['exchange']
@@ -30,6 +31,19 @@ class RCRMQ(object):
         self.PASSWORD = rcfg.Password
         self.VHOST = rcfg.VHost
         self.PORT = rcfg.Port
+        self.DEBUG = debug
+
+        if self.DEBUG:
+            print("""
+            Created RabbitMQ instance with:
+              Exchange name: {},
+              Exchange type: {},
+              Host: {},
+              User: {},
+              VHost: {},
+              Port: {}
+            """.format(self.EXCHANGE, self.EXCHANGE_TYPE, self.HOST, self.USER, self.VHOST, self.PORT))
+
         self._parameters = pika.ConnectionParameters(
                 self.HOST,
                 self.PORT,
@@ -37,6 +51,9 @@ class RCRMQ(object):
                 pika.PlainCredentials(self.USER, self.PASSWORD))
 
     def connect(self):
+        if self.DEBUG:
+            print("Connecting...\n" + "Exchange: " + self.EXCHANGE + " Exchange type: " + self.EXCHANGE_TYPE)
+
         self._connection = pika.BlockingConnection(self._parameters)
         self._channel = self._connection.channel()
         self._channel.exchange_declare(
@@ -75,6 +92,9 @@ class RCRMQ(object):
             self.ROUTING_KEY = obj['routing_key'] if 'routing_key' in obj else self.QUEUE
         if 'durable' in obj:
             self.DURABLE = obj['durable']
+
+        if self.DEBUG:
+            print("Queue: " + self.QUEUE + "\nRouting_key: " + self.ROUTING_KEY)
 
         self.connect()
 
