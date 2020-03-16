@@ -44,6 +44,10 @@ class RCRMQ(object):
               Port: {}
             """.format(self.EXCHANGE, self.EXCHANGE_TYPE, self.HOST, self.USER, self.VHOST, self.PORT))
 
+        self._consumer_tag = None
+        self._connection = None
+        self._consuming = False
+        self._channel = None
         self._parameters = pika.ConnectionParameters(
                 self.HOST,
                 self.PORT,
