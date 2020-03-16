@@ -1,11 +1,7 @@
 #!/usr/bin/env python
-import pika # python client
 import sys
-import rabbit_config as rcfg
-import socket
-import subprocess
-import time
 import json
+import subprocess
 from rc_rmq import RCRMQ
 
 task = 'ood_account'
