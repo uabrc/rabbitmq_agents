@@ -1,13 +1,12 @@
 from rc_rmq import RCRMQ
 import json
 
-rc_rmq = RCRMQ({'exchange': 'Register'})
-confirm_rmq = RCRMQ({'exchange': 'Confirm'})
-tasks = {'ohpc_account': False, 'ohpc_homedir': False, 'ood_account': False, 'slurm_account': False}
+rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
+tasks = {'ohpc_account': None, 'ood_account': None, 'slurm_account': None}
 
 def add_account(username, full='', reason=''):
   rc_rmq.publish_msg({
-    'routing_key': 'ohpc_account',
+    'routing_key': 'request.' + username,
     'msg': {
       "username": username,
       "fullname": full,
@@ -18,8 +17,8 @@ def add_account(username, full='', reason=''):
 def worker(ch, method, properties, body):
     msg = json.loads(body)
     task = msg['task']
-    print("get msg: {}".format(task))
     tasks[task] = msg['success']
+    print("Got msg: {}({})".format(msg['task'], msg['success']))
 
     # Check if all tasks are done
     done = True
@@ -37,6 +36,7 @@ def consume(username, callback, debug=False):
     else:
         confirm_rmq.start_consume({
             'queue': username,
+            'routing_key': 'confirm.' + username,
             'cb': callback
         })
   
