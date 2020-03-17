@@ -20,8 +20,9 @@ def slurm_account_create(ch, method, properties, body):
         print("SLURM account for user {} has been added".format(username))
         success = True
     except:
-        print("Failed to create user")
-    
+        e = sys.exc_info()[0]
+        print("[{}]: Error: {}".format(task, e))
+
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
     # send confirm message

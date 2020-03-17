@@ -20,7 +20,8 @@ def ohpc_account_create(ch, method, properties, body):
         print("[{}]: User {} has been added".format(task, username))
         success = True
     except:
-        print("Failed to create user")
+        e = sys.exc_info()[0]
+        print("[{}]: Error: {}".format(task, e))
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
     msg['uid'] = getpwnam(username).pw_uid
