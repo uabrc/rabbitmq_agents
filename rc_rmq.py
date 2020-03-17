@@ -61,7 +61,7 @@ class RCRMQ(object):
         self._connection = pika.BlockingConnection(self._parameters)
         self._channel = self._connection.channel()
         self._channel.exchange_declare(
-                exchange=self.EXCHANGE, 
+                exchange=self.EXCHANGE,
                 exchange_type=self.EXCHANGE_TYPE,
                 durable=True)
 
