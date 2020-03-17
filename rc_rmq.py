@@ -82,13 +82,15 @@ class RCRMQ(object):
         if 'routing_key' in obj:
             self.ROUTING_KEY = obj['routing_key']
 
-        self.connect()
+        if self._connection is None:
+            self.connect()
 
         self._channel.basic_publish(exchange=self.EXCHANGE,
                 routing_key=self.ROUTING_KEY,
                 body=json.dumps(obj['msg']))
 
-        self.disconnect()
+        if not self._consuming:
+            self.disconnect()
 
     def start_consume(self, obj):
         if 'queue' in obj:
@@ -100,9 +102,11 @@ class RCRMQ(object):
         if self.DEBUG:
             print("Queue: " + self.QUEUE + "\nRouting_key: " + self.ROUTING_KEY)
 
-        self.connect()
+        if self._connection is None:
+            self.connect()
 
         self._consumer_tag = self._channel.basic_consume(self.QUEUE,obj['cb'])
+        self._consuming = True
         try:
             self._channel.start_consuming()
         except KeyboardInterrupt:
