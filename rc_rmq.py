@@ -65,11 +65,11 @@ class RCRMQ(object):
                 exchange_type=self.EXCHANGE_TYPE,
                 durable=True)
 
-        if self.QUEUE is not None:
-            self._channel.queue_declare(queue=self.QUEUE, durable=self.DURABLE)
-            self._channel.queue_bind(exchange=self.EXCHANGE,
-                    queue=self.QUEUE,
-                    routing_key=self.ROUTING_KEY)
+    def bind_queue(self):
+        self._channel.queue_declare(queue=self.QUEUE, durable=self.DURABLE)
+        self._channel.queue_bind(exchange=self.EXCHANGE,
+                queue=self.QUEUE,
+                routing_key=self.ROUTING_KEY)
 
     def disconnect(self):
         self._channel.close()
@@ -102,6 +102,8 @@ class RCRMQ(object):
 
         if self._connection is None:
             self.connect()
+
+        self.bind_queue()
 
         self._consumer_tag = self._channel.basic_consume(self.QUEUE,obj['cb'])
         self._consuming = True
