@@ -27,14 +27,14 @@ def worker(ch, method, properties, body):
             print("{} is not done yet.".format(key))
             done = False
     if done:
-        confirm_rmq.stop_consume()
-        confirm_rmq.delete_queue()
+        rc_rmq.stop_consume()
+        rc_rmq.delete_queue()
 
 def consume(username, callback, debug=False):
     if debug:
         sleep(5)
     else:
-        confirm_rmq.start_consume({
+        rc_rmq.start_consume({
             'queue': username,
             'routing_key': 'confirm.' + username,
             'cb': callback
