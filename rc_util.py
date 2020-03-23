@@ -30,7 +30,7 @@ def worker(ch, method, properties, body):
         rc_rmq.stop_consume()
         rc_rmq.delete_queue()
 
-def consume(username, callback, debug=False):
+def consume(username, callback=worker, debug=False):
     if debug:
         sleep(5)
     else:
