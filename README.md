@@ -44,4 +44,7 @@ rc_rmq.start_consume({
   'cb': callback_function
 })
 
+
+# don't forget to close connection
+rc_rmq.disconnect()
 ```

@@ -13,6 +13,7 @@ def add_account(username, full='', reason=''):
       "reason": reason
     }
   })
+  rc_rmq.disconnect()
 
 def worker(ch, method, properties, body):
     msg = json.loads(body)
@@ -39,5 +40,6 @@ def consume(username, callback=worker, debug=False):
             'routing_key': 'confirm.' + username,
             'cb': callback
         })
+        rc_rmq.disconnect()
 
     return { 'success' : True }

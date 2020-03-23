@@ -74,6 +74,7 @@ class RCRMQ(object):
     def disconnect(self):
         self._channel.close()
         self._connection.close()
+        self._connection = None
 
     def delete_queue(self):
         self._channel.queue_delete(self.QUEUE)
@@ -88,9 +89,6 @@ class RCRMQ(object):
         self._channel.basic_publish(exchange=self.EXCHANGE,
                 routing_key=self.ROUTING_KEY,
                 body=json.dumps(obj['msg']))
-
-        if not self._consuming:
-            self.disconnect()
 
     def start_consume(self, obj):
         if 'queue' in obj:
@@ -111,8 +109,6 @@ class RCRMQ(object):
             self._channel.start_consuming()
         except KeyboardInterrupt:
             self._channel.stop_consuming()
-
-        self.disconnect()
 
     def stop_consume(self):
         self._channel.basic_cancel(self._consumer_tag)
