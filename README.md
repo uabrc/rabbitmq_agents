@@ -41,7 +41,10 @@ def callback_function(ch, method, properties, body):
 # start consume messagre from queue with callback function
 rc_rmq.start_consume({
   'queue': 'queue_name',
+  'routing_key: 'your_key',
   'cb': callback_function
 })
 
+# don't forget to close connection
+rc_rmq.disconnect()
 ```
