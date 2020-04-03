@@ -23,10 +23,10 @@ def git_commit(ch, method, properties, body):
     ticketnum = msg.get('ticketnum', 'add-users-' + username.lower())
     DEBUG = msg.get('debug', False)
     success = False
+    branch_name = 'issue-' + ticketnum
 
     try:
 
-        branch_name = 'issue-' + ticketnum
         git.checkout('master')
         git.pull()
         git.checkout('-b', branch_name)
