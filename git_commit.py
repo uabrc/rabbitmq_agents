@@ -34,7 +34,7 @@ def git_commit(ch, method, properties, body):
             print('[{}]: /cm/local/apps/openldap/sbin/slapcat\\'.format(task))
             print("\t-f /cm/local/apps/openldap/etc/slapd.conf -b 'dc=cm,dc=cluster' > {}".format(cheaha_ldif))
             print('[{}]: ldapsearch\\'.format(task))
-            print("\t-LLL -x -h cheaha-master02 -b 'dc=cm,dc=cluster'".format(cheaha_ldapsearch_ldif))
+            print("\t-LLL -x -h ldapserver -b 'dc=cm,dc=cluster'".format(cheaha_ldapsearch_ldif))
             print('[{}]: git add {}'.format(task, cheaha_ldif))
             print('[{}]: git add {}'.format(task, cheaha_ldapsearch_ldif))
             print('[{}]: git commit -m "{}"'.format(task, "Added new cheaha user: " + username))
@@ -50,7 +50,7 @@ def git_commit(ch, method, properties, body):
             with open(cheaha_ldif, 'w') as ldif_f,\
                 open(cheaha_ldapsearch_ldif, 'w') as ldapsearch_ldif_f:
                 slapcat('-f', '/cm/local/apps/openldap/etc/slapd.conf', '-b', "'dc=cm,dc=cluster'", _out=ldif_f)
-                ldapsearch('-LLL', '-x', '-h', 'cheaha-master02', '-b', "'dc=cm,dc=cluster'", _out=ldapsearch_ldif_f)
+                ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "'dc=cm,dc=cluster'", _out=ldapsearch_ldif_f)
 
             git.diff()
             git.add(cheaha_ldif)
