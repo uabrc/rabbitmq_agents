@@ -66,7 +66,7 @@ def git_commit(ch, method, properties, body):
         e = sys.exc_info()[0]
         print("[{}]: Error: {}".format(task, e))
 
-    # send confirm message
+    # Send confirm message
     rc_rmq.publish_msg({
         'routing_key': 'confirm.' + username,
         'msg': {
