@@ -21,6 +21,7 @@ def git_commit(ch, method, properties, body):
     msg = json.loads(body)
     username = msg['username']
     ticketnum = msg.get('ticketnum', 'add-users-' + username.lower())
+    DEBUG = msg.get('debug', False)
     success = False
 
     try:
@@ -53,6 +54,7 @@ def git_commit(ch, method, properties, body):
     rc_rmq.publish_msg({
         'routing_key': 'confirm.' + username,
         'msg': {
+            'debug': DEBUG,
             'task': task,
             'success': success
         }
