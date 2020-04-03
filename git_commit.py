@@ -20,7 +20,7 @@ ldapsearch = sh.Command('ldapsearch')
 def git_commit(ch, method, properties, body):
     msg = json.loads(body)
     username = msg['username']
-    ticketnum = msg['ticketnum']
+    ticketnum = msg.get('ticketnum', 'add-users-' + username.lower())
     success = False
 
     try:
