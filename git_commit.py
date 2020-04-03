@@ -60,6 +60,9 @@ def git_commit(ch, method, properties, body):
         }
     })
 
+    # Acknowledge message
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+
 
 print("Start listening to queue: {}".format(task))
 rc_rmq.start_consume({
