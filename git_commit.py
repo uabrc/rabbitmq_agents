@@ -27,23 +27,39 @@ def git_commit(ch, method, properties, body):
 
     try:
 
-        git.checkout('master')
-        git.pull()
-        git.checkout('-b', branch_name)
+        if DEBUG:
+            print('[{}]: git checkout master'.format(task))
+            print('[{}]: git pull'.format(task))
+            print('[{}]: git checkout -b {}'.format(task, branch_name))
+            print('[{}]: /cm/local/apps/openldap/sbin/slapcat\\'.format(task))
+            print("\t-f /cm/local/apps/openldap/etc/slapd.conf -b 'dc=cm,dc=cluster' > {}".format(cheaha_ldif))
+            print('[{}]: ldapsearch\\'.format(task))
+            print("\t-LLL -x -h cheaha-master02 -b 'dc=cm,dc=cluster'".format(cheaha_ldapsearch_ldif))
+            print('[{}]: git add {}'.format(task, cheaha_ldif))
+            print('[{}]: git add {}'.format(task, cheaha_ldapsearch_ldif))
+            print('[{}]: git commit -m "{}"'.format(task, "Added new cheaha user: " + username))
+            print('[{}]: git push origin'.format(task))
+            print('[{}]: git checkout master'.format(task))
+            print('[{}]: git pull'.format(task))
 
-        with open(cheaha_ldif, 'w') as ldif_f,\
-            open(cheaha_ldapsearch_ldif, 'w') as ldapsearch_ldif_f:
-            slapcat('-f', '/cm/local/apps/openldap/etc/slapd.conf', '-b', "'dc=cm,dc=cluster'", _out=ldif_f)
-            ldapsearch('-LLL', '-x', '-h', 'cheaha-master02', '-b', "'dc=cm,dc=cluster'", _out=ldapsearch_ldif_f)
+        else:
+            git.checkout('master')
+            git.pull()
+            git.checkout('-b', branch_name)
 
-        git.diff()
-        git.add(cheaha_ldif)
-        git.add(cheaha_ldapsearch_ldif)
-        git.commit(m="Added new cheaha user: " + username)
-        git.push('origin', branch_name)
-        git.checkout('master')
-        time.sleep(60)
-        git.pull()
+            with open(cheaha_ldif, 'w') as ldif_f,\
+                open(cheaha_ldapsearch_ldif, 'w') as ldapsearch_ldif_f:
+                slapcat('-f', '/cm/local/apps/openldap/etc/slapd.conf', '-b', "'dc=cm,dc=cluster'", _out=ldif_f)
+                ldapsearch('-LLL', '-x', '-h', 'cheaha-master02', '-b', "'dc=cm,dc=cluster'", _out=ldapsearch_ldif_f)
+
+            git.diff()
+            git.add(cheaha_ldif)
+            git.add(cheaha_ldapsearch_ldif)
+            git.commit(m="Added new cheaha user: " + username)
+            git.push('origin', branch_name)
+            git.checkout('master')
+            time.sleep(60)
+            git.pull()
 
         success = True
     except:
