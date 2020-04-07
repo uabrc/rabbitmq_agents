@@ -4,11 +4,12 @@ import json
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 tasks = {'ohpc_account': None, 'ood_account': None, 'slurm_account': None}
 
-def add_account(username, full='', reason=''):
+def add_account(username, email, full='', reason=''):
   rc_rmq.publish_msg({
     'routing_key': 'request.' + username,
     'msg': {
       "username": username,
+      "email": email,
       "fullname": full,
       "reason": reason
     }
