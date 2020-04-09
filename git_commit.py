@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import sh
 import sys
 import json
@@ -10,7 +11,7 @@ task = 'git_commit'
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
-repo_location = '~/git/rc-users'
+repo_location = os.path.expanduser('~/git/rc-users')
 cheaha_ldif = repo_location + '/users/cheaha-openldap.ldif'
 cheaha_ldapsearch_ldif = repo_location + '/users/cheaha-openldap-ldapsearch.ldif'
 
@@ -20,7 +21,7 @@ parser.add_argument('-v', '--verbose', action='store_true', help='verbose output
 parser.add_argument('-n', '--dry-run', action='store_true', help='enable dry run mode')
 args = parser.parse_args()
 
-git = sh.git.bake(repo_location)
+git = sh.git.bake('-C', repo_location)
 slapcat = sh.Command('/cm/local/apps/openldap/sbin/slapcat')
 ldapsearch = sh.Command('ldapsearch')
 
