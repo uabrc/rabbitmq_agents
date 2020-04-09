@@ -2,6 +2,7 @@
 import sh
 import sys
 import json
+import argparse
 from rc_rmq import RCRMQ
 
 task = 'git_commit'
@@ -12,6 +13,12 @@ rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 repo_location = '~/git/rc-users'
 cheaha_ldif = repo_location + '/users/cheaha-openldap.ldif'
 cheaha_ldapsearch_ldif = repo_location + '/users/cheaha-openldap-ldapsearch.ldif'
+
+# Parse arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
+parser.add_argument('-n', '--dry-run', action='store_true', help='enable dry run mode')
+args = parser.parse_args()
 
 git = sh.git.bake(repo_location)
 slapcat = sh.Command('/cm/local/apps/openldap/sbin/slapcat')
