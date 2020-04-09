@@ -50,8 +50,10 @@ def git_commit(ch, method, properties, body):
         git.add(cheaha_ldif)
         git.add(cheaha_ldapsearch_ldif)
         git.commit(m="Added new cheaha user: " + username)
-        git.push('origin', branch_name)
         git.checkout('master')
+
+        git.merge(branch_name, '--no-ff', '--no-edit')
+        git.push('origin', 'master')
 
         success = True
     except:
