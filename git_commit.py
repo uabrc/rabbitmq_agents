@@ -11,9 +11,12 @@ task = 'git_commit'
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
+# Define some location
 repo_location = os.path.expanduser('~/git/rc-users')
 cheaha_ldif = repo_location + '/users/cheaha-openldap.ldif'
 cheaha_ldapsearch_ldif = repo_location + '/users/cheaha-openldap-ldapsearch.ldif'
+slapcat_bin = '/cm/local/apps/openldap/sbin/slapcat'
+slapd_conf = '/cm/local/apps/openldap/etc/slapd.conf'
 
 # Parse arguments
 parser = argparse.ArgumentParser()
@@ -22,7 +25,7 @@ parser.add_argument('-n', '--dry-run', action='store_true', help='enable dry run
 args = parser.parse_args()
 
 git = sh.git.bake('-C', repo_location)
-slapcat = sh.Command('/cm/local/apps/openldap/sbin/slapcat')
+slapcat = sh.Command(slapcat_bin)
 ldapsearch = sh.Command('ldapsearch')
 
 def git_commit(ch, method, properties, body):
@@ -40,7 +43,7 @@ def git_commit(ch, method, properties, body):
 
         with open(cheaha_ldif, 'w') as ldif_f,\
             open(cheaha_ldapsearch_ldif, 'w') as ldapsearch_ldif_f:
-            slapcat('-f', '/cm/local/apps/openldap/etc/slapd.conf', '-b', "'dc=cm,dc=cluster'", _out=ldif_f)
+            slapcat('-f', slapd_conf, '-b', "'dc=cm,dc=cluster'", _out=ldif_f)
             ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "'dc=cm,dc=cluster'", _out=ldapsearch_ldif_f)
 
         git.diff()
