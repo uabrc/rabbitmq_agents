@@ -28,45 +28,28 @@ def git_commit(ch, method, properties, body):
     msg = json.loads(body)
     username = msg['username']
     ticketnum = msg.get('ticketnum', 'add-users-' + username.lower())
-    DEBUG = msg.get('debug', False)
     success = False
     branch_name = 'issue-' + ticketnum
 
     try:
 
-        if DEBUG:
-            print('[{}]: git checkout master'.format(task))
-            print('[{}]: git pull'.format(task))
-            print('[{}]: git checkout -b {}'.format(task, branch_name))
-            print('[{}]: /cm/local/apps/openldap/sbin/slapcat\\'.format(task))
-            print("\t-f /cm/local/apps/openldap/etc/slapd.conf -b 'dc=cm,dc=cluster' > {}".format(cheaha_ldif))
-            print('[{}]: ldapsearch\\'.format(task))
-            print("\t-LLL -x -h ldapserver -b 'dc=cm,dc=cluster'".format(cheaha_ldapsearch_ldif))
-            print('[{}]: git add {}'.format(task, cheaha_ldif))
-            print('[{}]: git add {}'.format(task, cheaha_ldapsearch_ldif))
-            print('[{}]: git commit -m "{}"'.format(task, "Added new cheaha user: " + username))
-            print('[{}]: git push origin'.format(task))
-            print('[{}]: git checkout master'.format(task))
-            print('[{}]: git pull'.format(task))
+        git.checkout('master')
+        git.pull()
+        git.checkout('-b', branch_name)
 
-        else:
-            git.checkout('master')
-            git.pull()
-            git.checkout('-b', branch_name)
+        with open(cheaha_ldif, 'w') as ldif_f,\
+            open(cheaha_ldapsearch_ldif, 'w') as ldapsearch_ldif_f:
+            slapcat('-f', '/cm/local/apps/openldap/etc/slapd.conf', '-b', "'dc=cm,dc=cluster'", _out=ldif_f)
+            ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "'dc=cm,dc=cluster'", _out=ldapsearch_ldif_f)
 
-            with open(cheaha_ldif, 'w') as ldif_f,\
-                open(cheaha_ldapsearch_ldif, 'w') as ldapsearch_ldif_f:
-                slapcat('-f', '/cm/local/apps/openldap/etc/slapd.conf', '-b', "'dc=cm,dc=cluster'", _out=ldif_f)
-                ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "'dc=cm,dc=cluster'", _out=ldapsearch_ldif_f)
-
-            git.diff()
-            git.add(cheaha_ldif)
-            git.add(cheaha_ldapsearch_ldif)
-            git.commit(m="Added new cheaha user: " + username)
-            git.push('origin', branch_name)
-            git.checkout('master')
-            time.sleep(60)
-            git.pull()
+        git.diff()
+        git.add(cheaha_ldif)
+        git.add(cheaha_ldapsearch_ldif)
+        git.commit(m="Added new cheaha user: " + username)
+        git.push('origin', branch_name)
+        git.checkout('master')
+        time.sleep(60)
+        git.pull()
 
         success = True
     except:
@@ -77,7 +60,6 @@ def git_commit(ch, method, properties, body):
     rc_rmq.publish_msg({
         'routing_key': 'confirm.' + username,
         'msg': {
-            'debug': DEBUG,
             'task': task,
             'success': success
         }
