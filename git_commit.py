@@ -117,7 +117,7 @@ def git_commit(ch, method, properties, body):
 logger.info("Start listening to queue: %s", task)
 rc_rmq.start_consume({
     'queue': task,
-    'routing_key': "git.*",
+    'routing_key': "verify.*",
     'cb': git_commit
 })
 
