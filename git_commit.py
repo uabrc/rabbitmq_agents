@@ -52,8 +52,6 @@ def git_commit(ch, method, properties, body):
         git.commit(m="Added new cheaha user: " + username)
         git.push('origin', branch_name)
         git.checkout('master')
-        time.sleep(60)
-        git.pull()
 
         success = True
     except:
