@@ -1,3 +1,4 @@
+import argparse
 from rc_rmq import RCRMQ
 import json
 
@@ -41,3 +42,10 @@ def consume(username, callback, debug=False):
         })
   
     return { 'success' : True }
+
+def get_args():
+    # Parse arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
+    parser.add_argument('-n', '--dry-run', action='store_true', help='enable dry run mode')
+    return parser.parse_args()
