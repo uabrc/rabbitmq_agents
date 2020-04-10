@@ -27,7 +27,7 @@ def bright_account_create(ch, method, properties, body):
 
         #popen(cmd)
         print(cmd)
-        success = true
+        success = True
     except:
         e = sys.exc_info()[0]
         print("[{}]: Error: {}".format(task, e))
