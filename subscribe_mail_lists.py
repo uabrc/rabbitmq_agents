@@ -18,7 +18,7 @@ def mail_list_subscription(ch, method, properties, body):
     print("Received msg {}".format(msg))
     username = msg['username']
     fullname = msg['fullname']
-    user_email = msg['email']
+    email = msg['email']
 
     mail_list_admin = 'admin@uab.edu' #change this during deploy
     mail_list = 'LISTSERV@LISTSERV.UAB.EDU'
