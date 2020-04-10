@@ -28,6 +28,7 @@ def mail_list_subscription(ch, method, properties, body):
     listserv_cmd['hpc_users'] = f'QUIET ADD hpc-users {email} {fullname}'
 
     print("Adding user{} to mail list".format(username))
+    success = False
     try:
         # Create a text/plain message
         email_msg = EmailMessage()
@@ -45,6 +46,7 @@ def mail_list_subscription(ch, method, properties, body):
             print(email_msg)
 
         s.quit()
+        success = True
     except:
         e = sys.exc_info()[0]
         print("[{}]: Error: {}".format(task, e))    
