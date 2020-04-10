@@ -41,6 +41,8 @@ def task_manager(ch, method, properties, body):
         current['uid'] = msg.get('uid', -1)
         current['gid'] = msg.get('gid', -1)
         current['email'] = msg.get('email', '')
+    else:
+        current = tracking[username]
 
     try:
     # Check each level
@@ -82,6 +84,7 @@ def task_manager(ch, method, properties, body):
                 'gid': current['gid']
             }
         })
+
 
 print("Start listening to queue: {}".format(task))
 rc_rmq.start_consume({
