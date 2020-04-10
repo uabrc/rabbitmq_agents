@@ -11,14 +11,20 @@ rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 # Define your callback function
 def log_user_reg_events(ch, method, properties, body):
 
-    # Retrieve routing key
-    routing_key = method.routing_key
-    print(routing_key)
     # Retrieve message
     msg = json.loads(body)
-    print(msg)
-    # Do Something
-    print('[{}]: Callback called.'.format(task))
+    #print(msg)
+
+    # Retrieve routing key
+    routing_key = method.routing_key
+    action = routing_key.split(".")[0]
+    user = routing_key.split(".")[1]
+    if action != 'confirm':
+        print(f'Got a message for {user}: {routing_key}')
+    else:
+        task = msg['task']
+        status = msg['success']
+        print(f'Task {task} completed?: {status}')
 
     # Acknowledge message
     ch.basic_ack(delivery_tag=method.delivery_tag)
