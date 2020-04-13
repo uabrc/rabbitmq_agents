@@ -4,6 +4,7 @@ import json
 import ldap
 import logging
 import argparse
+import rc_util
 from os import popen
 from rc_rmq import RCRMQ
 
@@ -12,24 +13,10 @@ task = 'get_next_uid_gid'
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
-# Parse arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
-parser.add_argument('-n', '--dry-run', action='store_true', help='enable dry run mode')
-args = parser.parse_args()
-
-#Default Log level
-log_lvl = logging.WARNING
-
-if args.verbose:
-   log_lvl = logging.DEBUG
-if args.dry_run:
-   log_lvl = logging.INFO
+args = rc_util.get_args()
 
 # Logger
-logging.basicConfig(format='%(asctime)s %(levelname)s [%(module)s] - %(message)s', level=log_lvl)
-logger = logging.getLogger(__name__)
-
+logger = rc_util.get_logger()
 
 #Check if the username already exists via LDAP
 def user_exists(username):
