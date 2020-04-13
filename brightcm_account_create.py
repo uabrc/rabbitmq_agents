@@ -3,6 +3,7 @@ import sys
 import json
 import logging
 import argparse
+import rc_util
 from os import popen
 from rc_rmq import RCRMQ
 
@@ -12,22 +13,10 @@ task = 'bright_account'
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
 # Parse arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
-parser.add_argument('-n', '--dry-run', action='store_true', help='enable dry run mode')
-args = parser.parse_args()
-
-#Default Log level
-log_lvl = logging.WARNING
-
-if args.verbose:
-   log_lvl = logging.DEBUG
-if args.dry_run:
-   log_lvl = logging.INFO
+args = rc_util.get_args()
 
 # Logger
-logging.basicConfig(format='%(asctime)s %(levelname)s [%(module)s] - %(message)s', level=log_lvl)
-logger = logging.getLogger(__name__)
+logger = rc_util.get_logger()
 
 # Define your callback function
 def bright_account_create(ch, method, properties, body):
