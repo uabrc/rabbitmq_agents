@@ -9,12 +9,14 @@ from datetime import datetime
 # Define queue name 
 task = 'reg_logger'
 
-# Instantiate logging object 
-logging.basicConfig(format='%(asctime)s[%(levelname)s] - %(message)s', level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 # Instantiate rabbitmq object
 reg_logger = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
+
+# Parse arguments
+args = rc_util.get_args()
+
+# Logger
+logger = rc_util.get_logger()
 
 # Open registry table in DB
 db = dataset.connect('sqlite:///reg_logger.db')
