@@ -4,6 +4,7 @@ import sys
 import dataset
 import logging
 from rc_rmq import RCRMQ
+from datetime import datetime
 
 # Define queue name 
 task = 'reg_logger'
@@ -24,6 +25,7 @@ def log_registration(ch, method, properties, body):
 
     account_req = json.loads(body)
     table.insert(account_req)
+    account_req['req_time'] = datetime.now(),
     logger.info("logged account request for %s", account_req['username'])
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
