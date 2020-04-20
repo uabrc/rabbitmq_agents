@@ -84,7 +84,7 @@ def task_manager(ch, method, properties, body):
     if done:
         # send trigger message
         rc_rmq.publish_msg({
-            'routing_key': routing_key
+            'routing_key': routing_key,
             'msg': {
                 'username': username,
                 'email': current['email'],
