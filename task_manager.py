@@ -21,6 +21,9 @@ record = {
     'verify': {
         'git_commit': None,
         'dir_verify': None
+    },
+    'notify': {
+        'notify_user': None
     }
 }
 
@@ -68,6 +71,11 @@ def task_manager(ch, method, properties, body):
             for status in current['verify'].values():
                 if status is not True:
                     done = False
+
+        elif task_name in current['notify']:
+            current['verify'][task_name] = success
+            routing_key = 'complete.' + username
+            done = success
 
     except:
         e = sys.exc_info()[0]
