@@ -73,8 +73,6 @@ def git_commit(ch, method, properties, body):
             ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "'ou=Group,dc=cm,dc=cluster'", f"cn={username}", _out=ldif_g)
         logger.info('user ldif files generated.')
 
-        logger.debug('git diff')
-        git.diff()
         logger.debug('git add %s', user_ldif)
         git.add(user_ldif)
         logger.debug('git add %s', group_ldif)
