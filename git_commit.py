@@ -14,7 +14,8 @@ rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
 # Define some location
 repo_location = os.path.expanduser('~/git/rc-users')
-cheaha_ldapsearch_ldif = repo_location + '/users/cheaha-openldap-ldapsearch.ldif'
+users_dir = repo_location + '/users'
+groups_dir = repo_location + '/groups'
 
 # Default logger level
 logger_lvl = logging.WARNING
@@ -47,6 +48,8 @@ def git_commit(ch, method, properties, body):
     ticketnum = msg.get('ticketnum', 'add-users-' + username.lower())
     success = False
     branch_name = 'issue-' + ticketnum
+    user_ldif = users_dir + f'/{username}.ldif'
+    group_ldif = groups_dir + f'/{username}.ldif'
 
     logger.info("Received: %s", msg)
     logger.debug("ticketnum: %s", ticketnum)
@@ -61,16 +64,21 @@ def git_commit(ch, method, properties, body):
         logger.debug('git checkout -b %s', branch_name)
         git.checkout('-b', branch_name)
 
-        logger.debug("open(%s, 'w')", cheaha_ldapsearch_ldif)
-        with open(cheaha_ldapsearch_ldif, 'w') as ldapsearch_ldif_f:
-            logger.debug("ldapsearch -LLL -x -h ldapserver -b 'dc=cm,dc=cluster' > %s", ldapsearch_ldif)
-            ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "'dc=cm,dc=cluster'", _out=ldapsearch_ldif_f)
-        logger.info('ldif files generated.')
+        logger.debug("open(%s, 'w'), open(%s, 'w')", user_ldif, group_ldif)
+        with open(user_ldif, 'w') as ldif_u,\
+            open(group_ldif, 'w') as ldif_g:
+            logger.debug(f"ldapsearch -LLL -x -h ldapserver -b 'dc=cm,dc=cluster' uid={username} > {user_ldif}")
+            ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "'dc=cm,dc=cluster'", f"uid={username}", _out=ldif_u)
+            logger.debug(f"ldapsearch -LLL -x -h ldapserver -b 'ou=Group,dc=cm,dc=cluster' cn={username} > {group_ldif}")
+            ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "'ou=Group,dc=cm,dc=cluster'", f"cn={username}", _out=ldif_g)
+        logger.info('user ldif files generated.')
 
         logger.debug('git diff')
         git.diff()
-        logger.debug('git add %s', cheaha_ldapsearch_ldif)
-        git.add(cheaha_ldapsearch_ldif)
+        logger.debug('git add %s', user_ldif)
+        git.add(user_ldif)
+        logger.debug('git add %s', group_ldif)
+        git.add(group_ldif)
         logger.debug("git commit -m 'Added new cheaha user: %s'", branch_name)
         git.commit(m="Added new cheaha user: " + username)
         logger.debug('git checkout master')
@@ -82,7 +90,7 @@ def git_commit(ch, method, properties, body):
         git.push('origin', 'master')
         # merge with gitlab api
 
-        logger.info('updated ldif files and committed to git repo')
+        logger.info('Added ldif files and committed to git repo')
 
         success = True
     except Exception as exception:
