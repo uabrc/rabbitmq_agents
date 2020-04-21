@@ -77,7 +77,7 @@ def git_commit(ch, method, properties, body):
         git.add(user_ldif)
         logger.debug('git add %s', group_ldif)
         git.add(group_ldif)
-        logger.debug("git commit -m 'Added new cheaha user: %s'", branch_name)
+        logger.debug("git commit -m 'Added new cheaha user: %s'", username)
         git.commit(m="Added new cheaha user: " + username)
         logger.debug('git checkout master')
         git.checkout('master')
