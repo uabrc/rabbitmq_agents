@@ -14,10 +14,7 @@ rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
 # Define some location
 repo_location = os.path.expanduser('~/git/rc-users')
-cheaha_ldif = repo_location + '/users/cheaha-openldap.ldif'
 cheaha_ldapsearch_ldif = repo_location + '/users/cheaha-openldap-ldapsearch.ldif'
-slapcat_bin = '/cm/local/apps/openldap/sbin/slapcat'
-slapd_conf = '/cm/local/apps/openldap/etc/slapd.conf'
 
 # Default logger level
 logger_lvl = logging.WARNING
@@ -33,12 +30,10 @@ if args.verbose:
 
 if not args.dry_run:
     git = sh.git.bake('-C', repo_location)
-    slapcat = sh.Command(slapcat_bin)
     ldapsearch = sh.Command('ldapsearch')
 else:
     logger_lvl = logging.INFO
     git = sh.echo.bake('git', '-C', repo_location)
-    slapcat = sh.echo.bake(slapcat_bin)
     ldapsearch = sh.echo.bake('ldapsearch')
 
 # Logger
@@ -66,19 +61,14 @@ def git_commit(ch, method, properties, body):
         logger.debug('git checkout -b %s', branch_name)
         git.checkout('-b', branch_name)
 
-        logger.debug("open(%s, 'w'), open(%s, 'w')", cheaha_ldif, cheaha_ldapsearch_ldif)
-        with open(cheaha_ldif, 'w') as ldif_f,\
-            open(cheaha_ldapsearch_ldif, 'w') as ldapsearch_ldif_f:
-            logger.debug("%s -f %s -b 'dc=cm,dc=cluster' > %s", slapcat_bin, slapcat_config, cheaha_ldif)
-            slapcat('-f', slapd_conf, '-b', "'dc=cm,dc=cluster'", _out=ldif_f)
+        logger.debug("open(%s, 'w')", cheaha_ldapsearch_ldif)
+        with open(cheaha_ldapsearch_ldif, 'w') as ldapsearch_ldif_f:
             logger.debug("ldapsearch -LLL -x -h ldapserver -b 'dc=cm,dc=cluster' > %s", ldapsearch_ldif)
             ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "'dc=cm,dc=cluster'", _out=ldapsearch_ldif_f)
         logger.info('ldif files generated.')
 
         logger.debug('git diff')
         git.diff()
-        logger.debug('git add %s', cheaha_ldif)
-        git.add(cheaha_ldif)
         logger.debug('git add %s', cheaha_ldapsearch_ldif)
         git.add(cheaha_ldapsearch_ldif)
         logger.debug("git commit -m 'Added new cheaha user: %s'", branch_name)
