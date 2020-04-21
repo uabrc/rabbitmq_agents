@@ -3,37 +3,12 @@ import sys
 import json
 import smtplib
 from rc_rmq import RCRMQ
+from jinja2 import Template
+import mail
 
 task = 'notify_user'
 
-# Some variable for email
 DEBUG = False
-passwd_str = '<Your BlazerID/XIAS Password>'
-hpcsrv = 'cheaha.rc.uab.edu'
-# idmap_srv = 'cheaha.rc.uab.edu'
-# idmap = '/home/useradmin/.useridmap'
-signature = 'UAB IT Research Computing'
-my_email = 'mhanby@uab.edu'
-info_url = 'http://docs.uabgrid.uab.edu/wiki/Cheaha'
-quickstart_url = 'https://docs.uabgrid.uab.edu/wiki/Cheaha_Quick_Start'
-# matlab_url = 'http://docs.uabgrid.uab.edu/wiki/MatLab_DCS'
-helpdesk_url = 'https://uabprod.service-now.com/ess_portal/' # Once we get a real helpdesk, change to URL instead of email
-support_email = 'askit@uab.edu'
-loginwiki_url = 'http://docs.uabgrid.uab.edu/wiki/Cheaha_GettingStarted#Login'
-queuewiki_url = 'https://docs.uabgrid.uab.edu/wiki/Slurm'
-# Old Mailman HPC mailing list
-# hpclist_url = 'http://lists.it.uab.edu/mailman/listinfo/hpcusers'
-# hpclist_email = 'hpcusers-subscribe@lists.it.uab.edu'
-# New Sympa based mailing lists
-mailinglist_admin = 'mhanby@uab.edu'
-mailinglist_email = 'LISTSERV@LISTSERV.UAB.EDU'
-#mailinglist_email = 'sympa@vo.uabgrid.uab.edu'
-#hpcannounce_url = 'http://vo.uabgrid.uab.edu/sympa/info/hpc-announce'
-hpcannounce_email = 'HPC-ANNOUNCE@LISTSERV.UAB.EDU'
-#hpcusers_url = 'http://vo.uabgrid.uab.edu/sympa/info/hpc-users'
-hpcusers_email = 'HPC-USERS@LISTSERV.UAB.EDU'
-ticket_url = 'https://gitlab.rc.uab.edu/mhanby/rc-users/issues'
-
 
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
@@ -67,45 +42,7 @@ def notify_user(ch, method, properties, body):
     user_email = msg['email']
     success = False
 
-    email_body = f"""
-Your account has been set up on {hpcsrv}
-
-====================================
-User ID:  {username}
-Password: {passwd_str}
-====================================
-
-Important: You are responsible for backing up your files on Cheaha! The following storage locations are available:
-* $HOME - /home/$USER - 20G quota per user
-* $USER_DATA - /data/user/$USER - 5TB quota per user
-* $USER_SCRATCH - /data/scratch/$USER - 500TB shared amongst ALL users
-
-DO NOT compute out of $HOME, all computation must be done on the fast storage that is $USER_DATA and $USER_SCRATCH
-
-Please read the information available on our Wiki pages, especially the Cheaha Quick Start:
-
-Cheaha Quick Start
- {quickstart_url}
-Additional Cluster Login Instructions
- {loginwiki_url}
-Job Queuing information and examples
- {queuewiki_url}
-General information about Cheaha
- {info_url}
-
-If you encounter a problem or have any questions, please send a detailed email to: {support_email}
-
-You have been subscribed to two important email lists:
- * hpc-announce : Important HPC related announcements are sent via this list, please read
-     all emails from {hpcannounce_email}
- * hpc-users : This email list can be used by all HPC users to discuss anything
-     related to our HPC environment by sending email to {hpcusers_email}
-
- Regards,
-
-{signature}
-{helpdesk_url}
-"""
+    email_body = Template(mail.body).render(username=username)
 
     try:
         #Send email to user
