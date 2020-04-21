@@ -24,7 +24,8 @@ record = {
     },
     'notify': {
         'notify_user': None
-    }
+    },
+    'delivery_tags': []
 }
 
 # Currently tracking users
@@ -46,6 +47,9 @@ def task_manager(ch, method, properties, body):
         current['email'] = msg.get('email', '')
     else:
         current = tracking[username]
+
+    # save the delivery tags for future use
+    current['delivery_tags'].append(method.delivery_tag)
 
     try:
     # Check each level
@@ -82,6 +86,11 @@ def task_manager(ch, method, properties, body):
         print("[{}]: Error: {}".format(task, e))
 
     if done:
+        # acknowledge all message from last level
+        for tag in current['delivery_tags']:
+            ch.basic_ack(tag)
+        current['delivery_tags'] = []
+
         # send trigger message
         rc_rmq.publish_msg({
             'routing_key': routing_key,
