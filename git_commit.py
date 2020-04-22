@@ -3,8 +3,7 @@ import os
 import sh
 import sys
 import json
-import argparse
-import logging
+import rc_util
 from rc_rmq import RCRMQ
 
 task = 'git_commit'
@@ -17,17 +16,8 @@ repo_location = os.path.expanduser('~/git/rc-users')
 users_dir = repo_location + '/users'
 groups_dir = repo_location + '/groups'
 
-# Default logger level
-logger_lvl = logging.WARNING
-
-# Parse arguments
-parser = argparse.ArgumentParser()
-parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
-parser.add_argument('-n', '--dry-run', action='store_true', help='enable dry run mode')
-args = parser.parse_args()
-
-if args.verbose:
-    logger_lvl = logging.DEBUG
+args = rc_util.get_args()
+logger = rc_util.get_logger(args)
 
 if not args.dry_run:
     git = sh.git.bake('-C', repo_location)
@@ -36,11 +26,6 @@ else:
     logger_lvl = logging.INFO
     git = sh.echo.bake('git', '-C', repo_location)
     ldapsearch = sh.echo.bake('ldapsearch')
-
-# Logger
-logging.basicConfig(format='%(asctime)s [%(module)s] - %(message)s', level=logger_lvl)
-logger = logging.getLogger(__name__)
-
 
 def git_commit(ch, method, properties, body):
     msg = json.loads(body)
