@@ -1,7 +1,7 @@
 # Some variable for email
 Server = 'localhost'
-My_email = 'admin@localhost'
-Sender = 'ADMIN@LISTSERV.LOCALHOST'
+My_email = 'root@localhost'
+Sender = 'ROOT@LOCALHOST'
 Sender_alias = 'Services'
 Subject = 'New User Account'
 Info_url = 'https://www.google.com'

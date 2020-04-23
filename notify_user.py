@@ -5,7 +5,7 @@ import rc_util
 import smtplib
 from rc_rmq import RCRMQ
 from jinja2 import Template
-import mail
+import mail_config as mail_cfg
 
 task = 'notify_user'
 
