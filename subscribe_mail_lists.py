@@ -28,7 +28,7 @@ def mail_list_subscription(ch, method, properties, body):
     fullname = msg['fullname']
     email = msg['email']
 
-    mail_list_admin = 'admin@uab.edu' #change this during deploy
+    mail_list_admin = 'root@localhost' #change this during deploy
     mail_list = 'LISTSERV@LISTSERV.UAB.EDU'
 
     listserv_cmd = {}
