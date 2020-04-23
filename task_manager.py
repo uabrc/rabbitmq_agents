@@ -55,13 +55,10 @@ def task_manager(ch, method, properties, body):
     else:
         current = tracking[username]
 
-    # save the delivery tags for future use
+    # Save the delivery tags for future use
     current['delivery_tags'].append(method.delivery_tag)
 
     try:
-    # Check each level
-    # task timeout
-    # failure agent(?
         if task_name in current['request']:
             current['request'][task_name] = success
             routing_key = 'create.' + username
@@ -100,14 +97,14 @@ def task_manager(ch, method, properties, body):
         logger.error('', exc_info=True)
 
     if done:
-        # acknowledge all message from last level
+        # Acknowledge all message from last level
         for tag in current['delivery_tags']:
             ch.basic_ack(tag)
         current['delivery_tags'] = []
 
         logger.debug('Previous level messages acknowledged')
 
-        # send trigger message
+        # Send trigger message
         rc_rmq.publish_msg({
             'routing_key': routing_key,
             'msg': {
