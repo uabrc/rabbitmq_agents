@@ -37,7 +37,8 @@ def bright_account_create(ch, method, properties, body):
         if not args.dry_run:
             popen(cmd)
         logger.info(f'Bright command to create user:{cmd}')
-        success = True
+        msg['task'] = task
+        msg['success'] = True
     except Exception:
         logger.exception("Fatal error:")
 
@@ -48,21 +49,9 @@ def bright_account_create(ch, method, properties, body):
     logger.debug('rc_rmq.publish_msg()')
     rc_rmq.publish_msg({
         'routing_key': 'confirm.' + username,
-        'msg': {
-            'task': task,
-            'success': success
-        }
+        'msg': msg
     })
     logger.info('confirmation sent')
-
-    if success:
-        # send create message to verify dir permissions agent
-        logger.debug(f'The task {task} finished successfully')
-        rc_rmq.publish_msg({
-            'routing_key': 'verify.' + username,
-            'msg': msg
-        })
-        logger.info('verify msg sent to next agent')
 
 logger.info("Start listening to queue: {}".format(task))
 rc_rmq.start_consume({
