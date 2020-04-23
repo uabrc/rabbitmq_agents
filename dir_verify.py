@@ -51,6 +51,8 @@ def dir_verify(ch, method, properties, body):
 
     logger.debug(f'User {username} confirmation sent')
 
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+
 
 logger.info(f'Start listening to queue: {task}')
 rc_rmq.start_consume({
