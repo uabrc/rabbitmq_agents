@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import json
+import rc_util
 import smtplib
 from rc_rmq import RCRMQ
 from jinja2 import Template
@@ -8,7 +9,8 @@ import mail
 
 task = 'notify_user'
 
-DEBUG = False
+args = rc_util.get_args()
+logger = rc_util.get_logger(args)
 
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
@@ -24,7 +26,7 @@ To: <{to}>
 Subject: {opts['subject']}
 {opts['body']}
 """
-    if DEBUG:
+    if args.dry_run:
         print(msg)
         return
 
@@ -47,7 +49,7 @@ def notify_user(ch, method, properties, body):
 
     try:
         #Send email to user
-        if DEBUG:
+        if args.dry_run:
             send_email('louistw@uab.edu', {
                 'from': support_email,
                 'from_alias': 'Research Computing Services',
@@ -64,11 +66,10 @@ def notify_user(ch, method, properties, body):
             })
 
         msg['success'] = True
-    except:
-        e = sys.exc_info()[0]
-        print("[{}]: Error: {}".format(task, e))
+    except Exception as exception:
+        logger.error('', exc_info=True)
 
-    if not DEBUG:
+    if not args.dry_run:
         # acknowledge the message
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -80,11 +81,12 @@ def notify_user(ch, method, properties, body):
 
 
 if __name__ == "__main__":
-    print("Start listening to queue: {}".format(task))
+    logger.info(f'Start listening to queue: {task}')
     rc_rmq.start_consume({
         'queue': task,
         'routing_key': "notify.*",
         'cb': notify_user
     })
 
+    logger.info('Disconnected')
     rc_rmq.disconnect()
