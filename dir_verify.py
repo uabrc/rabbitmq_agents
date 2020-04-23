@@ -18,7 +18,8 @@ rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 def dir_verify(ch, method, properties, body):
     msg = json.loads(body)
     username = msg['username']
-    success = False
+    msg['task'] = task
+    msg['success'] = False
 
     try:
         for d in dirs:
@@ -37,7 +38,7 @@ def dir_verify(ch, method, properties, body):
 
                     logger.debug(f'{path} created')
 
-        success = True
+        msg['success'] = True
 
     except Exception as exception:
         logger.error('', exc_info=True)
@@ -45,10 +46,7 @@ def dir_verify(ch, method, properties, body):
     # send confirm message
     rc_rmq.publish_msg({
         'routing_key': 'confirm.' + username,
-        'msg': {
-            'task': task,
-            'success': success
-        }
+        'msg': msg
     })
 
     logger.debug(f'User {username} confirmation sent')
