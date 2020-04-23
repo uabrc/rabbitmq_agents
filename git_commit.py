@@ -31,7 +31,8 @@ def git_commit(ch, method, properties, body):
     msg = json.loads(body)
     username = msg['username']
     ticketnum = msg.get('ticketnum', 'add-users-' + username.lower())
-    success = False
+    msg['task'] = task
+    msg['success'] = False
     branch_name = 'issue-' + ticketnum
     user_ldif = users_dir + f'/{username}.ldif'
     group_ldif = groups_dir + f'/{username}.ldif'
@@ -75,7 +76,7 @@ def git_commit(ch, method, properties, body):
 
         logger.info('Added ldif files and committed to git repo')
 
-        success = True
+        msg['success'] = True
     except Exception as exception:
         logger.error('', exc_info=True)
 
@@ -83,10 +84,7 @@ def git_commit(ch, method, properties, body):
     logger.debug('rc_rmq.publish_msge()')
     rc_rmq.publish_msg({
         'routing_key': 'confirm.' + username,
-        'msg': {
-            'task': task,
-            'success': success
-        }
+        'msg': msg
     })
     logger.info('confirmation sent')
 
