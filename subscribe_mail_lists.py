@@ -55,7 +55,8 @@ def mail_list_subscription(ch, method, properties, body):
             logging.info(f'This email will add user {username} to {key}\n{email_msg}')
 
         s.quit()
-        success = True
+        msg['task'] = task
+        msg['success'] = True
     except Exception:
         logger.exception("Fatal error:")
 
@@ -66,10 +67,7 @@ def mail_list_subscription(ch, method, properties, body):
     logger.debug('rc_rmq.publish_msg()')
     rc_rmq.publish_msg({
         'routing_key': 'confirm.' + username,
-        'msg': {
-            'task': task,
-            'success': success
-        }
+        'msg': msg
     })
     logger.info('confirmation sent')
 
