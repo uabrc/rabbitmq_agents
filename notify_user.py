@@ -30,9 +30,9 @@ Subject: {opts['subject']}
 
     smtp = smtplib.SMTP(opts['server'])
     if 'bcc' in opts:
-        smtp.sendmail(opts['from'], [to, opts['bcc']], messagge)
+        smtp.sendmail(opts['from'], [to, opts['bcc']], msg)
     else:
-        smtp.sendmail(opts['from'], [to], messagge)
+        smtp.sendmail(opts['from'], [to], msg)
 
 
 # Email instruction to user
