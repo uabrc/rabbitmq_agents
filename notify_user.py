@@ -15,28 +15,6 @@ logger = rc_util.get_logger(args)
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
-def send_email(to, opts=None):
-    opts['server'] = opts.get('server', 'localhost')
-    opts['from'] = opts.get('from', 'SUPPORT@LISTSERV.UAB.EDU')
-    opts['from_alias'] = opts.get('from_alias', 'Research Computing Services')
-    opts['subject'] = opts.get('subject', 'HPC New User Account')
-
-    msg = f"""From: {opts['from_alias']} <{opts['from']}>
-To: <{to}>
-Subject: {opts['subject']}
-{opts['body']}
-"""
-    if args.dry_run:
-        print(msg)
-        return
-
-    smtp = smtplib.SMTP(opts['server'])
-    if 'bcc' in opts:
-        smtp.sendmail(opts['from'], [to, opts['bcc']], msg)
-    else:
-        smtp.sendmail(opts['from'], [to], msg)
-
-
 # Email instruction to user
 def notify_user(ch, method, properties, body):
     msg = json.loads(body)
@@ -45,25 +23,17 @@ def notify_user(ch, method, properties, body):
     msg['task'] = task
     msg['success'] = False
 
-    email_body = Template(mail.body).render(username=username)
-
     try:
         #Send email to user
+        receiver = [user_mail, mail_cfg.My_mail]
+        message = Template(mail_cfg.Whole_mail).render(username=username, to=user_email)
+
         if args.dry_run:
-            send_email('louistw@uab.edu', {
-                'from': support_email,
-                'from_alias': 'Research Computing Services',
-                'subject': f'[TEST] New User Account on {hpcsrv}',
-                'body': email_body
-            })
+            logger.info("smtp.sendmail(sender, receiver, message)")
 
         else:
-            send_email(user_email, {
-                'from': support_email,
-                'from_alias': 'Research Computing Services',
-                'subject': f'New User Account on {hpcsrv}',
-                'body': email_body
-            })
+            smtp = smtplib.SMTP(mail_cfg.Server)
+            smtp.sendmail(sender, receiver, message)
 
         msg['success'] = True
     except Exception as exception:
