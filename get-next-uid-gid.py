@@ -42,25 +42,21 @@ def get_next_uid_gid(ch, method, properties, body):
 
     # Determine next available UID
     try:
-        #if user_exists(username):
-        if False:
+        if user_exists(username):
             logger.info("The user, {} already exists".format(username))
-            sys.exit(1)
+            msg['uid'] = result[0][1]['uidNumber'][0].decode('utf-8')
+            msg['gid'] = result[0][1]['gidNumber'][0].decode('utf-8')
 
-        cmd_uid = "/usr/bin/getent passwd | \
-            awk -F: '($3>10000) && ($3<20000) && ($3>maxuid) { maxuid=$3; } END { print maxuid+1; }'"
-        if not args.dry_run:
+        else:
+            cmd_uid = "/usr/bin/getent passwd | \
+                awk -F: '($3>10000) && ($3<20000) && ($3>maxuid) { maxuid=$3; } END { print maxuid+1; }'"
             msg['uid'] = popen(cmd_uid).read().rstrip()
+            logger.info(f"UID query: {cmd_uid}")
 
-        logger.info(f"UID query: {cmd_uid}")
-
-        cmd_gid = "/usr/bin/getent group | \
-            awk -F: '($3>10000) && ($3<20000) && ($3>maxgid) { maxgid=$3; } END { print maxgid+1; }'"
-        if not args.dry_run:
+            cmd_gid = "/usr/bin/getent group | \
+                awk -F: '($3>10000) && ($3<20000) && ($3>maxgid) { maxgid=$3; } END { print maxgid+1; }'"
             msg['gid'] = popen(cmd_gid).read().rstrip()
-
-        logger.info(f"GID query: {cmd_gid}")
-        success = True
+            logger.info(f"GID query: {cmd_gid}")
     except Exception:
         logger.exception("Fatal error:")
 
