@@ -39,15 +39,14 @@ def notify_user(ch, method, properties, body):
     except Exception as exception:
         logger.error('', exc_info=True)
 
-    if not args.dry_run:
-        # acknowledge the message
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+    # acknowledge the message
+    ch.basic_ack(delivery_tag=method.delivery_tag)
 
-        # send confirm message
-        rc_rmq.publish_msg({
-            'routing_key': 'confirm.' + username,
-            'msg': msg
-        })
+    # send confirm message
+    rc_rmq.publish_msg({
+        'routing_key': 'confirm.' + username,
+        'msg': msg
+    })
 
 
 if __name__ == "__main__":
