@@ -40,7 +40,8 @@ def notify_user(ch, method, properties, body):
     msg = json.loads(body)
     username = msg['username']
     user_email = msg['email']
-    success = False
+    msg['task'] = task
+    msg['success'] = False
 
     email_body = Template(mail.body).render(username=username)
 
@@ -62,7 +63,7 @@ def notify_user(ch, method, properties, body):
                 'body': email_body
             })
 
-        success = True
+        msg['success'] = True
     except:
         e = sys.exc_info()[0]
         print("[{}]: Error: {}".format(task, e))
@@ -74,10 +75,7 @@ def notify_user(ch, method, properties, body):
         # send confirm message
         rc_rmq.publish_msg({
             'routing_key': 'confirm.' + username,
-            'msg': {
-                'task': task,
-                'success': success
-            }
+            'msg': msg
         })
 
 
