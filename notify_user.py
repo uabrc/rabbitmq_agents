@@ -68,14 +68,15 @@ def notify_user(ch, method, properties, body):
     except Exception as exception:
         logger.error('', exc_info=True)
 
-    # send confirm message
+    # Send confirm message
     rc_rmq.publish_msg({
         'routing_key': 'confirm.' + username,
         'msg': msg
     })
 
-    # acknowledge the message
+    # Acknowledge the message
     ch.basic_ack(delivery_tag=method.delivery_tag)
+
 
 if __name__ == "__main__":
     logger.info(f'Start listening to queue: {task}')
