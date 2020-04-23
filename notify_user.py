@@ -3,14 +3,19 @@ import sys
 import json
 import rc_util
 import smtplib
+import dataset
 from rc_rmq import RCRMQ
 from jinja2 import Template
+from datetime import datetime
 import mail_config as mail_cfg
 
 task = 'notify_user'
 
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)
+
+db = dataset.connect(f'sqlite:///.agent_db/{task}.db')
+table = db['notified_user']
 
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
@@ -24,16 +29,40 @@ def notify_user(ch, method, properties, body):
     msg['success'] = False
 
     try:
-        #Send email to user
-        receiver = [user_mail, mail_cfg.My_mail]
-        message = Template(mail_cfg.Whole_mail).render(username=username, to=user_email)
 
-        if args.dry_run:
-            logger.info("smtp.sendmail(sender, receiver, message)")
+        # Search username in database
+        record = table.find_one(username=username)
+
+        if record:
+            # Update counter
+            count = record['count']
+            table.update({'username': username, 'count': count + 1}, ['username'])
+
+            logger.debug(f'User {username} counter updated to {count + 1}')
 
         else:
-            smtp = smtplib.SMTP(mail_cfg.Server)
-            smtp.sendmail(sender, receiver, message)
+            # Send email to user
+            receiver = [user_mail, mail_cfg.My_mail]
+            message = Template(mail_cfg.Whole_mail).render(username=username, to=user_email)
+
+            if args.dry_run:
+                logger.info(f'smtp = smtplib.SMTP({mail_cfg.Server})')
+                logger.info(f'smtp.sendmail({sender}, {receiver}, message)')
+                logger.info(f"table.insert({'username': {username}, 'count': 1, 'sent_at': {datetime.now()}})")
+
+            else:
+                smtp = smtplib.SMTP(mail_cfg.Server)
+                smtp.sendmail(sender, receiver, message)
+
+                logger.debug(f'Email sent to: {user_email}')
+
+                table.insert({
+                    'username': username,
+                    'count': 1,
+                    'sent_at': datetime.now()
+                })
+
+                logger.debug(f'User {username} inserted into database')
 
         msg['success'] = True
     except Exception as exception:
