@@ -74,6 +74,8 @@ def notify_user(ch, method, properties, body):
         'msg': msg
     })
 
+    logger.debug(f'User {username} confirmation sent')
+
     # Acknowledge the message
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
