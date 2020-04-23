@@ -57,6 +57,8 @@ def get_next_uid_gid(ch, method, properties, body):
                 awk -F: '($3>10000) && ($3<20000) && ($3>maxgid) { maxgid=$3; } END { print maxgid+1; }'"
             msg['gid'] = popen(cmd_gid).read().rstrip()
             logger.info(f"GID query: {cmd_gid}")
+        msg['task'] = task
+        msg['success'] = True
     except Exception:
         logger.exception("Fatal error:")
 
@@ -67,20 +69,9 @@ def get_next_uid_gid(ch, method, properties, body):
     logger.debug('rc_rmq.publish_msg()')
     rc_rmq.publish_msg({
         'routing_key': 'confirm.' + username,
-        'msg': {
-            'task': task,
-            'success': success
-        }
+        'msg': msg
     })
     logger.info('confirmation sent')
-
-    if success:
-        # Send create message to BrightCM agent
-        logger.info(f'The task {task} finished, sending create msg to next queue')
-        rc_rmq.publish_msg({
-            'routing_key': 'create.' + username,
-            'msg': msg
-        })
 
 logger.info("Start listening to queue: {}".format(task))
 rc_rmq.start_consume({
