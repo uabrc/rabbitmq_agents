@@ -97,13 +97,6 @@ def task_manager(ch, method, properties, body):
         logger.error('', exc_info=True)
 
     if done:
-        # Acknowledge all message from last level
-        for tag in current['delivery_tags']:
-            ch.basic_ack(tag)
-        current['delivery_tags'] = []
-
-        logger.debug('Previous level messages acknowledged')
-
         # Send trigger message
         rc_rmq.publish_msg({
             'routing_key': routing_key,
@@ -116,6 +109,13 @@ def task_manager(ch, method, properties, body):
         })
 
         logger.debug(f"Trigger message '{routing_key}' sent")
+
+        # Acknowledge all message from last level
+        for tag in current['delivery_tags']:
+            ch.basic_ack(tag)
+        current['delivery_tags'] = []
+
+        logger.debug('Previous level messages acknowledged')
 
 
 logger.info(f'Start listening to queue: {task}')
