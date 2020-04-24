@@ -16,7 +16,7 @@ rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 args = rc_util.get_args()
 
 # Logger
-logger = rc_util.get_logger()# Define your callback function
+logger = rc_util.get_logger()
 
 # Parse arguments
 args = rc_util.get_args()
