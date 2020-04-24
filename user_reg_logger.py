@@ -2,7 +2,7 @@
 import json
 import sys
 import dataset
-import logging
+import rc_util
 from rc_rmq import RCRMQ
 from datetime import datetime
 
@@ -10,7 +10,13 @@ from datetime import datetime
 task = 'reg_logger'
 
 # Instantiate rabbitmq object
-reg_logger = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
+rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
+
+# Parse arguments
+args = rc_util.get_args()
+
+# Logger
+logger = rc_util.get_logger()# Define your callback function
 
 # Parse arguments
 args = rc_util.get_args()
@@ -35,7 +41,7 @@ def log_registration(ch, method, properties, body):
 logger.info("Start listening to queue: {}".format(task))
 
 # Start consuming messages from queue with callback function
-reg_logger.start_consume({
+rc_rmq.start_consume({
   'queue': task,
   'routing_key': "create.*",
   'cb': log_registration
