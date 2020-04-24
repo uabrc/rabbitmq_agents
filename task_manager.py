@@ -42,7 +42,7 @@ def task_manager(ch, method, properties, body):
     msg = json.loads(body)
     username = method.routing_key.split('.')[1]
     task_name = msg['task']
-    success = msg['success']
+    done = success = msg['success']
 
     if username not in tracking:
         current = tracking[username] = record.copy()
