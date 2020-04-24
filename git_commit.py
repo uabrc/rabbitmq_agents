@@ -23,7 +23,6 @@ if not args.dry_run:
     git = sh.git.bake('-C', repo_location)
     ldapsearch = sh.Command('ldapsearch')
 else:
-    logger_lvl = logging.INFO
     git = sh.echo.bake('git', '-C', repo_location)
     ldapsearch = sh.echo.bake('ldapsearch')
 
