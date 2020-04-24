@@ -18,12 +18,6 @@ args = rc_util.get_args()
 # Logger
 logger = rc_util.get_logger()
 
-# Parse arguments
-args = rc_util.get_args()
-
-# Logger
-logger = rc_util.get_logger()
-
 # Open registry table in DB
 db = dataset.connect('sqlite:///reg_logger.db')
 account_req_table = db['registry']
