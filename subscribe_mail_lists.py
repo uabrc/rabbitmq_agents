@@ -31,9 +31,8 @@ def mail_list_subscription(ch, method, properties, body):
     mail_list_admin = 'root@localhost' #change this during deploy
     mail_list = 'LISTSERV@LISTSERV.UAB.EDU'
 
-    listserv_cmd = {}
-    listserv_cmd['hpc_announce'] = f'QUIET ADD hpc-announce {email} {fullname}'
-    listserv_cmd['hpc_users'] = f'QUIET ADD hpc-users {email} {fullname}'
+    listserv_cmd = f'QUIET ADD hpc-announce {email} {fullname} \
+                   \nQUIET ADD hpc-users {email} {fullname}'
 
     logger.info("Adding user{} to mail list".format(username))
     success = False
@@ -48,11 +47,10 @@ def mail_list_subscription(ch, method, properties, body):
         # Create an smtp object and send email
         s = smtplib.SMTP('localhost')
 
-        for key,value in listserv_cmd.items():
-            email_msg.set_content(value)
-            if not args.dry_run:
-                s.send_message(email_msg)
-            logging.info(f'This email will add user {username} to {key}\n{email_msg}')
+        email_msg.set_content(listserv_cmd)
+        if not args.dry_run:
+            s.send_message(email_msg)
+        logging.info(f'This email will add user {username} to {key}\n{email_msg}')
 
         s.quit()
         msg['task'] = task
