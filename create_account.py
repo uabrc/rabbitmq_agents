@@ -31,4 +31,4 @@ rc_util.add_account(args.username, email=args.email, full=args.full_name, reason
 logger.info(f'Account for {args.username} requested.')
 
 logger.info('Waiting for completion...')
-rc_util.consume(args.username, callback=callback)
+rc_util.consume(args.username, routing_key=f'complete.{args.username}', callback=callback)
