@@ -17,8 +17,18 @@ if args.email == '':
     if '@' not in args.email:
         args.email = args.username + '@' + args.domain
 
+def callback(channel, method, properties, body):
+    msg = json.loads(body)
+    username = msg['username']
+
+    logger.info(f'Account for {username} has been created.')
+
+    rc_rmq.stop_consume()
+    rc_rmq.delete_queue()
+
+
 rc_util.add_account(args.username, email=args.email, full=args.full_name, reason=args.reason)
 logger.info(f'Account for {args.username} requested.')
 
 logger.info('Waiting for completion...')
-rc_util.consume(args.username)
+rc_util.consume(args.username, callback=callback)
