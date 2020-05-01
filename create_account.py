@@ -2,15 +2,17 @@
 import rc_util
 import argparse
 
-logger = rc_util.get_logger()
-
 parser = argparse.ArgumentParser()
 parser.add_argument('username', help='username that will be created')
 parser.add_argument('email', nargs='?', default='', help="User's email")
 parser.add_argument('full_name', nargs='?', default='', help="User's full name")
 parser.add_argument('reason', nargs='?', default='', help='Reason of requesting')
 parser.add_argument('--domain', default='localhost', help='domain of email')
+parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
+parser.add_argument('-n', '--dry-run', action='store_true', help='enable dry run mode')
 args = parser.parse_args()
+
+logger = rc_util.get_logger(args)
 
 if args.email == '':
     args.email = args.username
