@@ -16,7 +16,7 @@ record = {
     'email': '',
     'last_update': datetime.now(),
     'request': {
-        'uid_resolve': None
+        'get_next_uid_gid': None
     },
     'create': {
         'join_list': None,
