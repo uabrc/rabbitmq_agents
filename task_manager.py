@@ -20,8 +20,8 @@ record = {
         'get_next_uid_gid': None
     },
     'create': {
-        'join_list': None,
-        'create_account': None
+        'subscribe_mail_list': None,
+        'bright_account': None
     },
     'verify': {
         'git_commit': None,
