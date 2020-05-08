@@ -18,19 +18,6 @@ args = rc_util.get_args()
 # Logger
 logger = rc_util.get_logger()
 
-#Check if the username already exists via LDAP
-def user_exists(username):
-    try:
-        logger.info(f"Searching LDAP for the user: {username}")
-        con = ldap.initialize('ldap://ldapserver')
-        ldap_base = "dc=cm,dc=cluster"
-        query = "(uid={})".format(username)
-        result = con.search_s(ldap_base, ldap.SCOPE_SUBTREE, query)
-        logging.debug(f"The search result is: {result}")
-        return result
-    except ldap.LDAPError:
-        logger.exception("Fatal LDAP error:")
-
 # Define your callback function
 def get_next_uid_gid(ch, method, properties, body):
 
@@ -42,10 +29,13 @@ def get_next_uid_gid(ch, method, properties, body):
 
     # Determine next available UID
     try:
-        if user_exists(username):
+        user_exists_cmd = "/usr/bin/getent passwd {username}"
+        user_exists = popen(user_exists_cmd).read().rstrip()
+
+        if user_exists:
             logger.info("The user, {} already exists".format(username))
-            msg['uid'] = result[0][1]['uidNumber'][0].decode('utf-8')
-            msg['gid'] = result[0][1]['gidNumber'][0].decode('utf-8')
+            msg['uid'] = user_exists.split(':')[2] 
+            msg['gid'] = user_exists.split(':')[3]
 
         else:
             cmd_uid = "/usr/bin/getent passwd | \
