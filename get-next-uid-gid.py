@@ -18,6 +18,28 @@ args = rc_util.get_args()
 # Logger
 logger = rc_util.get_logger()
 
+#Account creation 
+def create_account(msg):
+
+    logger.info(f'Account creation request received: {msg}')
+    username = msg['username']
+    uid = msg['uid']
+    email = msg['email']
+    fullname = msg['fullname']
+    success = False
+
+    try:
+        # Bright command to create user
+        cmd = '/cm/local/apps/cmd/bin/cmsh -c '
+        cmd += f'"user; add {username}; set userid {uid}; set email {email}; set commonname \\"{fullname}\\"; '
+        cmd += 'commit;"'
+
+        if not args.dry_run:
+            popen(cmd)
+        logger.info(f'Bright command to create user:{cmd}')
+    except Exception:
+        logger.exception("Fatal cmsh error:")
+
 # Define your callback function
 def get_next_uid_gid(ch, method, properties, body):
 
@@ -47,10 +69,12 @@ def get_next_uid_gid(ch, method, properties, body):
                 awk -F: '($3>10000) && ($3<20000) && ($3>maxgid) { maxgid=$3; } END { print maxgid+1; }'"
             msg['gid'] = popen(cmd_gid).read().rstrip()
             logger.info(f"GID query: {cmd_gid}")
+
+            create_account(msg)
         msg['task'] = task
         msg['success'] = True
     except Exception:
-        logger.exception("Fatal error:")
+        logger.exception("Fatal UID resolution error:")
 
     # Acknowledge message
     ch.basic_ack(delivery_tag=method.delivery_tag)
