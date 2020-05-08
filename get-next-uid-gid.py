@@ -41,7 +41,7 @@ def create_account(msg):
         logger.exception("Fatal cmsh error:")
 
 # Define your callback function
-def get_next_uid_gid(ch, method, properties, body):
+def resolve_uid_gid(ch, method, properties, body):
 
     # Retrieve message
     msg = json.loads(body)
@@ -91,7 +91,7 @@ logger.info("Start listening to queue: {}".format(task))
 rc_rmq.start_consume({
     'queue': task,
     'routing_key': "request.*",
-    'cb': get_next_uid_gid
+    'cb': resolve_uid_gid
 })
 
 logger.info("Disconnected")
