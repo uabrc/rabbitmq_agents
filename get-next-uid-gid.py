@@ -8,7 +8,7 @@ import rc_util
 from os import popen
 from rc_rmq import RCRMQ
 
-task = 'get_next_uid_gid'
+task = 'create_account'
 
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
