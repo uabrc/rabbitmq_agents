@@ -72,7 +72,7 @@ def mail_list_subscription(ch, method, properties, body):
 logger.info("Start listening to queue: {}".format(task))
 rc_rmq.start_consume({
     'queue': task,      # Define your Queue name
-    'routing_key': "create.*", # Define your routing key
+    'routing_key': "verify.*", # Define your routing key
     'cb': mail_list_subscription # Pass in callback function you just define
 })
 
