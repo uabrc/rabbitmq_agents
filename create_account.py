@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import rc_util
 import argparse
 
@@ -25,8 +26,8 @@ def callback(channel, method, properties, body):
 
     logger.info(f'Account for {username} has been created.')
 
-    rc_rmq.stop_consume()
-    rc_rmq.delete_queue()
+    rc_util.rc_rmq.stop_consume()
+    rc_util.rc_rmq.delete_queue()
 
 
 rc_util.add_account(args.username, email=args.email, full=args.full_name, reason=args.reason)
