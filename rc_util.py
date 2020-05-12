@@ -35,13 +35,16 @@ def worker(ch, method, properties, body):
         rc_rmq.stop_consume()
         rc_rmq.delete_queue()
 
-def consume(username, callback=worker, debug=False):
+def consume(username, routing_key='', callback=worker, debug=False):
+    if routing_key == '':
+        routing_key = 'confirm.' + username
+
     if debug:
         sleep(5)
     else:
         rc_rmq.start_consume({
             'queue': username,
-            'routing_key': 'confirm.' + username,
+            'routing_key': routing_key,
             'cb': callback
         })
         rc_rmq.disconnect()
