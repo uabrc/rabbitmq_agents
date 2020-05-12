@@ -42,17 +42,17 @@ def notify_user(ch, method, properties, body):
 
         else:
             # Send email to user
-            receiver = [user_mail, mail_cfg.My_mail]
+            receivers = [user_mail, mail_cfg.My_email]
             message = Template(mail_cfg.Whole_mail).render(username=username, to=user_email)
 
             if args.dry_run:
                 logger.info(f'smtp = smtplib.SMTP({mail_cfg.Server})')
-                logger.info(f'smtp.sendmail({mail_cfg.Sender}, {receiver}, message)')
+                logger.info(f'smtp.sendmail({mail_cfg.Sender}, {receivers}, message)')
                 logger.info(f"table.insert({{'username': {username}, 'count': 1, 'sent_at': datetime.now()}})")
 
             else:
                 smtp = smtplib.SMTP(mail_cfg.Server)
-                smtp.sendmail(mail_cfg.Sender, receiver, message)
+                smtp.sendmail(mail_cfg.Sender, receivers, message)
 
                 logger.debug(f'Email sent to: {user_email}')
 
