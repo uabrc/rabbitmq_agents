@@ -47,12 +47,12 @@ def notify_user(ch, method, properties, body):
 
             if args.dry_run:
                 logger.info(f'smtp = smtplib.SMTP({mail_cfg.Server})')
-                logger.info(f'smtp.sendmail({sender}, {receiver}, message)')
+                logger.info(f'smtp.sendmail({mail_cfg.Sender}, {receiver}, message)')
                 logger.info(f"table.insert({'username': {username}, 'count': 1, 'sent_at': {datetime.now()}})")
 
             else:
                 smtp = smtplib.SMTP(mail_cfg.Server)
-                smtp.sendmail(sender, receiver, message)
+                smtp.sendmail(mail_cfg.Sender, receiver, message)
 
                 logger.debug(f'Email sent to: {user_email}')
 
