@@ -1,25 +1,38 @@
 #!/usr/bin/env python3
 import sys
+import json
 import rc_util
+import argparse
 
-if len(sys.argv) < 2:
-    print("Usage: {} USERNAME [EMAIL] [FULL_NAME] [REASON]".format(sys.argv[0]), file=sys.stderr)
-    exit(1)
+parser = argparse.ArgumentParser()
+parser.add_argument('username', help='username that will be created')
+parser.add_argument('email', nargs='?', default='', help="User's email")
+parser.add_argument('full_name', nargs='?', default='', help="User's full name")
+parser.add_argument('reason', nargs='?', default='', help='Reason of requesting')
+parser.add_argument('--domain', default='localhost', help='domain of email')
+parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
+parser.add_argument('-n', '--dry-run', action='store_true', help='enable dry run mode')
+args = parser.parse_args()
 
-domain = 'uab.edu'
-user_name = sys.argv[1]
-email = sys.argv[2] if len(sys.argv) >= 3 else ''
-full_name = sys.argv[3] if len(sys.argv) >= 4 else ''
-reason    = sys.argv[4] if len(sys.argv) >= 5 else ''
+logger = rc_util.get_logger(args)
 
-if email == '':
-    if '@' in user_name:
-        email = user_name
-    else:
-        email = user_name + '@' + domain
+if args.email == '':
+    args.email = args.username
+    if '@' not in args.email:
+        args.email = args.username + '@' + args.domain
 
-rc_util.add_account(user_name, email=email, full=full_name, reason=reason)
-print("Account requested for user: {}".format(user_name))
+def callback(channel, method, properties, body):
+    msg = json.loads(body)
+    username = msg['username']
 
-print("Waiting for confirmation...")
-rc_util.consume(user_name)
+    logger.info(f'Account for {username} has been created.')
+
+    rc_util.rc_rmq.stop_consume()
+    rc_util.rc_rmq.delete_queue()
+
+
+rc_util.add_account(args.username, email=args.email, full=args.full_name, reason=args.reason)
+logger.info(f'Account for {args.username} requested.')
+
+logger.info('Waiting for completion...')
+rc_util.consume(args.username, routing_key=f'complete.{args.username}', callback=callback)
