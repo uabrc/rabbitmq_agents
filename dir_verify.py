@@ -34,7 +34,7 @@ def dir_verify(ch, method, properties, body):
                     path.mkdir(mode=0o700)
 
                     # Make sure ownership is correct
-                    shutil.chown(path, msg['uid'], msg['gid'])
+                    shutil.chown(path, int(msg['uid']), int(msg['gid']))
 
                     logger.debug(f'{path} created')
 
