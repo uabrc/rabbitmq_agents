@@ -24,7 +24,7 @@ if not args.dry_run:
     git = sh.git.bake('-C', repo_location)
     ldapsearch = sh.Command('ldapsearch')
 else:
-    git = sh.echo.bake('git', '-C', repo_location)
+    git = sh.git.bake('--git-dir', repo_location+'/.git', '--work-tree', repo_location)
     ldapsearch = sh.echo.bake('ldapsearch')
 
 def git_commit(ch, method, properties, body):
