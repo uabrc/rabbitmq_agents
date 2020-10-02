@@ -52,10 +52,10 @@ def git_commit(ch, method, properties, body):
         logger.debug("open(%s, 'w'), open(%s, 'w')", user_ldif, group_ldif)
         with open(user_ldif, 'w') as ldif_u,\
             open(group_ldif, 'w') as ldif_g:
-            logger.debug(f"ldapsearch -LLL -x -h ldapserver -b 'dc=cm,dc=cluster' uid={username} > {user_ldif}")
-            ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "dc=cm,dc=cluster", f"uid={username}", _out=ldif_u)
-            logger.debug(f"ldapsearch -LLL -x -h ldapserver -b 'ou=Group,dc=cm,dc=cluster' cn={username} > {group_ldif}")
-            ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "ou=Group,dc=cm,dc=cluster", f"cn={username}", _out=ldif_g)
+            logger.debug(f"ldapsearch -LLL -x -H ldaps://ldapserver -b 'dc=cm,dc=cluster' uid={username} > {user_ldif}")
+            ldapsearch('-LLL', '-x', '-H', 'ldaps://ldapserver', '-b', "dc=cm,dc=cluster", f"uid={username}", _out=ldif_u)
+            logger.debug(f"ldapsearch -LLL -x -H ldapserver -b 'ou=Group,dc=cm,dc=cluster' cn={username} > {group_ldif}")
+            ldapsearch('-LLL', '-x', '-H', 'ldaps://ldapserver', '-b', "ou=Group,dc=cm,dc=cluster", f"cn={username}", _out=ldif_g)
         logger.info('user ldif files generated.')
 
         logger.debug('git add %s', user_ldif)
