@@ -31,7 +31,7 @@ def create_account(msg):
     try:
         # Bright command to create user
         cmd = '/cm/local/apps/cmd/bin/cmsh -c '
-        cmd += f'"user; add {username}; set userid {uid}; set email {email}; set commonname \\"{fullname}\\"; '
+        cmd += f'"user; add {username}; set id {uid}; set email {email}; set commonname \\"{fullname}\\"; '
         cmd += 'commit;"'
 
         if not args.dry_run:
