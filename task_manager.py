@@ -77,7 +77,7 @@ def task_manager(ch, method, properties, body):
             logger.debug(f'Verify level task(s) done?{done}')
 
         elif task_name in current['notify']:
-            current['verify'][task_name] = success
+            current['notify'][task_name] = success
             routing_key = 'complete.' + username
             done = success
 
