@@ -17,15 +17,12 @@ record = {
     'fullname': '',
     'last_update': datetime.now(),
     'request': {
-        'get_next_uid_gid': None
-    },
-    'create': {
-        'subscribe_mail_list': None,
-        'bright_account': None
+        'create_account': None
     },
     'verify': {
         'git_commit': None,
-        'dir_verify': None
+        'dir_verify': None,
+        'subscribe_mail_list': None
     },
     'notify': {
         'notify_user': None
@@ -64,20 +61,10 @@ def task_manager(ch, method, properties, body):
     try:
         if task_name in current['request']:
             current['request'][task_name] = success
-            routing_key = 'create.' + username
+            routing_key = 'verify.' + username
             done = success
 
             logger.debug(f'Request level task(s) done?{done}')
-
-        elif task_name in current['create']:
-            current['create'][task_name] = success
-            routing_key = 'verify.' + username
-            done = True
-            for status in current['create'].values():
-                if status is not True:
-                    done = False
-
-            logger.debug(f'Create level task(s) done?{done}')
 
         elif task_name in current['verify']:
             current['verify'][task_name] = success
@@ -90,7 +77,7 @@ def task_manager(ch, method, properties, body):
             logger.debug(f'Verify level task(s) done?{done}')
 
         elif task_name in current['notify']:
-            current['verify'][task_name] = success
+            current['notify'][task_name] = success
             routing_key = 'complete.' + username
             done = success
 
@@ -108,7 +95,8 @@ def task_manager(ch, method, properties, body):
                 'fullname': current['fullname'],
                 'email': current['email'],
                 'uid': current['uid'],
-                'gid': current['gid']
+                'gid': current['gid'],
+                'fullname': current['fullname']
             }
         })
 

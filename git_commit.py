@@ -3,6 +3,7 @@ import os
 import sh
 import sys
 import json
+import ldap
 import rc_util
 from rc_rmq import RCRMQ
 
@@ -20,10 +21,10 @@ args = rc_util.get_args()
 logger = rc_util.get_logger(args)
 
 if not args.dry_run:
-    git = sh.git.bake('-C', repo_location)
+    git = sh.git.bake('--git-dir', repo_location+'/.git', '--work-tree', repo_location)
     ldapsearch = sh.Command('ldapsearch')
 else:
-    git = sh.echo.bake('git', '-C', repo_location)
+    git = sh.echo.bake('--git-dir', repo_location+'/.git', '--work-tree', repo_location)
     ldapsearch = sh.echo.bake('ldapsearch')
 
 def git_commit(ch, method, properties, body):
@@ -52,10 +53,10 @@ def git_commit(ch, method, properties, body):
         logger.debug("open(%s, 'w'), open(%s, 'w')", user_ldif, group_ldif)
         with open(user_ldif, 'w') as ldif_u,\
             open(group_ldif, 'w') as ldif_g:
-            logger.debug(f"ldapsearch -LLL -x -h ldapserver -b 'dc=cm,dc=cluster' uid={username} > {user_ldif}")
-            ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "dc=cm,dc=cluster", f"uid={username}", _out=ldif_u)
-            logger.debug(f"ldapsearch -LLL -x -h ldapserver -b 'ou=Group,dc=cm,dc=cluster' cn={username} > {group_ldif}")
-            ldapsearch('-LLL', '-x', '-h', 'ldapserver', '-b', "ou=Group,dc=cm,dc=cluster", f"cn={username}", _out=ldif_g)
+            logger.debug(f"ldapsearch -LLL -x -H ldaps://ldapserver -b 'dc=cm,dc=cluster' uid={username} > {user_ldif}")
+            ldapsearch('-LLL', '-x', '-H', 'ldaps://ldapserver', '-b', "dc=cm,dc=cluster", f"uid={username}", _out=ldif_u)
+            logger.debug(f"ldapsearch -LLL -x -H ldapserver -b 'ou=Group,dc=cm,dc=cluster' cn={username} > {group_ldif}")
+            ldapsearch('-LLL', '-x', '-H', 'ldaps://ldapserver', '-b', "ou=Group,dc=cm,dc=cluster", f"cn={username}", _out=ldif_g)
         logger.info('user ldif files generated.')
 
         logger.debug('git add %s', user_ldif)
