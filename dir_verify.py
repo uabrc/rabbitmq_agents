@@ -31,7 +31,7 @@ def dir_verify(ch, method, properties, body):
             else:
                 if not path.exists():
                     # Make sure folder exists and with right permission
-                    path.mkdir(mode=0o700)
+                    path.mkdir(mode=0o700, parents=True, exist_ok=True)
 
                     # Make sure ownership is correct
                     shutil.chown(path, int(msg['uid']), int(msg['gid']))
