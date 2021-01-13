@@ -2,6 +2,7 @@
 import sys
 import json
 import ldap
+import time
 import logging
 import argparse
 import rc_util
@@ -36,6 +37,7 @@ def create_account(msg):
 
         if not args.dry_run:
             popen(cmd)
+            time.sleep(1)
         logger.info(f'Bright command to create user:{cmd}')
     except Exception:
         logger.exception("Fatal cmsh error:")
