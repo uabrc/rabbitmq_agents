@@ -3,7 +3,6 @@ import os
 import sh
 import sys
 import json
-import ldap
 import rc_util
 from rc_rmq import RCRMQ
 
