@@ -3,6 +3,7 @@ Server = 'localhost'
 My_email = 'root@localhost'
 Sender = 'ROOT@LOCALHOST'
 Sender_alias = 'Services'
+Mail_list = 'ROOT@LOCALHOST'
 Subject = 'New User Account'
 Info_url = 'https://www.google.com'
 
