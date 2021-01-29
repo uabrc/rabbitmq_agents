@@ -42,7 +42,7 @@ def notify_user(ch, method, properties, body):
 
         else:
             # Send email to user
-            receivers = [user_email, mail_cfg.My_email]
+            receivers = [user_email, mail_cfg.Admin_email]
             message = Template(mail_cfg.Whole_mail).render(username=username, to=user_email)
 
             if args.dry_run:
