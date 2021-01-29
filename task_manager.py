@@ -2,8 +2,10 @@
 import sys
 import json
 import rc_util
+import smtplib
 from rc_rmq import RCRMQ
 from datetime import datetime
+import mail_config as mail_cfg
 
 task = 'task_manager'
 
@@ -36,11 +38,37 @@ tracking = {}
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
+def notify_admin(username, user_record):
+    message = mail_cfg.UserReportHead
+    message += f"""
+        User Creation Report for user {username}
+        uid: {user_record["uid"]}, gid: {user_record["gid"]}
+        Tasks:
+            'create_account':      {user_record["request"]["create_account"]}
+            'git_commit':          {user_record["verify"]["git_commit"]}
+            'dir_verify':          {user_record["verify"]["dir_verify"]}
+            'subscribe_mail_list': {user_record["verify"]["subscribe_mail_list"]}
+            'notify_user':         {user_record["notify"]["notify_user"]}
+    """
+
+    if args.dry_run:
+        logger.info(f'smtp = smtplib.SMTP({mail_cfg.Server})')
+        logger.info(f'smtp.sendmail({mail_cfg.Sender}, {mail_cfg.Admin_email}, message)')
+        logger.info(message)
+
+    else:
+        smtp = smtplib.SMTP(mail_cfg.Server)
+        smtp.sendmail(mail_cfg.Sender, receivers, message)
+
+        logger.debug(f'User report sent to: {mail_cfg.Admin_email}')
+
+
 def task_manager(ch, method, properties, body):
     msg = json.loads(body)
     username = method.routing_key.split('.')[1]
     task_name = msg['task']
     done = success = msg['success']
+    completed = terminated = False
     routing_key = ""
 
     if username not in tracking:
@@ -63,6 +91,9 @@ def task_manager(ch, method, properties, body):
             current['request'][task_name] = success
             routing_key = 'verify.' + username
             done = success
+            # Terminate the process if failed
+            if not success:
+                terminated = True
 
             logger.debug(f'Request level task(s) done?{done}')
 
@@ -74,12 +105,19 @@ def task_manager(ch, method, properties, body):
                 if status is not True:
                     done = False
 
+            # Terminate the process if dir_verify failed
+            if task_name == "dir_verify":
+                if not success:
+                    terminated = True
+
             logger.debug(f'Verify level task(s) done?{done}')
 
         elif task_name in current['notify']:
             current['notify'][task_name] = success
             routing_key = 'complete.' + username
             done = success
+            # The whole creation process has completed
+            completed = True
 
             logger.debug(f'Notify level task(s) done?{done}')
 
@@ -108,6 +146,10 @@ def task_manager(ch, method, properties, body):
         current['delivery_tags'] = []
 
         logger.debug('Previous level messages acknowledged')
+
+    # Send report to admin after all tasks confirmed or terminated
+    if completed or terminated:
+        notify_admin(username, current)
 
 
 logger.info(f'Start listening to queue: {task}')
