@@ -5,6 +5,7 @@ import smtplib
 import logging
 import argparse
 import rc_util
+import mail_config as mail_cfg
 from email.message import EmailMessage
 from rc_rmq import RCRMQ
 
@@ -28,8 +29,8 @@ def mail_list_subscription(ch, method, properties, body):
     fullname = msg['fullname']
     email = msg['email']
 
-    mail_list_admin = 'root@localhost' #change this during deploy
-    mail_list = 'LISTSERV@LISTSERV.UAB.EDU'
+    mail_list_admin = mail_cfg.Sender #change this during deploy
+    mail_list = mail_cfg.Mail_list
 
     listserv_cmd = f'QUIET ADD hpc-announce {email} {fullname} \
                    \nQUIET ADD hpc-users {email} {fullname}'
@@ -45,7 +46,7 @@ def mail_list_subscription(ch, method, properties, body):
         email_msg['Subject'] = ''
 
         # Create an smtp object and send email
-        s = smtplib.SMTP('localhost')
+        s = smtplib.SMTP(mail_cfg.Server)
 
         email_msg.set_content(listserv_cmd)
         if not args.dry_run:
