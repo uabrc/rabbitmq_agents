@@ -30,10 +30,9 @@ else:
 def git_commit(ch, method, properties, body):
     msg = json.loads(body)
     username = msg['username']
-    ticketnum = msg.get('ticketnum', 'add-users-' + username.lower())
     msg['task'] = task
     msg['success'] = False
-    branch_name = 'issue-' + ticketnum
+    branch_name = 'issue-add-users-' + username.lower() 
     user_ldif = users_dir + f'/{username}.ldif'
     group_ldif = groups_dir + f'/{username}.ldif'
 
