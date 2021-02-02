@@ -55,8 +55,8 @@ def mail_list_subscription(ch, method, properties, body):
         s.quit()
         msg['task'] = task
         msg['success'] = True
-    except Exception:
-        logger.exception("Fatal error:")
+    except Exception as exception:
+        logger.error('', exc_info=True)
 
     # Acknowledge message
     ch.basic_ack(delivery_tag=method.delivery_tag)
