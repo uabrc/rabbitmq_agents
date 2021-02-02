@@ -29,18 +29,15 @@ def create_account(msg):
     fullname = msg['fullname']
     success = False
 
-    try:
         # Bright command to create user
-        cmd = '/cm/local/apps/cmd/bin/cmsh -c '
-        cmd += f'"user; add {username}; set id {uid}; set email {email}; set commonname \\"{fullname}\\"; '
-        cmd += 'commit;"'
+    cmd = '/cm/local/apps/cmd/bin/cmsh -c '
+    cmd += f'"user; add {username}; set id {uid}; set email {email}; set commonname \\"{fullname}\\"; '
+    cmd += 'commit;"'
 
-        if not args.dry_run:
-            popen(cmd)
-            time.sleep(1)
-        logger.info(f'Bright command to create user:{cmd}')
-    except Exception:
-        logger.exception("Fatal cmsh error:")
+    if not args.dry_run:
+        popen(cmd)
+        time.sleep(1)
+    logger.info(f'Bright command to create user:{cmd}')
 
 # Define your callback function
 def resolve_uid_gid(ch, method, properties, body):
@@ -75,8 +72,10 @@ def resolve_uid_gid(ch, method, properties, body):
             create_account(msg)
         msg['task'] = task
         msg['success'] = True
-    except Exception:
-        logger.exception("Fatal UID resolution error:")
+    except Exception as exception:
+        msg['success'] = False
+        msg['errmsg'] = f"Exception raised during account creation, check logs for stack trace"
+        logger.error('', exc_info=True)
 
     # Acknowledge message
     ch.basic_ack(delivery_tag=method.delivery_tag)
