@@ -16,6 +16,7 @@ record = {
     'uid': -1,
     'gid': -1,
     'email': '',
+    'reason': '',
     'fullname': '',
     'last_update': datetime.now(),
     'request': {
@@ -77,6 +78,7 @@ def task_manager(ch, method, properties, body):
         current['uid'] = msg.get('uid', -1)
         current['gid'] = msg.get('gid', -1)
         current['email'] = msg.get('email', '')
+        current['reason'] = msg.get('reason', '')
         current['fullname'] = msg.get('fullname', '')
 
         logger.debug(f'Tracking user {username}')
@@ -134,7 +136,7 @@ def task_manager(ch, method, properties, body):
                 'email': current['email'],
                 'uid': current['uid'],
                 'gid': current['gid'],
-                'fullname': current['fullname']
+                'reason': current['reason']
             }
         })
 
