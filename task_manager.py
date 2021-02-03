@@ -52,6 +52,13 @@ def notify_admin(username, user_record):
             'subscribe_mail_list': {user_record["verify"]["subscribe_mail_list"]}
             'notify_user':         {user_record["notify"]["notify_user"]}
     """
+    if user_record['errmsg']:
+        message += """
+
+        Error(s):
+        """
+        for msg in user_record['errmsg']:
+            message += msg + "\n"
 
     if args.dry_run:
         logger.info(f'smtp = smtplib.SMTP({mail_cfg.Server})')
