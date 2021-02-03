@@ -97,7 +97,7 @@ def task_manager(ch, method, properties, body):
             if not success:
                 terminated = True
 
-            logger.debug(f'Request level task(s) done?{done}')
+            logger.debug(f'Request level {task_name}? {success}')
 
         elif task_name in current['verify']:
             current['verify'][task_name] = success
@@ -112,7 +112,7 @@ def task_manager(ch, method, properties, body):
                 if not success:
                     terminated = True
 
-            logger.debug(f'Verify level task(s) done?{done}')
+            logger.debug(f'Verify level {task_name}? {success}')
 
         elif task_name in current['notify']:
             current['notify'][task_name] = success
@@ -121,7 +121,7 @@ def task_manager(ch, method, properties, body):
             # The whole creation process has completed
             completed = True
 
-            logger.debug(f'Notify level task(s) done?{done}')
+            logger.debug(f'Notify level {task_name}? {success}')
 
     except Exception as exception:
         logger.error('', exc_info=True)
