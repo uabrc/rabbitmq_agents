@@ -19,6 +19,7 @@ record = {
     'reason': '',
     'fullname': '',
     'last_update': datetime.now(),
+    'errmsg': [],
     'request': {
         'create_account': None
     },
@@ -87,6 +88,12 @@ def task_manager(ch, method, properties, body):
 
     # Save the delivery tags for future use
     current['delivery_tags'].append(method.delivery_tag)
+
+    # Save error message if the task was failed
+    if not success:
+        errmsg = msg.get('errmsg', '')
+        if errmsg:
+            current['errmsg'].append(f"{task_name}: {errmsg}")
 
     try:
         if task_name in current['request']:
