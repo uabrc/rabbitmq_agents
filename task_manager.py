@@ -103,6 +103,16 @@ def task_manager(ch, method, properties, body):
         if errmsg:
             current['errmsg'].append(f"{task_name}: {errmsg}")
 
+    # Define message that's going to be published
+    message = {
+        'username': username,
+        'uid': current['uid'],
+        'gid': current['gid'],
+        'email': current['email'],
+        'reason': current['reason'],
+        'fullname': current['fullname']
+    }
+
     try:
         if task_name in current['request']:
             current['request'][task_name] = success
@@ -147,14 +157,7 @@ def task_manager(ch, method, properties, body):
         # Send trigger message
         rc_rmq.publish_msg({
             'routing_key': routing_key,
-            'msg': {
-                'username': username,
-                'fullname': current['fullname'],
-                'email': current['email'],
-                'uid': current['uid'],
-                'gid': current['gid'],
-                'reason': current['reason']
-            }
+            'msg': message
         })
 
         logger.debug(f"Trigger message '{routing_key}' sent")
