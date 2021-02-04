@@ -14,7 +14,6 @@ parser.add_argument('-v', '--verbose', action='store_true', help='verbose output
 parser.add_argument('-n', '--dry-run', action='store_true', help='enable dry run mode')
 args = parser.parse_args()
 
-logger = rc_util.get_logger(args)
 
 if args.email == '':
     args.email = args.username
@@ -38,7 +37,7 @@ def callback(channel, method, properties, body):
 
 
 rc_util.add_account(args.username, email=args.email, full=args.full_name, reason=args.reason)
-logger.info(f'Account for {args.username} requested.')
+print(f'Account for {args.username} requested.')
 
-logger.info('Waiting for completion...')
+print('Waiting for completion...')
 rc_util.consume(args.username, routing_key=f'complete.{args.username}', callback=callback)
