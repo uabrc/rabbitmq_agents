@@ -98,6 +98,8 @@ def task_manager(ch, method, properties, body):
     # Save the delivery tags for future use
     current['delivery_tags'].append(method.delivery_tag)
 
+    current['last_update'] = datetime.now()
+
     # Save error message if the task was failed
     if not success:
         errmsg = msg.get('errmsg', '')
