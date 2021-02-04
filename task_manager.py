@@ -20,7 +20,7 @@ record = {
     'fullname': '',
     'last_update': datetime.now(),
     'errmsg': [],
-    'waiting': {},
+    'waiting': set(),
     'request': {
         'create_account': None
     },
