@@ -20,6 +20,7 @@ record = {
     'fullname': '',
     'last_update': datetime.now(),
     'errmsg': [],
+    'waiting': {},
     'request': {
         'create_account': None
     },
@@ -123,15 +124,16 @@ def task_manager(ch, method, properties, body):
                 terminated = True
 
             send = True
+            current['waiting'] = {'git_commit', 'dir_verify', 'subscribe_mail_list'}
             logger.debug(f'Request level {task_name}? {success}')
 
         elif task_name in current['verify']:
             current['verify'][task_name] = success
+            current['waiting'].discard(task_name)
             routing_key = 'notify.' + username
-            send = True
-            for status in current['verify'].values():
-                if status is not True:
-                    send = False
+            if not current['waiting']:
+                send = True
+                current['waiting'] = {'notify_user'}
 
             # Terminate the process if dir_verify failed
             if task_name == "dir_verify":
@@ -142,6 +144,7 @@ def task_manager(ch, method, properties, body):
 
         elif task_name in current['notify']:
             current['notify'][task_name] = success
+            current['waiting'].discard(task_name)
             routing_key = 'complete.' + username
             send = True
 
