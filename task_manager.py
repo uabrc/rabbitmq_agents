@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import json
+import signal
 import rc_util
 import smtplib
 from rc_rmq import RCRMQ
@@ -8,6 +9,7 @@ from datetime import datetime
 import mail_config as mail_cfg
 
 task = 'task_manager'
+timeout = 30
 
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)
@@ -192,6 +194,32 @@ def task_manager(ch, method, properties, body):
 
         logger.debug('Admin report sent')
 
+
+def timeout_handler(signum, frame):
+    current_time = datetime.now()
+    for user in tuple(tracking):
+        print(tracking[user])
+        delta = tracking[user]['last_update'] - current_time
+
+        if delta.seconds > timeout:
+
+            rc_rmq.publish_msg({
+                'routing_key': 'complete.' + user,
+                'msg': {
+                    'username': user,
+                    'success': False,
+                    'errmsg': ["Timeout on " + ', '.join(tracking[user]['waiting'])]
+                }
+            })
+
+            notify_admin(user, tracking[user])
+
+            tracking.pop(user)
+
+
+# Set initial timeout timer
+signal.signal(signal.SIGALRM, timeout_handler)
+signal.setitimer(signal.ITIMER_REAL, timeout, timeout)
 
 logger.info(f'Start listening to queue: {task}')
 rc_rmq.start_consume({
