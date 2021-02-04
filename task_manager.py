@@ -122,6 +122,9 @@ def task_manager(ch, method, properties, body):
             # Terminate the process if failed
             if not success:
                 terminated = True
+                routing_key = 'complete.' + username
+                message['success'] = False
+                message['errmsg'] = current['errmsg']
 
             send = True
             current['waiting'] = {'git_commit', 'dir_verify', 'subscribe_mail_list'}
@@ -131,14 +134,17 @@ def task_manager(ch, method, properties, body):
             current['verify'][task_name] = success
             current['waiting'].discard(task_name)
             routing_key = 'notify.' + username
+
             if not current['waiting']:
                 send = True
                 current['waiting'] = {'notify_user'}
 
-            # Terminate the process if dir_verify failed
-            if task_name == "dir_verify":
-                if not success:
-                    terminated = True
+            # Terminate if dir_verify failed and all agents has responsed
+            if send and not current['verify']['dir_verify']:
+                terminated = True
+                routing_key = 'complete.' + username
+                message['success'] = False
+                message['errmsg'] = current['errmsg']
 
             logger.debug(f'Verify level {task_name}? {success}')
 
@@ -146,6 +152,9 @@ def task_manager(ch, method, properties, body):
             current['notify'][task_name] = success
             current['waiting'].discard(task_name)
             routing_key = 'complete.' + username
+            message['success'] = success
+            message['errmsg'] = current['errmsg']
+
             send = True
 
             # The whole creation process has completed
