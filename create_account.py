@@ -25,7 +25,13 @@ def callback(channel, method, properties, body):
     msg = json.loads(body)
     username = msg['username']
 
-    logger.info(f'Account for {username} has been created.')
+    if msg['success']:
+        print(f'Account for {username} has been created.')
+    else:
+        print(f"There's some issue while creating account for {username}")
+        errmsg = msg.get('errmsg', [])
+        for err in errmsg:
+            print(err)
 
     rc_util.rc_rmq.stop_consume()
     rc_util.rc_rmq.delete_queue()
