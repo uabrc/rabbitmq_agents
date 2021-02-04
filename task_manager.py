@@ -76,8 +76,8 @@ def task_manager(ch, method, properties, body):
     msg = json.loads(body)
     username = method.routing_key.split('.')[1]
     task_name = msg['task']
-    done = success = msg['success']
-    completed = terminated = False
+    success = msg['success']
+    send = completed = terminated = False
     routing_key = ""
 
     if username not in tracking:
@@ -106,20 +106,21 @@ def task_manager(ch, method, properties, body):
         if task_name in current['request']:
             current['request'][task_name] = success
             routing_key = 'verify.' + username
-            done = success
+
             # Terminate the process if failed
             if not success:
                 terminated = True
 
+            send = True
             logger.debug(f'Request level {task_name}? {success}')
 
         elif task_name in current['verify']:
             current['verify'][task_name] = success
             routing_key = 'notify.' + username
-            done = True
+            send = True
             for status in current['verify'].values():
                 if status is not True:
-                    done = False
+                    send = False
 
             # Terminate the process if dir_verify failed
             if task_name == "dir_verify":
@@ -131,7 +132,8 @@ def task_manager(ch, method, properties, body):
         elif task_name in current['notify']:
             current['notify'][task_name] = success
             routing_key = 'complete.' + username
-            done = success
+            send = True
+
             # The whole creation process has completed
             completed = True
 
@@ -140,7 +142,7 @@ def task_manager(ch, method, properties, body):
     except Exception as exception:
         logger.error('', exc_info=True)
 
-    if done:
+    if send:
         # Send trigger message
         rc_rmq.publish_msg({
             'routing_key': routing_key,
