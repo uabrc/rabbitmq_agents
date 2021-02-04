@@ -183,9 +183,14 @@ def task_manager(ch, method, properties, body):
 
         logger.debug('Previous level messages acknowledged')
 
-    # Send report to admin after all tasks confirmed or terminated
+    # Send report to admin
     if completed or terminated:
+
         notify_admin(username, current)
+
+        tracking.pop(username)
+
+        logger.debug('Admin report sent')
 
 
 logger.info(f'Start listening to queue: {task}')
