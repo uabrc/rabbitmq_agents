@@ -41,6 +41,7 @@ tracking = {}
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
 def notify_admin(username, user_record):
+    receivers = [user_record['email'], mail_cfg.Admin_email]
     message = mail_cfg.UserReportHead
     message += f"""
         User Creation Report for user {username}
