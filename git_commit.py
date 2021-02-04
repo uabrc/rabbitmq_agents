@@ -6,6 +6,7 @@ import json
 import ldap
 import rc_util
 from rc_rmq import RCRMQ
+import rabbit_config as rmq_cfg
 
 task = 'git_commit'
 
@@ -13,7 +14,7 @@ task = 'git_commit'
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
 # Define some location
-repo_location = os.path.expanduser('~/git/rc-users')
+repo_location = os.path.expanduser(rmq_cfg.rc_users_ldap_repo_loc)
 users_dir = repo_location + '/users'
 groups_dir = repo_location + '/groups'
 
