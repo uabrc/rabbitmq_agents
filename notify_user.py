@@ -36,7 +36,14 @@ def notify_user(ch, method, properties, body):
         if record['sent'] is not None:
             # Update counter
             count = record['count']
-            table.update({'username': username, 'count': count + 1}, ['username'])
+            if args.dry_run:
+                logger.info('Update counter in database')
+
+            else:
+                table.update({
+                    'username': username,
+                    'count': count + 1
+                }, ['username'])
 
             logger.debug(f'User {username} counter updated to {count + 1}')
 
