@@ -227,6 +227,8 @@ def task_manager(ch, method, properties, body):
 
         notify_admin(username, current)
 
+        update_db(username, {'reported': True})
+
         tracking.pop(username)
 
         logger.debug('Admin report sent')
@@ -249,6 +251,8 @@ def timeout_handler(signum, frame):
             })
 
             notify_admin(user, tracking[user])
+
+            update_db(user, {'reported': True})
 
             tracking.pop(user)
 
