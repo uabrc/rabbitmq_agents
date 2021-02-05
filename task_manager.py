@@ -133,6 +133,12 @@ def task_manager(ch, method, properties, body):
 
     current['last_update'] = datetime.now()
 
+    # Update Database
+    update_db(username, {
+        task_name: success,
+        'last_update': current['last_update']}
+    )
+
     # Save error message if the task was failed
     if not success:
         errmsg = msg.get('errmsg', '')
