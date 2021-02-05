@@ -14,8 +14,8 @@ task = 'notify_user'
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)
 
-db = dataset.connect(f'sqlite:///.agent_db/{task}.db')
-table = db['notified_user']
+db = dataset.connect(f'sqlite:///.agent_db/user_reg.db')
+table = db['users']
 
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
@@ -33,7 +33,7 @@ def notify_user(ch, method, properties, body):
         # Search username in database
         record = table.find_one(username=username)
 
-        if record:
+        if record['sent'] is not None:
             # Update counter
             count = record['count']
             table.update({'username': username, 'count': count + 1}, ['username'])
@@ -48,7 +48,7 @@ def notify_user(ch, method, properties, body):
             if args.dry_run:
                 logger.info(f'smtp = smtplib.SMTP({mail_cfg.Server})')
                 logger.info(f'smtp.sendmail({mail_cfg.Sender}, {receivers}, message)')
-                logger.info(f"table.insert({{'username': {username}, 'count': 1, 'sent_at': datetime.now()}})")
+                logger.info(f"table.update({{'username': {username}, 'count': 1, 'sent_at': datetime.now()}}, ['username'])")
 
             else:
                 smtp = smtplib.SMTP(mail_cfg.Server)
@@ -56,11 +56,11 @@ def notify_user(ch, method, properties, body):
 
                 logger.debug(f'Email sent to: {user_email}')
 
-                table.insert({
+                table.update({
                     'username': username,
                     'count': 1,
                     'sent_at': datetime.now()
-                })
+                }, ['username'])
 
                 logger.debug(f'User {username} inserted into database')
 
