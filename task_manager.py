@@ -3,6 +3,7 @@ import sys
 import copy
 import json
 import signal
+import dataset
 import rc_util
 import smtplib
 from rc_rmq import RCRMQ
@@ -14,6 +15,9 @@ timeout = 30
 
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)
+
+db = dataset.connect(f'sqlite:///.agent_db/user_reg.db')
+table = db['users']
 
 record = {
     'uid': -1,
@@ -75,6 +79,29 @@ def notify_admin(username, user_record):
         smtp.sendmail(mail_cfg.Sender, receivers, message)
 
         logger.debug(f'User report sent to: {mail_cfg.Admin_email}')
+
+
+def insert_db(username, msg):
+    # Search username in db
+    record = table.find_one(username=username)
+
+    if not record:
+        # SQL insert
+        table.insert({
+          'username': username,
+          'uid': msg.get('uid', -1),
+          'gid': msg.get('gid', -1),
+          'email': msg.get('email', ''),
+          'reason': msg.get('reason', ''),
+          'fullname': msg.get('fullname', ''),
+          'sent': None,
+          'last_update': datetime.now()
+        })
+
+
+def update_db(username, data):
+    obj = { 'username': username, **data }
+    table.update(obj, ['username'])
 
 
 def task_manager(ch, method, properties, body):
