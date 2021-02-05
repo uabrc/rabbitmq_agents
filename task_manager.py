@@ -122,6 +122,8 @@ def task_manager(ch, method, properties, body):
         current['reason'] = msg.get('reason', '')
         current['fullname'] = msg.get('fullname', '')
 
+        insert_db(username, msg)
+
         logger.debug(f'Tracking user {username}')
     else:
         current = tracking[username]
