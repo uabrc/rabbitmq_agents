@@ -27,6 +27,7 @@ def notify_user(ch, method, properties, body):
     user_email = msg['email']
     msg['task'] = task
     msg['success'] = False
+    errmsg = ""
 
     try:
 
@@ -34,6 +35,7 @@ def notify_user(ch, method, properties, body):
         record = table.find_one(username=username)
 
         if record['sent'] is not None:
+            errmsg = 'Updating database counter'
             # Update counter
             count = record['count']
             if args.dry_run:
@@ -58,11 +60,13 @@ def notify_user(ch, method, properties, body):
                 logger.info(f"table.update({{'username': {username}, 'count': 1, 'sent_at': datetime.now()}}, ['username'])")
 
             else:
+                errmsg = 'Sending email to user'
                 smtp = smtplib.SMTP(mail_cfg.Server)
                 smtp.sendmail(mail_cfg.Sender, receivers, message)
 
                 logger.debug(f'Email sent to: {user_email}')
 
+                errmsg = 'Updating database email sent time'
                 table.update({
                     'username': username,
                     'count': 1,
@@ -74,6 +78,7 @@ def notify_user(ch, method, properties, body):
         msg['success'] = True
     except Exception as exception:
         logger.error('', exc_info=True)
+        msg['errmsg'] = errmsg if errmsg else 'Unexpected error'
 
     # Send confirm message
     rc_rmq.publish_msg({
