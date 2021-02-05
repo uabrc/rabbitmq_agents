@@ -36,7 +36,7 @@ def worker(ch, method, properties, body):
 
 def consume(username, routing_key='', callback=worker, debug=False):
     if routing_key == '':
-        routing_key = 'confirm.' + username
+        routing_key = 'complete.' + username
 
     if debug:
         sleep(5)
