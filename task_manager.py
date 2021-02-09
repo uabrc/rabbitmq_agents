@@ -21,7 +21,7 @@ record = {
     'reason': '',
     'fullname': '',
     'last_update': datetime.now(),
-    'errmsg': [],
+    'errmsg': None,
     'waiting': set(),
     'request': {
         'create_account': None
@@ -87,6 +87,7 @@ def task_manager(ch, method, properties, body):
     if username not in tracking:
         current = tracking[username] = record.copy()
         current['delivery_tags'] = []
+        current['errmsg'] = []
         current['uid'] = msg.get('uid', -1)
         current['gid'] = msg.get('gid', -1)
         current['email'] = msg.get('email', '')
