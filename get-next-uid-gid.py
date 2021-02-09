@@ -8,6 +8,7 @@ import argparse
 import rc_util
 from os import popen
 from rc_rmq import RCRMQ
+import rabbit_config as rcfg
 
 task = 'create_account'
 
@@ -37,7 +38,7 @@ def create_account(msg):
 
         if not args.dry_run:
             popen(cmd)
-            time.sleep(1)
+            time.sleep(rcfg.Delay)
         logger.info(f'Bright command to create user:{cmd}')
     except Exception:
         logger.exception("Fatal cmsh error:")
