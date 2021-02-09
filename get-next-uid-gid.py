@@ -27,7 +27,7 @@ def create_account(msg):
     uid = msg['uid']
     email = msg['email']
     fullname = msg['fullname']
-    success = False
+    msg['success'] = False
 
     try:
         # Bright command to create user
@@ -49,7 +49,7 @@ def resolve_uid_gid(ch, method, properties, body):
     msg = json.loads(body)
     logger.info("Received {}".format(msg))
     username = msg['username']
-    success = False
+    msg['success'] = False
 
     # Determine next available UID
     try:
