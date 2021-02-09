@@ -200,7 +200,7 @@ def timeout_handler(signum, frame):
     current_time = datetime.now()
     for user in tuple(tracking):
         print(tracking[user])
-        delta = tracking[user]['last_update'] - current_time
+        delta = current_time - tracking[user]['last_update']
 
         if delta.seconds > timeout:
 
