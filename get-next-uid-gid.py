@@ -53,7 +53,7 @@ def resolve_uid_gid(ch, method, properties, body):
 
     # Determine next available UID
     try:
-        user_exists_cmd = "/usr/bin/getent passwd {username}"
+        user_exists_cmd = f"/usr/bin/getent passwd {username}"
         user_exists = popen(user_exists_cmd).read().rstrip()
 
         if user_exists:
