@@ -199,7 +199,6 @@ def task_manager(ch, method, properties, body):
 def timeout_handler(signum, frame):
     current_time = datetime.now()
     for user in tuple(tracking):
-        print(tracking[user])
         delta = current_time - tracking[user]['last_update']
 
         if delta.seconds > timeout:
