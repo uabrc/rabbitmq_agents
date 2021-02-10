@@ -47,34 +47,35 @@ def git_commit(ch, method, properties, body):
         git.checkout('master')
         logger.debug('git pull')
         git.pull()
-        logger.debug('git checkout -b %s', branch_name)
-        git.checkout('-b', branch_name)
+        branch_exists = git.branch('--list', branch_name)
+        if not branch_exists:
+            logger.debug('git checkout -b %s', branch_name)
+            git.checkout('-b', branch_name)
+            logger.debug("open(%s, 'w'), open(%s, 'w')", user_ldif, group_ldif)
+            with open(user_ldif, 'w') as ldif_u,\
+                open(group_ldif, 'w') as ldif_g:
+                logger.debug(f"ldapsearch -LLL -x -H ldaps://ldapserver -b 'dc=cm,dc=cluster' uid={username} > {user_ldif}")
+                ldapsearch('-LLL', '-x', '-H', 'ldaps://ldapserver', '-b', "dc=cm,dc=cluster", f"uid={username}", _out=ldif_u)
+                logger.debug(f"ldapsearch -LLL -x -H ldapserver -b 'ou=Group,dc=cm,dc=cluster' cn={username} > {group_ldif}")
+                ldapsearch('-LLL', '-x', '-H', 'ldaps://ldapserver', '-b', "ou=Group,dc=cm,dc=cluster", f"cn={username}", _out=ldif_g)
+            logger.info('user ldif files generated.')
 
-        logger.debug("open(%s, 'w'), open(%s, 'w')", user_ldif, group_ldif)
-        with open(user_ldif, 'w') as ldif_u,\
-            open(group_ldif, 'w') as ldif_g:
-            logger.debug(f"ldapsearch -LLL -x -H ldaps://ldapserver -b 'dc=cm,dc=cluster' uid={username} > {user_ldif}")
-            ldapsearch('-LLL', '-x', '-H', 'ldaps://ldapserver', '-b', "dc=cm,dc=cluster", f"uid={username}", _out=ldif_u)
-            logger.debug(f"ldapsearch -LLL -x -H ldapserver -b 'ou=Group,dc=cm,dc=cluster' cn={username} > {group_ldif}")
-            ldapsearch('-LLL', '-x', '-H', 'ldaps://ldapserver', '-b', "ou=Group,dc=cm,dc=cluster", f"cn={username}", _out=ldif_g)
-        logger.info('user ldif files generated.')
+            logger.debug('git add %s', user_ldif)
+            git.add(user_ldif)
+            logger.debug('git add %s', group_ldif)
+            git.add(group_ldif)
+            logger.debug("git commit -m 'Added new cheaha user: %s'", username)
+            git.commit(m="Added new cheaha user: " + username)
+            logger.debug('git checkout master')
+            git.checkout('master')
 
-        logger.debug('git add %s', user_ldif)
-        git.add(user_ldif)
-        logger.debug('git add %s', group_ldif)
-        git.add(group_ldif)
-        logger.debug("git commit -m 'Added new cheaha user: %s'", username)
-        git.commit(m="Added new cheaha user: " + username)
-        logger.debug('git checkout master')
-        git.checkout('master')
+            logger.debug('git merge %s --no-ff --no-edit', branch_name)
+            git.merge(branch_name, '--no-ff', '--no-edit')
+            logger.debug('git push origin master')
+            git.push('origin', 'master')
+            # merge with gitlab api
 
-        logger.debug('git merge %s --no-ff --no-edit', branch_name)
-        git.merge(branch_name, '--no-ff', '--no-edit')
-        logger.debug('git push origin master')
-        git.push('origin', 'master')
-        # merge with gitlab api
-
-        logger.info('Added ldif files and committed to git repo')
+            logger.info('Added ldif files and committed to git repo')
 
         msg['success'] = True
     except Exception as exception:
