@@ -95,6 +95,7 @@ def insert_db(username, msg):
           'reason': msg.get('reason', ''),
           'fullname': msg.get('fullname', ''),
           'sent': None,
+          'reported': False,
           'last_update': datetime.now()
         })
 
