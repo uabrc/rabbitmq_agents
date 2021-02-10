@@ -117,18 +117,31 @@ def task_manager(ch, method, properties, body):
         current = tracking[username]
 
     else:
+        user_db = table.find_one(username=username)
+
         current = tracking[username] = copy.deepcopy(record)
         current['delivery_tags'] = []
         current['errmsg'] = []
-        current['uid'] = msg.get('uid', -1)
-        current['gid'] = msg.get('gid', -1)
-        current['email'] = msg.get('email', '')
-        current['reason'] = msg.get('reason', '')
-        current['fullname'] = msg.get('fullname', '')
+        current['uid'] = user_db['uid'] if user_db else msg['uid']
+        current['gid'] = user_db['gid'] if user_db else msg['gid']
+        current['email'] = user_db['email'] if user_db else msg['email']
+        current['reason'] = user_db['reason'] if user_db else msg['reason']
+        current['fullname'] = user_db['fullname'] if user_db else msg['fullname']
 
-        insert_db(username, msg)
+        if user_db:
+            # Restore task status
+            current['request']['create_account'] = user_db['create_account']
+            current['verify']['git_commit'] = user_db['git_commit']
+            current['verify']['dir_verify'] = user_db['dir_verify']
+            current['verify']['subscribe_mail_list'] = user_db['subscribe_mail_list']
+            current['notify']['notify_user'] = user_db['notify_user']
 
-        logger.debug(f'Tracking user {username}')
+            logger.debug(f'Loaded user {username} from DB')
+
+        else:
+            insert_db(username, msg)
+
+            logger.debug(f'Tracking user {username}')
 
     # Save the delivery tags for future use
     current['delivery_tags'].append(method.delivery_tag)
