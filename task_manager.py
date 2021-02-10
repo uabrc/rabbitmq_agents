@@ -113,7 +113,10 @@ def task_manager(ch, method, properties, body):
     send = completed = terminated = False
     routing_key = ""
 
-    if username not in tracking:
+    if username in tracking:
+        current = tracking[username]
+
+    else:
         current = tracking[username] = copy.deepcopy(record)
         current['delivery_tags'] = []
         current['errmsg'] = []
@@ -126,8 +129,6 @@ def task_manager(ch, method, properties, body):
         insert_db(username, msg)
 
         logger.debug(f'Tracking user {username}')
-    else:
-        current = tracking[username]
 
     # Save the delivery tags for future use
     current['delivery_tags'].append(method.delivery_tag)
