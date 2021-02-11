@@ -35,7 +35,7 @@ def mail_list_subscription(ch, method, properties, body):
                    \nQUIET ADD hpc-users {email} {fullname}'
 
     logger.info("Adding user{} to mail list".format(username))
-    success = False
+    msg['success'] = False
     try:
         # Create a text/plain message
         email_msg = EmailMessage()
@@ -55,8 +55,8 @@ def mail_list_subscription(ch, method, properties, body):
         s.quit()
         msg['task'] = task
         msg['success'] = True
-    except Exception:
-        logger.exception("Fatal error:")
+    except Exception as exception:
+        logger.error('', exc_info=True)
 
     # Acknowledge message
     ch.basic_ack(delivery_tag=method.delivery_tag)
