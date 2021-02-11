@@ -66,7 +66,7 @@ def notify_user(ch, method, properties, body):
                 table.update({
                     'username': username,
                     'count': 1,
-                    'sent_at': datetime.now()
+                    'sent': datetime.now()
                 }, ['username'])
 
                 logger.debug(f'User {username} inserted into database')
