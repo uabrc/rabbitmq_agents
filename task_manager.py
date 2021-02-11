@@ -94,6 +94,11 @@ def insert_db(username, msg):
           'email': msg.get('email', ''),
           'reason': msg.get('reason', ''),
           'fullname': msg.get('fullname', ''),
+          'create_account': None,
+          'git_commit': None,
+          'dir_verify': None,
+          'subscribe_mail_list': None,
+          'notify_user': None,
           'sent': None,
           'reported': False,
           'last_update': datetime.now()
