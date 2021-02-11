@@ -27,7 +27,7 @@ def create_account(msg):
     uid = msg['uid']
     email = msg['email']
     fullname = msg['fullname']
-    success = False
+    msg['success'] = False
 
         # Bright command to create user
     cmd = '/cm/local/apps/cmd/bin/cmsh -c '
@@ -46,11 +46,11 @@ def resolve_uid_gid(ch, method, properties, body):
     msg = json.loads(body)
     logger.info("Received {}".format(msg))
     username = msg['username']
-    success = False
+    msg['success'] = False
 
     # Determine next available UID
     try:
-        user_exists_cmd = "/usr/bin/getent passwd {username}"
+        user_exists_cmd = f"/usr/bin/getent passwd {username}"
         user_exists = popen(user_exists_cmd).read().rstrip()
 
         if user_exists:
