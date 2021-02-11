@@ -38,8 +38,7 @@ record = {
     },
     'notify': {
         'notify_user': None
-    },
-    'delivery_tags': None
+    }
 }
 
 # Currently tracking users
@@ -125,7 +124,6 @@ def task_manager(ch, method, properties, body):
         user_db = table.find_one(username=username)
 
         current = tracking[username] = copy.deepcopy(record)
-        current['delivery_tags'] = []
         current['errmsg'] = []
         current['uid'] = user_db['uid'] if user_db else msg['uid']
         current['gid'] = user_db['gid'] if user_db else msg['gid']
@@ -147,9 +145,6 @@ def task_manager(ch, method, properties, body):
             insert_db(username, msg)
 
             logger.debug(f'Tracking user {username}')
-
-    # Save the delivery tags for future use
-    current['delivery_tags'].append(method.delivery_tag)
 
     current['last_update'] = datetime.now()
 
@@ -235,11 +230,6 @@ def task_manager(ch, method, properties, body):
 
         logger.debug(f"Trigger message '{routing_key}' sent")
 
-        # Acknowledge all message from last level
-        for tag in current['delivery_tags']:
-            ch.basic_ack(tag)
-        current['delivery_tags'] = []
-
         logger.debug('Previous level messages acknowledged')
 
     # Send report to admin
@@ -252,6 +242,9 @@ def task_manager(ch, method, properties, body):
         tracking.pop(username)
 
         logger.debug('Admin report sent')
+
+    # Acknowledge message
+    ch.basic_ack(method.delivery_tag)
 
 
 def timeout_handler(signum, frame):
