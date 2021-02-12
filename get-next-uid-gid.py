@@ -8,6 +8,7 @@ import argparse
 import rc_util
 from os import popen
 from rc_rmq import RCRMQ
+import rabbit_config as rcfg
 
 task = 'create_account'
 
@@ -34,10 +35,13 @@ def create_account(msg):
     cmd += f'"user; add {username}; set id {uid}; set email {email}; set commonname \\"{fullname}\\"; '
     cmd += 'commit;"'
 
-    if not args.dry_run:
-        popen(cmd)
-        time.sleep(1)
-    logger.info(f'Bright command to create user:{cmd}')
+        if not args.dry_run:
+            popen(cmd)
+            time.sleep(rcfg.Delay)
+        logger.info(f'Bright command to create user:{cmd}')
+    except Exception:
+        logger.exception("Fatal cmsh error:")
+
 
 # Define your callback function
 def resolve_uid_gid(ch, method, properties, body):

@@ -7,7 +7,7 @@ import dataset
 from rc_rmq import RCRMQ
 from jinja2 import Template
 from datetime import datetime
-import mail_config as mail_cfg
+import rabbit_config as mail_cfg
 
 task = 'notify_user'
 

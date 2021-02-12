@@ -7,6 +7,7 @@ import argparse
 import rc_util
 from email.message import EmailMessage
 from rc_rmq import RCRMQ
+import rabbit_config as rcfg
 
 task = 'subscribe_mail_list'
 
@@ -28,8 +29,10 @@ def mail_list_subscription(ch, method, properties, body):
     fullname = msg['fullname']
     email = msg['email']
 
-    mail_list_admin = 'root@localhost' #change this during deploy
-    mail_list = 'LISTSERV@LISTSERV.UAB.EDU'
+    mail_list_admin = rcfg.Sender
+    mail_list = rcfg.Mail_list
+    mail_list_bcc = rcfg.Mail_list_bcc
+    server = rcfg.Server
 
     listserv_cmd = f'QUIET ADD hpc-announce {email} {fullname} \
                    \nQUIET ADD hpc-users {email} {fullname}'
@@ -43,9 +46,10 @@ def mail_list_subscription(ch, method, properties, body):
         email_msg['From'] = mail_list_admin
         email_msg['To'] = mail_list
         email_msg['Subject'] = ''
+        email_msg['Bcc'] = mail_list_bcc
 
         # Create an smtp object and send email
-        s = smtplib.SMTP('localhost')
+        s = smtplib.SMTP(server)
 
         email_msg.set_content(listserv_cmd)
         if not args.dry_run:
