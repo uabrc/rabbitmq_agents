@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import sys
 import json
 import shutil
@@ -19,7 +20,9 @@ def dir_verify(ch, method, properties, body):
     msg = json.loads(body)
     username = msg['username']
     msg['task'] = task
-    msg['success'] = False
+    msg['success'] = True
+
+    missing_dirs = []
 
     try:
         for d in dirs:
@@ -30,17 +33,24 @@ def dir_verify(ch, method, properties, body):
 
             else:
                 if not path.exists():
-                    # Make sure folder exists and with right permission
-                    path.mkdir(mode=0o700, parents=True, exist_ok=True)
-
-                    # Make sure ownership is correct
-                    shutil.chown(path, int(msg['uid']), int(msg['gid']))
-
-                    logger.debug(f'{path} created')
-
-        msg['success'] = True
+                    # check if dirs exist and record any missing dirs
+                    missing_dirs.append(path)
+                    msg['success'] = False
+                    msg['errmsg'] = f"Error: missing dirs {missing_dirs}"
+                    logger.info(f'{path} does not exist')
+                else:
+                    # check existing dirs for correct ownership and permissions
+                    status = os.stat(path)
+                    mask = oct(status.st_mode)[-3:]
+                    uid = str(status.st_uid)
+                    gid = str(status.st_gid)
+                    if mask!='700' or uid!=msg['uid'] or gid!=msg['gid']:
+                        msg['success'] = False
+                        msg['errmsg'] = f"Error: dir {path} permissions or ownership are wrong"
 
     except Exception as exception:
+        msg['success'] = False
+        msg['errmsg'] = "Exception raised, check the logs for stack trace"
         logger.error('', exc_info=True)
 
     # send confirm message

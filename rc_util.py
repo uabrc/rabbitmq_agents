@@ -21,23 +21,22 @@ def add_account(username, email, full='', reason=''):
 
 def worker(ch, method, properties, body):
     msg = json.loads(body)
-    task = msg['task']
-    tasks[task] = msg['success']
-    print("Got msg: {}({})".format(msg['task'], msg['success']))
+    username = msg['username']
 
-    # Check if all tasks are done
-    done = True
-    for key, status in tasks.items():
-        if not status:
-            print("{} is not done yet.".format(key))
-            done = False
-    if done:
-        rc_rmq.stop_consume()
-        rc_rmq.delete_queue()
+    if msg['success']:
+        print(f'Account for {username} has been created.')
+    else:
+        print(f"There's some issue while creating account for {username}")
+        errmsg = msg.get('errmsg', [])
+        for err in errmsg:
+            print(err)
+
+    rc_rmq.stop_consume()
+    rc_rmq.delete_queue()
 
 def consume(username, routing_key='', callback=worker, debug=False):
     if routing_key == '':
-        routing_key = 'confirm.' + username
+        routing_key = 'complete.' + username
 
     if debug:
         sleep(5)

@@ -28,13 +28,12 @@ def create_account(msg):
     uid = msg['uid']
     email = msg['email']
     fullname = msg['fullname']
-    success = False
+    msg['success'] = False
 
-    try:
         # Bright command to create user
-        cmd = '/cm/local/apps/cmd/bin/cmsh -c '
-        cmd += f'"user; add {username}; set id {uid}; set email {email}; set commonname \\"{fullname}\\"; '
-        cmd += 'commit;"'
+    cmd = '/cm/local/apps/cmd/bin/cmsh -c '
+    cmd += f'"user; add {username}; set id {uid}; set email {email}; set commonname \\"{fullname}\\"; '
+    cmd += 'commit;"'
 
         if not args.dry_run:
             popen(cmd)
@@ -43,6 +42,7 @@ def create_account(msg):
     except Exception:
         logger.exception("Fatal cmsh error:")
 
+
 # Define your callback function
 def resolve_uid_gid(ch, method, properties, body):
 
@@ -50,11 +50,11 @@ def resolve_uid_gid(ch, method, properties, body):
     msg = json.loads(body)
     logger.info("Received {}".format(msg))
     username = msg['username']
-    success = False
+    msg['success'] = False
 
     # Determine next available UID
     try:
-        user_exists_cmd = "/usr/bin/getent passwd {username}"
+        user_exists_cmd = f"/usr/bin/getent passwd {username}"
         user_exists = popen(user_exists_cmd).read().rstrip()
 
         if user_exists:
@@ -76,8 +76,10 @@ def resolve_uid_gid(ch, method, properties, body):
             create_account(msg)
         msg['task'] = task
         msg['success'] = True
-    except Exception:
-        logger.exception("Fatal UID resolution error:")
+    except Exception as exception:
+        msg['success'] = False
+        msg['errmsg'] = f"Exception raised during account creation, check logs for stack trace"
+        logger.error('', exc_info=True)
 
     # Acknowledge message
     ch.basic_ack(delivery_tag=method.delivery_tag)
