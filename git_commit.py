@@ -37,7 +37,6 @@ def git_commit(ch, method, properties, body):
     group_ldif = groups_dir + f'/{username}.ldif'
 
     logger.info("Received: %s", msg)
-    logger.debug("ticketnum: %s", ticketnum)
     logger.debug("branch_name: %s", branch_name)
 
     try:
