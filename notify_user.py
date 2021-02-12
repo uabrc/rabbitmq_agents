@@ -14,8 +14,8 @@ task = 'notify_user'
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)
 
-db = dataset.connect(f'sqlite:///.agent_db/{task}.db')
-table = db['notified_user']
+db = dataset.connect(f'sqlite:///.agent_db/user_reg.db')
+table = db['users']
 
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
@@ -27,16 +27,25 @@ def notify_user(ch, method, properties, body):
     user_email = msg['email']
     msg['task'] = task
     msg['success'] = False
+    errmsg = ""
 
     try:
 
         # Search username in database
         record = table.find_one(username=username)
 
-        if record:
+        if record['sent'] is not None:
+            errmsg = 'Updating database counter'
             # Update counter
             count = record['count']
-            table.update({'username': username, 'count': count + 1}, ['username'])
+            if args.dry_run:
+                logger.info('Update counter in database')
+
+            else:
+                table.update({
+                    'username': username,
+                    'count': count + 1
+                }, ['username'])
 
             logger.debug(f'User {username} counter updated to {count + 1}')
 
@@ -48,25 +57,28 @@ def notify_user(ch, method, properties, body):
             if args.dry_run:
                 logger.info(f'smtp = smtplib.SMTP({mail_cfg.Server})')
                 logger.info(f'smtp.sendmail({mail_cfg.Sender}, {receivers}, message)')
-                logger.info(f"table.insert({{'username': {username}, 'count': 1, 'sent_at': datetime.now()}})")
+                logger.info(f"table.update({{'username': {username}, 'count': 1, 'sent_at': datetime.now()}}, ['username'])")
 
             else:
+                errmsg = 'Sending email to user'
                 smtp = smtplib.SMTP(mail_cfg.Server)
                 smtp.sendmail(mail_cfg.Sender, receivers, message)
 
                 logger.debug(f'Email sent to: {user_email}')
 
-                table.insert({
+                errmsg = 'Updating database email sent time'
+                table.update({
                     'username': username,
                     'count': 1,
-                    'sent_at': datetime.now()
-                })
+                    'sent': datetime.now()
+                }, ['username'])
 
                 logger.debug(f'User {username} inserted into database')
 
         msg['success'] = True
     except Exception as exception:
         logger.error('', exc_info=True)
+        msg['errmsg'] = errmsg if errmsg else 'Unexpected error'
 
     # Send confirm message
     rc_rmq.publish_msg({

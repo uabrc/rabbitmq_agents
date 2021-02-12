@@ -3,6 +3,7 @@ import sys
 import copy
 import json
 import signal
+import dataset
 import rc_util
 import smtplib
 from rc_rmq import RCRMQ
@@ -14,6 +15,9 @@ timeout = 30
 
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)
+
+db = dataset.connect(f'sqlite:///.agent_db/user_reg.db')
+table = db['users']
 
 record = {
     'uid': -1,
@@ -34,8 +38,7 @@ record = {
     },
     'notify': {
         'notify_user': None
-    },
-    'delivery_tags': None
+    }
 }
 
 # Currently tracking users
@@ -77,6 +80,35 @@ def notify_admin(username, user_record):
         logger.debug(f'User report sent to: {mail_cfg.Admin_email}')
 
 
+def insert_db(username, msg):
+    # Search username in db
+    record = table.find_one(username=username)
+
+    if not record:
+        # SQL insert
+        table.insert({
+          'username': username,
+          'uid': msg.get('uid', -1),
+          'gid': msg.get('gid', -1),
+          'email': msg.get('email', ''),
+          'reason': msg.get('reason', ''),
+          'fullname': msg.get('fullname', ''),
+          'create_account': None,
+          'git_commit': None,
+          'dir_verify': None,
+          'subscribe_mail_list': None,
+          'notify_user': None,
+          'sent': None,
+          'reported': False,
+          'last_update': datetime.now()
+        })
+
+
+def update_db(username, data):
+    obj = { 'username': username, **data }
+    table.update(obj, ['username'])
+
+
 def task_manager(ch, method, properties, body):
     msg = json.loads(body)
     username = method.routing_key.split('.')[1]
@@ -85,24 +117,49 @@ def task_manager(ch, method, properties, body):
     send = completed = terminated = False
     routing_key = ""
 
-    if username not in tracking:
-        current = tracking[username] = copy.deepcopy(record)
-        current['delivery_tags'] = []
-        current['errmsg'] = []
-        current['uid'] = msg.get('uid', -1)
-        current['gid'] = msg.get('gid', -1)
-        current['email'] = msg.get('email', '')
-        current['reason'] = msg.get('reason', '')
-        current['fullname'] = msg.get('fullname', '')
-
-        logger.debug(f'Tracking user {username}')
-    else:
+    if username in tracking:
         current = tracking[username]
 
-    # Save the delivery tags for future use
-    current['delivery_tags'].append(method.delivery_tag)
+    else:
+        user_db = table.find_one(username=username)
+
+        current = tracking[username] = copy.deepcopy(record)
+        current['errmsg'] = []
+        current['uid'] = user_db['uid'] if user_db else msg['uid']
+        current['gid'] = user_db['gid'] if user_db else msg['gid']
+        current['email'] = user_db['email'] if user_db else msg['email']
+        current['reason'] = user_db['reason'] if user_db else msg['reason']
+        current['fullname'] = user_db['fullname'] if user_db else msg['fullname']
+
+        if user_db:
+            # Restore task status
+            current['request']['create_account'] = user_db['create_account']
+            current['verify']['git_commit'] = user_db['git_commit']
+            current['verify']['dir_verify'] = user_db['dir_verify']
+            current['verify']['subscribe_mail_list'] = user_db['subscribe_mail_list']
+            current['notify']['notify_user'] = user_db['notify_user']
+
+            for t in ['git_commit', 'dir_verify', 'subscribe_mail_list']:
+                if user_db[t] is None:
+                    current['waiting'].add(t)
+
+            if not current['waiting'] and user_db['notify_user'] is None:
+                current['waiting'].add('notify_user')
+
+            logger.debug(f'Loaded user {username} from DB')
+
+        else:
+            insert_db(username, msg)
+
+            logger.debug(f'Tracking user {username}')
 
     current['last_update'] = datetime.now()
+
+    # Update Database
+    update_db(username, {
+        task_name: success,
+        'last_update': current['last_update']}
+    )
 
     # Save error message if the task was failed
     if not success:
@@ -180,11 +237,6 @@ def task_manager(ch, method, properties, body):
 
         logger.debug(f"Trigger message '{routing_key}' sent")
 
-        # Acknowledge all message from last level
-        for tag in current['delivery_tags']:
-            ch.basic_ack(tag)
-        current['delivery_tags'] = []
-
         logger.debug('Previous level messages acknowledged')
 
     # Send report to admin
@@ -192,9 +244,14 @@ def task_manager(ch, method, properties, body):
 
         notify_admin(username, current)
 
+        update_db(username, {'reported': True})
+
         tracking.pop(username)
 
         logger.debug('Admin report sent')
+
+    # Acknowledge message
+    ch.basic_ack(method.delivery_tag)
 
 
 def timeout_handler(signum, frame):
@@ -214,6 +271,8 @@ def timeout_handler(signum, frame):
             })
 
             notify_admin(user, tracking[user])
+
+            update_db(user, {'reported': True})
 
             tracking.pop(user)
 
