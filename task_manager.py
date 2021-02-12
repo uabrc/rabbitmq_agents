@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import copy
 import json
 import signal
 import rc_util
@@ -85,7 +86,7 @@ def task_manager(ch, method, properties, body):
     routing_key = ""
 
     if username not in tracking:
-        current = tracking[username] = record.copy()
+        current = tracking[username] = copy.deepcopy(record)
         current['delivery_tags'] = []
         current['errmsg'] = []
         current['uid'] = msg.get('uid', -1)
