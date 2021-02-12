@@ -35,13 +35,10 @@ def create_account(msg):
     cmd += f'"user; add {username}; set id {uid}; set email {email}; set commonname \\"{fullname}\\"; '
     cmd += 'commit;"'
 
-        if not args.dry_run:
-            popen(cmd)
-            time.sleep(rcfg.Delay)
-        logger.info(f'Bright command to create user:{cmd}')
-    except Exception:
-        logger.exception("Fatal cmsh error:")
-
+    if not args.dry_run:
+        popen(cmd)
+        time.sleep(rcfg.Delay)
+    logger.info(f'Bright command to create user:{cmd}')
 
 # Define your callback function
 def resolve_uid_gid(ch, method, properties, body):
