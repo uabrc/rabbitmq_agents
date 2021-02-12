@@ -5,6 +5,10 @@ VHost = '/'
 Server = 'ohpc'
 Port = 5672
 
+# time delay to let account creation finish
+# to avoid concurrency with downstream agents
+Delay = 5
+
 # git_commit agent config
 rc_users_ldap_repo_loc = "~/git/rc-users"
 
