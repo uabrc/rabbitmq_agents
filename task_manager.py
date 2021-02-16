@@ -39,7 +39,8 @@ record = {
     },
     'notify': {
         'notify_user': None
-    }
+    },
+    'reported': False
 }
 
 # Currently tracking users
@@ -139,6 +140,8 @@ def task_manager(ch, method, properties, body):
             current['verify']['dir_verify'] = user_db['dir_verify']
             current['verify']['subscribe_mail_list'] = user_db['subscribe_mail_list']
             current['notify']['notify_user'] = user_db['notify_user']
+
+            current['reported'] = user_db['reported']
 
             for t in ['git_commit', 'dir_verify', 'subscribe_mail_list']:
                 if user_db[t] is None:
