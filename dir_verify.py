@@ -6,9 +6,10 @@ import shutil
 import rc_util
 from pathlib import Path
 from rc_rmq import RCRMQ
+import rabbit_config as rcfg
 
 task = 'dir_verify'
-dirs = ['/home', '/data/user', '/data/scratch']
+dirs = rcfg.User_dirs
 
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)

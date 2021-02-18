@@ -9,6 +9,9 @@ Port = 5672
 # to avoid concurrency with downstream agents
 Delay = 5
 
+# dir_verify agent config
+User_dirs = ['/home', '/data/user', '/data/scratch']
+
 # git_commit agent config
 rc_users_ldap_repo_loc = "~/git/rc-users"
 
