@@ -52,6 +52,8 @@ rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 def notify_admin(username, user_record):
     receivers = [user_record['email'], mail_cfg.Admin_email]
     message = Template(mail_cfg.UserReportHead).render(username=username, fullname=user_record['fullname'])
+    if user_record['reported']:
+        message += ' (Duplicate)'
     message += f""" \n
     User Creation Report for user {username}
     uid: {user_record["uid"]}, gid: {user_record["gid"]}
