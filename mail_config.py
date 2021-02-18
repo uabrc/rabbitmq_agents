@@ -31,6 +31,6 @@ Whole_mail = Head + Body
 
 UserReportHead = f"""From: {Sender_alias} <{Sender}>
 To: <{Admin_email}>
-Subject: User Creation Report:
+Subject: RC Account Creation Report: {{{{ fullname }}}}, {{{{ username }}}}
 """
 

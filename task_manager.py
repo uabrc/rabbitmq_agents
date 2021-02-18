@@ -7,6 +7,7 @@ import dataset
 import rc_util
 import smtplib
 from rc_rmq import RCRMQ
+from jinja2 import Template
 from datetime import datetime
 import mail_config as mail_cfg
 
@@ -49,16 +50,16 @@ rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
 def notify_admin(username, user_record):
     receivers = [user_record['email'], mail_cfg.Admin_email]
-    message = mail_cfg.UserReportHead
-    message += f"""
-        User Creation Report for user {username}
-        uid: {user_record["uid"]}, gid: {user_record["gid"]}
-        Tasks:
-            'create_account':      {user_record["request"]["create_account"]}
-            'git_commit':          {user_record["verify"]["git_commit"]}
-            'dir_verify':          {user_record["verify"]["dir_verify"]}
-            'subscribe_mail_list': {user_record["verify"]["subscribe_mail_list"]}
-            'notify_user':         {user_record["notify"]["notify_user"]}
+    message = Template(mail_cfg.UserReportHead).render(username=username, fullname=user_record['fullname'])
+    message += f""" \n
+    User Creation Report for user {username}
+    uid: {user_record["uid"]}, gid: {user_record["gid"]}
+    Tasks:
+    'create_account':      {user_record["request"]["create_account"]}
+    'git_commit':          {user_record["verify"]["git_commit"]}
+    'dir_verify':          {user_record["verify"]["dir_verify"]}
+    'subscribe_mail_list': {user_record["verify"]["subscribe_mail_list"]}
+    'notify_user':         {user_record["notify"]["notify_user"]}
     """
     if user_record['errmsg']:
         message += """
