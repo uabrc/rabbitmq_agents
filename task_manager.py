@@ -48,9 +48,9 @@ tracking = {}
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
-def notify_admin(username, fullname, user_record):
+def notify_admin(username, user_record):
     receivers = [user_record['email'], mail_cfg.Admin_email]
-    message = Template(mail_cfg.UserReportHead).render(username=username, fullname=fullname)
+    message = Template(mail_cfg.UserReportHead).render(username=username, fullname=user_record['fullname'])
     message += f""" \n
     User Creation Report for user {username}
     uid: {user_record["uid"]}, gid: {user_record["gid"]}
@@ -113,7 +113,6 @@ def update_db(username, data):
 def task_manager(ch, method, properties, body):
     msg = json.loads(body)
     username = method.routing_key.split('.')[1]
-    fullname = msg['fullname']
     task_name = msg['task']
     success = msg['success']
     send = completed = terminated = False
@@ -244,7 +243,7 @@ def task_manager(ch, method, properties, body):
     # Send report to admin
     if completed or terminated:
 
-        notify_admin(username, fullname, current)
+        notify_admin(username, current)
 
         update_db(username, {'reported': True})
 
