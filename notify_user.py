@@ -7,8 +7,8 @@ import dataset
 from rc_rmq import RCRMQ
 from jinja2 import Template
 from datetime import datetime
-import rabbit_config as mail_cfg
-
+import rabbit_config as rcfg
+import mail_config as mail_cfg
 task = 'notify_user'
 
 args = rc_util.get_args()
@@ -51,18 +51,18 @@ def notify_user(ch, method, properties, body):
 
         else:
             # Send email to user
-            receivers = [user_email, mail_cfg.Admin_email]
+            receivers = [user_email, rcfg.Admin_email]
             message = Template(mail_cfg.Whole_mail).render(username=username, to=user_email)
 
             if args.dry_run:
-                logger.info(f'smtp = smtplib.SMTP({mail_cfg.Server})')
-                logger.info(f'smtp.sendmail({mail_cfg.Sender}, {receivers}, message)')
+                logger.info(f'smtp = smtplib.SMTP({rcfg.Server})')
+                logger.info(f'smtp.sendmail({rcfg.Sender}, {receivers}, message)')
                 logger.info(f"table.update({{'username': {username}, 'count': 1, 'sent_at': datetime.now()}}, ['username'])")
 
             else:
                 errmsg = 'Sending email to user'
-                smtp = smtplib.SMTP(mail_cfg.Server)
-                smtp.sendmail(mail_cfg.Sender, receivers, message)
+                smtp = smtplib.SMTP(rcfg.Server)
+                smtp.sendmail(rcfg.Sender, receivers, message)
 
                 logger.debug(f'Email sent to: {user_email}')
 
