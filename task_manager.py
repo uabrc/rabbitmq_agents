@@ -10,7 +10,7 @@ from rc_rmq import RCRMQ
 from jinja2 import Template
 from datetime import datetime
 import mail_config as mail_cfg
-import rabbitmq_config as rcfg
+import rabbit_config as rcfg
 
 task = 'task_manager'
 timeout = 30
