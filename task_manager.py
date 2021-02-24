@@ -10,6 +10,7 @@ from rc_rmq import RCRMQ
 from jinja2 import Template
 from datetime import datetime
 import mail_config as mail_cfg
+import rabbitmq_config as rcfg
 
 task = 'task_manager'
 timeout = 30
@@ -50,7 +51,7 @@ tracking = {}
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
 def notify_admin(username, user_record):
-    receivers = [user_record['email'], mail_cfg.Admin_email]
+    receivers = [user_record['email'], rcfg.Admin_email]
     message = Template(mail_cfg.UserReportHead).render(username=username, fullname=user_record['fullname'])
     if user_record['reported']:
         message += ' (Duplicate)'
@@ -73,15 +74,15 @@ def notify_admin(username, user_record):
             message += msg + "\n"
 
     if args.dry_run:
-        logger.info(f'smtp = smtplib.SMTP({mail_cfg.Server})')
-        logger.info(f'smtp.sendmail({mail_cfg.Sender}, {mail_cfg.Admin_email}, message)')
+        logger.info(f'smtp = smtplib.SMTP({rcfg.Server})')
+        logger.info(f'smtp.sendmail({rcfg.Sender}, {rcfg.Admin_email}, message)')
         logger.info(message)
 
     else:
-        smtp = smtplib.SMTP(mail_cfg.Server)
-        smtp.sendmail(mail_cfg.Sender, receivers, message)
+        smtp = smtplib.SMTP(rcfg.Server)
+        smtp.sendmail(rcfg.Sender, receivers, message)
 
-        logger.debug(f'User report sent to: {mail_cfg.Admin_email}')
+        logger.debug(f'User report sent to: {rcfg.Admin_email}')
 
 
 def insert_db(username, msg):
