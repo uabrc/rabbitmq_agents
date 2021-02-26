@@ -51,7 +51,7 @@ tracking = {}
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
 def notify_admin(username, user_record):
-    receivers = [user_record['email'], rcfg.Admin_email]
+    receivers = [rcfg.Admin_email]
     message = Template(mail_cfg.UserReportHead).render(username=username, fullname=user_record['fullname'])
     if user_record['reported']:
         message += ' (Duplicate)'
