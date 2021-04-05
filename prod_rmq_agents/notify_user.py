@@ -55,13 +55,13 @@ def notify_user(ch, method, properties, body):
             message = Template(mail_cfg.Whole_mail).render(username=username, to=user_email)
 
             if args.dry_run:
-                logger.info(f'smtp = smtplib.SMTP({rcfg.Server})')
+                logger.info(f'smtp = smtplib.SMTP({rcfg.Mail_server})')
                 logger.info(f'smtp.sendmail({rcfg.Sender}, {receivers}, message)')
                 logger.info(f"table.update({{'username': {username}, 'count': 1, 'sent_at': datetime.now()}}, ['username'])")
 
             else:
                 errmsg = 'Sending email to user'
-                smtp = smtplib.SMTP(rcfg.Server)
+                smtp = smtplib.SMTP(rcfg.Mail_server)
                 smtp.sendmail(rcfg.Sender, receivers, message)
 
                 logger.debug(f'Email sent to: {user_email}')

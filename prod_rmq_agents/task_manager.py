@@ -74,12 +74,12 @@ def notify_admin(username, user_record):
             message += msg + "\n"
 
     if args.dry_run:
-        logger.info(f'smtp = smtplib.SMTP({rcfg.Server})')
+        logger.info(f'smtp = smtplib.SMTP({rcfg.Mail_server})')
         logger.info(f'smtp.sendmail({rcfg.Sender}, {rcfg.Admin_email}, message)')
         logger.info(message)
 
     else:
-        smtp = smtplib.SMTP(rcfg.Server)
+        smtp = smtplib.SMTP(rcfg.Mail_server)
         smtp.sendmail(rcfg.Sender, receivers, message)
 
         logger.debug(f'User report sent to: {rcfg.Admin_email}')
