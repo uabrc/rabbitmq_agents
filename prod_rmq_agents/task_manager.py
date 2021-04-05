@@ -52,7 +52,15 @@ rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
 def notify_admin(username, user_record):
     receivers = [rcfg.Admin_email]
-    message = Template(mail_cfg.UserReportHead).render(username=username, fullname=user_record['fullname'])
+
+    result = "SUCCESS" if user_record["request"]["create_account"] and\
+       user_record["verify"]["git_commit"] and\
+       user_record["verify"]["dir_verify"] and\
+       user_record["verify"]["subscribe_mail_list"] and\
+       user_record["notify"]["notify_user"]\
+       else "FAILED"
+
+    message = Template(mail_cfg.UserReportHead).render(username=username, fullname=user_record['fullname'], result=result)
     if user_record['reported']:
         message += ' (Duplicate)'
     message += f""" \n
