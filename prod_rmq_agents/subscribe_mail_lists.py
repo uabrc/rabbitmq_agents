@@ -32,7 +32,7 @@ def mail_list_subscription(ch, method, properties, body):
     mail_list_admin = rcfg.Sender
     mail_list = rcfg.Mail_list
     mail_list_bcc = rcfg.Mail_list_bcc
-    server = rcfg.Server
+    server = rcfg.Mail_server
 
     listserv_cmd = f'QUIET ADD hpc-announce {email} {fullname} \
                    \nQUIET ADD hpc-users {email} {fullname}'

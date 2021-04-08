@@ -16,7 +16,7 @@ User_dirs = ['/home', '/data/user', '/data/scratch']
 rc_users_ldap_repo_loc = "~/git/rc-users"
 
 # Config related to email
-Server = 'localhost'
+Mail_server = 'localhost'
 Admin_email = 'root@localhost'
 Sender = 'ROOT@LOCALHOST'
 Sender_alias = 'Services'

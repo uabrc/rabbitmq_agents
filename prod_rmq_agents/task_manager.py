@@ -52,7 +52,15 @@ rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 
 def notify_admin(username, user_record):
     receivers = [rcfg.Admin_email]
-    message = Template(mail_cfg.UserReportHead).render(username=username, fullname=user_record['fullname'])
+
+    result = "SUCCESS" if user_record["request"]["create_account"] and\
+       user_record["verify"]["git_commit"] and\
+       user_record["verify"]["dir_verify"] and\
+       user_record["verify"]["subscribe_mail_list"] and\
+       user_record["notify"]["notify_user"]\
+       else "FAILED"
+
+    message = Template(mail_cfg.UserReportHead).render(username=username, fullname=user_record['fullname'], result=result)
     if user_record['reported']:
         message += ' (Duplicate)'
     message += f""" \n
@@ -74,12 +82,12 @@ def notify_admin(username, user_record):
             message += msg + "\n"
 
     if args.dry_run:
-        logger.info(f'smtp = smtplib.SMTP({rcfg.Server})')
+        logger.info(f'smtp = smtplib.SMTP({rcfg.Mail_server})')
         logger.info(f'smtp.sendmail({rcfg.Sender}, {rcfg.Admin_email}, message)')
         logger.info(message)
 
     else:
-        smtp = smtplib.SMTP(rcfg.Server)
+        smtp = smtplib.SMTP(rcfg.Mail_server)
         smtp.sendmail(rcfg.Sender, receivers, message)
 
         logger.debug(f'User report sent to: {rcfg.Admin_email}')
