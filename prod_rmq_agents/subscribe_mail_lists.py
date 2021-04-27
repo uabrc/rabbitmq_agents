@@ -66,12 +66,12 @@ def mail_list_subscription(ch, method, properties, body):
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
     # send confirm message
-    logger.debug('rc_rmq.publish_msg()')
-    rc_rmq.publish_msg({
-        'routing_key': 'confirm.' + username,
-        'msg': msg
-    })
-    logger.info('confirmation sent')
+    logger.debug("rc_rmq.publish_msg()")
+    rc_rmq.publish_msg(
+        {"routing_key": "confirm." + msg["queuename"], "msg": msg}
+    )
+    logger.info("confirmation sent")
+
 
 logger.info("Start listening to queue: {}".format(task))
 rc_rmq.start_consume({

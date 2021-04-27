@@ -80,12 +80,11 @@ def git_commit(ch, method, properties, body):
         logger.error('', exc_info=True)
 
     # Send confirm message
-    logger.debug('rc_rmq.publish_msge()')
-    rc_rmq.publish_msg({
-        'routing_key': 'confirm.' + username,
-        'msg': msg
-    })
-    logger.info('confirmation sent')
+    logger.debug("rc_rmq.publish_msge()")
+    rc_rmq.publish_msg(
+        {"routing_key": "confirm." + msg["queuename"], "msg": msg}
+    )
+    logger.info("confirmation sent")
 
     # Acknowledge message
     logger.debug('ch.basic_ack()')
