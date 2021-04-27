@@ -99,22 +99,25 @@ def insert_db(username, msg):
 
     if not record:
         # SQL insert
-        table.insert({
-          'username': username,
-          'uid': msg.get('uid', -1),
-          'gid': msg.get('gid', -1),
-          'email': msg.get('email', ''),
-          'reason': msg.get('reason', ''),
-          'fullname': msg.get('fullname', ''),
-          'create_account': None,
-          'git_commit': None,
-          'dir_verify': None,
-          'subscribe_mail_list': None,
-          'notify_user': None,
-          'sent': None,
-          'reported': False,
-          'last_update': datetime.now()
-        })
+        table.insert(
+            {
+                "username": username,
+                "uid": msg.get("uid", -1),
+                "gid": msg.get("gid", -1),
+                "email": msg.get("email", ""),
+                "reason": msg.get("reason", ""),
+                "fullname": msg.get("fullname", ""),
+                "create_account": None,
+                "git_commit": None,
+                "dir_verify": None,
+                "subscribe_mail_list": None,
+                "notify_user": None,
+                "sent": None,
+                "reported": False,
+                "last_update": datetime.now(),
+                "queuename": msg.get("queuename", ""),
+            }
+        )
 
 
 def update_db(username, data):
@@ -124,9 +127,10 @@ def update_db(username, data):
 
 def task_manager(ch, method, properties, body):
     msg = json.loads(body)
-    username = method.routing_key.split('.')[1]
-    task_name = msg['task']
-    success = msg['success']
+    queuename = method.routing_key.split(".")[1]
+    username = msg["username"]
+    task_name = msg["task"]
+    success = msg["success"]
     send = completed = terminated = False
     routing_key = ""
 
@@ -137,12 +141,17 @@ def task_manager(ch, method, properties, body):
         user_db = table.find_one(username=username)
 
         current = tracking[username] = copy.deepcopy(record)
-        current['errmsg'] = []
-        current['uid'] = user_db['uid'] if user_db else msg['uid']
-        current['gid'] = user_db['gid'] if user_db else msg['gid']
-        current['email'] = user_db['email'] if user_db else msg['email']
-        current['reason'] = user_db['reason'] if user_db else msg['reason']
-        current['fullname'] = user_db['fullname'] if user_db else msg['fullname']
+        current["errmsg"] = []
+        current["queuename"] = (
+            user_db["queuename"] if user_db else msg["queuename"]
+        )
+        current["uid"] = user_db["uid"] if user_db else msg["uid"]
+        current["gid"] = user_db["gid"] if user_db else msg["gid"]
+        current["email"] = user_db["email"] if user_db else msg["email"]
+        current["reason"] = user_db["reason"] if user_db else msg["reason"]
+        current["fullname"] = (
+            user_db["fullname"] if user_db else msg["fullname"]
+        )
 
         if user_db:
             # Restore task status
@@ -184,34 +193,35 @@ def task_manager(ch, method, properties, body):
 
     # Define message that's going to be published
     message = {
-        'username': username,
-        'uid': current['uid'],
-        'gid': current['gid'],
-        'email': current['email'],
-        'reason': current['reason'],
-        'fullname': current['fullname']
+        "username": username,
+        "queuename": queuename,
+        "uid": current["uid"],
+        "gid": current["gid"],
+        "email": current["email"],
+        "reason": current["reason"],
+        "fullname": current["fullname"],
     }
 
     try:
-        if task_name in current['request']:
-            current['request'][task_name] = success
-            routing_key = 'verify.' + username
+        if task_name in current["request"]:
+            current["request"][task_name] = success
+            routing_key = "verify." + queuename
 
             # Terminate the process if failed
             if not success:
                 terminated = True
-                routing_key = 'complete.' + username
-                message['success'] = False
-                message['errmsg'] = current['errmsg']
+                routing_key = "complete." + queuename
+                message["success"] = False
+                message["errmsg"] = current["errmsg"]
 
             send = True
             current['waiting'] = {'git_commit', 'dir_verify', 'subscribe_mail_list'}
             logger.debug(f'Request level {task_name}? {success}')
 
-        elif task_name in current['verify']:
-            current['verify'][task_name] = success
-            current['waiting'].discard(task_name)
-            routing_key = 'notify.' + username
+        elif task_name in current["verify"]:
+            current["verify"][task_name] = success
+            current["waiting"].discard(task_name)
+            routing_key = "notify." + queuename
 
             if not current['waiting']:
                 send = True
@@ -220,18 +230,18 @@ def task_manager(ch, method, properties, body):
             # Terminate if dir_verify failed and all agents has responsed
             if send and not current['verify']['dir_verify']:
                 terminated = True
-                routing_key = 'complete.' + username
-                message['success'] = False
-                message['errmsg'] = current['errmsg']
+                routing_key = "complete." + queuename
+                message["success"] = False
+                message["errmsg"] = current["errmsg"]
 
             logger.debug(f'Verify level {task_name}? {success}')
 
-        elif task_name in current['notify']:
-            current['notify'][task_name] = success
-            current['waiting'].discard(task_name)
-            routing_key = 'complete.' + username
-            message['success'] = success
-            message['errmsg'] = current['errmsg']
+        elif task_name in current["notify"]:
+            current["notify"][task_name] = success
+            current["waiting"].discard(task_name)
+            routing_key = "complete." + queuename
+            message["success"] = success
+            message["errmsg"] = current["errmsg"]
 
             send = True
 
