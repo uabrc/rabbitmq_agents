@@ -17,7 +17,9 @@ args = parser.parse_args()
 
 timeout = 60
 
-if args.email == '':
+queuename = rc_util.encode_name(args.username)
+
+if args.email == "":
     args.email = args.username
     if '@' not in args.email:
         args.email = args.username + '@' + args.domain
@@ -43,12 +45,20 @@ def callback(channel, method, properties, body):
     rc_util.rc_rmq.delete_queue()
 
 
-rc_util.add_account(args.username, email=args.email, full=args.full_name, reason=args.reason)
-print(f'Account for {args.username} requested.')
+rc_util.add_account(
+    args.username,
+    queuename=queuename,
+    email=args.email,
+    full=args.full_name,
+    reason=args.reason,
+)
+print(f"Account for {args.username} requested.")
 
 # Set initial timeout timer
 signal.signal(signal.SIGALRM, timeout_handler)
 signal.setitimer(signal.ITIMER_REAL, timeout)
 
-print('Waiting for completion...')
-rc_util.consume(args.username, routing_key=f'complete.{args.username}', callback=callback)
+print("Waiting for completion...")
+rc_util.consume(
+    queuename, routing_key=f"complete.{queuename}", callback=callback
+)
