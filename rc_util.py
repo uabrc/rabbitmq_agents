@@ -21,7 +21,7 @@ def add_account(username, queuename, email, full="", reason=""):
             },
     }
     )
-  rc_rmq.disconnect()
+    rc_rmq.disconnect()
 
 def worker(ch, method, properties, body):
     msg = json.loads(body)
