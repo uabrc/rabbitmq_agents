@@ -20,7 +20,7 @@ args = rc_util.get_args()
 # Logger
 logger = rc_util.get_logger()
 
-#Account creation 
+#Account creation
 def create_account(msg):
 
     logger.info(f'Account creation request received: {msg}')
@@ -56,17 +56,17 @@ def resolve_uid_gid(ch, method, properties, body):
 
         if user_exists:
             logger.info("The user, {} already exists".format(username))
-            msg['uid'] = user_exists.split(':')[2] 
+            msg['uid'] = user_exists.split(':')[2]
             msg['gid'] = user_exists.split(':')[3]
 
         else:
             cmd_uid = "/usr/bin/getent passwd | \
-                awk -F: '($3>10000) && ($3<20000) && ($3>maxuid) { maxuid=$3; } END { print maxuid+1; }'"
+                awk -F: 'BEGIN { maxuid=10000 } ($3>10000) && ($3<20000) && ($3>maxuid) { maxuid=$3; } END { print maxuid+1; }'"
             msg['uid'] = popen(cmd_uid).read().rstrip()
             logger.info(f"UID query: {cmd_uid}")
 
             cmd_gid = "/usr/bin/getent group | \
-                awk -F: '($3>10000) && ($3<20000) && ($3>maxgid) { maxgid=$3; } END { print maxgid+1; }'"
+                awk -F: 'BEGIN { maxgid=10000 } ($3>10000) && ($3<20000) && ($3>maxgid) { maxgid=$3; } END { print maxgid+1; }'"
             msg['gid'] = popen(cmd_gid).read().rstrip()
             logger.info(f"GID query: {cmd_gid}")
 
