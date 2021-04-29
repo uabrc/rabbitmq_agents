@@ -24,6 +24,7 @@ Subject = 'New User Account'
 Info_url = 'https://www.google.com'
 Mail_list = 'root@localhost'
 Mail_list_bcc = 'cmsupport@localhost'
+Support_email = 'support@listserv.uab.edu'
 
 Head = f"""From: {Sender_alias} <{Sender}>
 To: <{{{{ to }}}}>
