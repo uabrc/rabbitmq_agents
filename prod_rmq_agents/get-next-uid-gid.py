@@ -62,12 +62,12 @@ def resolve_uid_gid(ch, method, properties, body):
 
         else:
             cmd_uid = "/usr/bin/getent passwd | \
-                awk -F: '($3>10000) && ($3<20000) && ($3>maxuid) { maxuid=$3; } END { print maxuid+1; }'"
+                awk -F: 'BEGIN { maxuid=10000 } ($3>10000) && ($3<20000) && ($3>maxuid) { maxuid=$3; } END { print maxuid+1; }'"
             msg["uid"] = popen(cmd_uid).read().rstrip()
             logger.info(f"UID query: {cmd_uid}")
 
             cmd_gid = "/usr/bin/getent group | \
-                awk -F: '($3>10000) && ($3<20000) && ($3>maxgid) { maxgid=$3; } END { print maxgid+1; }'"
+                awk -F: 'BEGIN { maxgid=10000 } ($3>10000) && ($3<20000) && ($3>maxgid) { maxgid=$3; } END { print maxgid+1; }'"
             msg["gid"] = popen(cmd_gid).read().rstrip()
             logger.info(f"GID query: {cmd_gid}")
 
