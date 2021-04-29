@@ -55,10 +55,9 @@ def dir_verify(ch, method, properties, body):
         logger.error('', exc_info=True)
 
     # send confirm message
-    rc_rmq.publish_msg({
-        'routing_key': 'confirm.' + username,
-        'msg': msg
-    })
+    rc_rmq.publish_msg(
+        {"routing_key": "confirm." + msg["queuename"], "msg": msg}
+    )
 
     logger.debug(f'User {username} confirmation sent')
 

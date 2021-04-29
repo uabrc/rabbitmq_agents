@@ -2,22 +2,26 @@ import logging
 import argparse
 from rc_rmq import RCRMQ
 import json
+from urllib.parse import quote
 
 rc_rmq = RCRMQ({'exchange': 'RegUsr', 'exchange_type': 'topic'})
 tasks = {'create_account': None, 'git_commit': None, 'dir_verify': None, 'subscribe_mail_list': None, 'notify_user': None}
 logger_fmt = '%(asctime)s [%(module)s] - %(message)s'
 
-def add_account(username, email, full='', reason=''):
-  rc_rmq.publish_msg({
-    'routing_key': 'request.' + username,
-    'msg': {
+def add_account(username, queuename, email, full="", reason=""):
+    rc_rmq.publish_msg(
+        {
+            "routing_key": "request." + queuename,
+            "msg": {
       "username": username,
       "email": email,
       "fullname": full,
-      "reason": reason
+                "reason": reason,
+                "queuename": queuename,
+            },
     }
-  })
-  rc_rmq.disconnect()
+    )
+    rc_rmq.disconnect()
 
 def worker(ch, method, properties, body):
     msg = json.loads(body)
@@ -34,18 +38,20 @@ def worker(ch, method, properties, body):
     rc_rmq.stop_consume()
     rc_rmq.delete_queue()
 
-def consume(username, routing_key='', callback=worker, debug=False):
-    if routing_key == '':
-        routing_key = 'complete.' + username
+def consume(queuename, routing_key="", callback=worker, debug=False):
+    if routing_key == "":
+        routing_key = "complete." + queuename
 
     if debug:
         sleep(5)
     else:
-        rc_rmq.start_consume({
-            'queue': username,
-            'routing_key': routing_key,
-            'cb': callback
-        })
+        rc_rmq.start_consume(
+            {
+                "queue": queuename,
+                "routing_key": routing_key,
+                "cb": callback,
+            }
+        )
         rc_rmq.disconnect()
 
     return { 'success' : True }
@@ -72,3 +78,9 @@ def get_logger(args=None):
     logging.basicConfig(format=logger_fmt, level=logger_lvl)
     return logging.getLogger(__name__)
 
+
+def encode_name(uname):
+    uname_quote = quote(uname)
+    if "." in uname_quote:
+        uname_quote = uname_quote.replace(".", "%2E")
+    return uname_quote

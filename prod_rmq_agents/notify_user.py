@@ -81,10 +81,9 @@ def notify_user(ch, method, properties, body):
         msg['errmsg'] = errmsg if errmsg else 'Unexpected error'
 
     # Send confirm message
-    rc_rmq.publish_msg({
-        'routing_key': 'confirm.' + username,
-        'msg': msg
-    })
+    rc_rmq.publish_msg(
+        {"routing_key": "confirm." + msg["queuename"], "msg": msg}
+    )
 
     logger.debug(f'User {username} confirmation sent')
 
