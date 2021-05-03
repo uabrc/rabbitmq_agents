@@ -37,5 +37,5 @@ logger.info("Start listening to queue: {}".format(task))
 
 # Start consuming messages from queue with callback function
 rc_rmq.start_consume(
-    {"queue": task, "routing_key": "create.*", "cb": log_registration}
+    {"queue": task, "routing_key": "request.*", "cb": log_registration}
 )
