@@ -26,7 +26,7 @@ account_req_table = db["registry"]
 def log_registration(ch, method, properties, body):
 
     account_req = json.loads(body)
-    account_req["req_time"] = (datetime.now(),)
+    account_req["req_time"] = datetime.now()
     account_req_table.insert(account_req)
     logger.info("logged account request for %s", account_req["username"])
 
