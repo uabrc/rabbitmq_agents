@@ -19,7 +19,7 @@ args = rc_util.get_args()
 logger = rc_util.get_logger()
 
 # Open registry table in DB
-db = dataset.connect("sqlite:///reg_logger.db")
+db = dataset.connect("sqlite:///.agent_db/reg_logger.db")
 account_req_table = db["registry"]
 
 # Define registration logger callback
