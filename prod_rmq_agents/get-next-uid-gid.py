@@ -9,6 +9,8 @@ import rc_util
 from os import popen
 from rc_rmq import RCRMQ
 import rabbit_config as rcfg
+from subprocess import run
+import shlex
 
 task = "create_account"
 
@@ -21,6 +23,8 @@ args = rc_util.get_args()
 logger = rc_util.get_logger()
 
 # Account creation
+
+
 def create_account(msg):
 
     logger.info(f"Account creation request received: {msg}")
@@ -36,7 +40,7 @@ def create_account(msg):
     cmd += 'commit;"'
 
     if not args.dry_run:
-        popen(cmd)
+        run(shlex.split(cmd))
         time.sleep(rcfg.Delay)
     logger.info(f"Bright command to create user:{cmd}")
 
