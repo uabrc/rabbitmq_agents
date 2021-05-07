@@ -3,6 +3,7 @@ import argparse
 from rc_rmq import RCRMQ
 import json
 from urllib.parse import quote
+from time import sleep
 
 rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 tasks = {
