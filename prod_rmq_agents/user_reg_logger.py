@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import json
-import sys
 import dataset
 import rc_util
 from rc_rmq import RCRMQ
