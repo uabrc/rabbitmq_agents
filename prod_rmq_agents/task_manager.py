@@ -159,9 +159,7 @@ def task_manager(ch, method, properties, body):
 
         if user_db:
             # Restore task status
-            current["request"]["create_account"] = user_db[
-                "create_account"
-            ]
+            current["request"]["create_account"] = user_db["create_account"]
             current["verify"]["git_commit"] = user_db["git_commit"]
             current["verify"]["dir_verify"] = user_db["dir_verify"]
             current["verify"]["subscribe_mail_list"] = user_db[
