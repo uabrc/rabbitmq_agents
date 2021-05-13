@@ -21,6 +21,7 @@ logger = rc_util.get_logger()
 db = dataset.connect("sqlite:///.agent_db/reg_logger.db")
 account_req_table = db["registry"]
 
+
 # Define registration logger callback
 def log_registration(ch, method, properties, body):
 

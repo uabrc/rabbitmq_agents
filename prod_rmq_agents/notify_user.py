@@ -20,6 +20,7 @@ table = db["users"]
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 
+
 # Email instruction to user
 def notify_user(ch, method, properties, body):
     msg = json.loads(body)
