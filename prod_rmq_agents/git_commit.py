@@ -6,6 +6,7 @@ import json
 import rc_util
 from rc_rmq import RCRMQ
 import rabbit_config as rmq_cfg
+import time
 
 task = "git_commit"
 
@@ -37,7 +38,8 @@ def git_commit(ch, method, properties, body):
     username = msg["username"]
     msg["task"] = task
     msg["success"] = False
-    branch_name = "issue-add-users-" + username.lower()
+    branch_name = "issue-add-users-" + \
+        username.lower() + "-" + time.strftime("%Y%m%d_%H%M%S")
     user_ldif = users_dir + f"/{username}.ldif"
     group_ldif = groups_dir + f"/{username}.ldif"
 

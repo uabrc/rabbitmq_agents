@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import sys
 import json
 import rc_util
 import smtplib
@@ -15,11 +14,12 @@ task = "notify_user"
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)
 
-db = dataset.connect(f"sqlite:///.agent_db/user_reg.db")
+db = dataset.connect(f"sqlite:///{rcfg.db_path}/user_reg.db")
 table = db["users"]
 
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
+
 
 # Email instruction to user
 def notify_user(ch, method, properties, body):
