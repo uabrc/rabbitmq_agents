@@ -14,6 +14,7 @@ User_dirs = ['/home', '/data/user', '/data/scratch']
 
 # git_commit agent config
 rc_users_ldap_repo_loc = "~/git/rc-users"
+db_path = ".agent_db"
 
 # Config related to email
 Mail_server = 'localhost'

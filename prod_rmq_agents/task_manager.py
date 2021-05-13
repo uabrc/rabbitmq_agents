@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import sys
 import copy
 import json
 import signal
@@ -18,7 +17,7 @@ timeout = 30
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)
 
-db = dataset.connect(f"sqlite:///.agent_db/user_reg.db")
+db = dataset.connect(f"sqlite:///{rcfg.db_path}/user_reg.db")
 table = db["users"]
 
 record = {
@@ -159,9 +158,7 @@ def task_manager(ch, method, properties, body):
 
         if user_db:
             # Restore task status
-            current["request"]["create_account"] = user_db[
-                "create_account"
-            ]
+            current["request"]["create_account"] = user_db["create_account"]
             current["verify"]["git_commit"] = user_db["git_commit"]
             current["verify"]["dir_verify"] = user_db["dir_verify"]
             current["verify"]["subscribe_mail_list"] = user_db[
