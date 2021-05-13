@@ -61,26 +61,26 @@ def git_commit(ch, method, properties, body):
                 group_ldif, "w"
             ) as ldif_g:
                 logger.debug(
-                    f"ldapsearch -LLL -x -H ldaps://ldapserver -b 'dc=cm,dc=cluster' uid={username} > {user_ldif}"
+                    f"ldapsearch -LLL -x -h ldapserver -b 'dc=cm,dc=cluster' uid={username} > {user_ldif}"
                 )
                 ldapsearch(
                     "-LLL",
                     "-x",
-                    "-H",
-                    "ldaps://ldapserver",
+                    "-h",
+                    "ldapserver",
                     "-b",
                     "dc=cm,dc=cluster",
                     f"uid={username}",
                     _out=ldif_u,
                 )
                 logger.debug(
-                    f"ldapsearch -LLL -x -H ldapserver -b 'ou=Group,dc=cm,dc=cluster' cn={username} > {group_ldif}"
+                    f"ldapsearch -LLL -x -h ldapserver -b 'ou=Group,dc=cm,dc=cluster' cn={username} > {group_ldif}"
                 )
                 ldapsearch(
                     "-LLL",
                     "-x",
-                    "-H",
-                    "ldaps://ldapserver",
+                    "-h",
+                    "ldapserver",
                     "-b",
                     "ou=Group,dc=cm,dc=cluster",
                     f"cn={username}",
