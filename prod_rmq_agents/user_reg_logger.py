@@ -4,6 +4,7 @@ import dataset
 import rc_util
 from rc_rmq import RCRMQ
 from datetime import datetime
+import rabbit_config as rcfg
 
 # Define queue name
 task = "reg_logger"
@@ -18,7 +19,7 @@ args = rc_util.get_args()
 logger = rc_util.get_logger()
 
 # Open registry table in DB
-db = dataset.connect("sqlite:///.agent_db/reg_logger.db")
+db = dataset.connect(f"sqlite:///{rcfg.db_path}/reg_logger.db")
 account_req_table = db["registry"]
 
 

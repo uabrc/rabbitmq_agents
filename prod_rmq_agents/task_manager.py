@@ -17,7 +17,7 @@ timeout = 30
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)
 
-db = dataset.connect(f"sqlite:///.agent_db/user_reg.db")
+db = dataset.connect(f"sqlite:///{rcfg.db_path}/user_reg.db")
 table = db["users"]
 
 record = {
