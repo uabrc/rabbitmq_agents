@@ -40,7 +40,7 @@ def slurm_account_create(ch, method, properties, body):
         )
         print("SLURM account for user {} has been added".format(username))
         success = True
-    except:
+    except Exception:
         e = sys.exc_info()[0]
         print("[{}]: Error: {}".format(task, e))
 

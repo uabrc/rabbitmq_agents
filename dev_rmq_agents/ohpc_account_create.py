@@ -20,7 +20,7 @@ def ohpc_account_create(ch, method, properties, body):
         subprocess.call(["sudo", "useradd", username])
         print("[{}]: User {} has been added".format(task, username))
         success = True
-    except:
+    except Exception:
         e = sys.exc_info()[0]
         print("[{}]: Error: {}".format(task, e))
 
