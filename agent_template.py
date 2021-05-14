@@ -7,6 +7,7 @@ task = "task_name"
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 
+
 # Define your callback function
 def on_message(ch, method, properties, body):
 

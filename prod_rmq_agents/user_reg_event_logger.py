@@ -7,6 +7,7 @@ task = "user_reg_event_log"
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 
+
 # Define your callback function
 def log_user_reg_events(ch, method, properties, body):
 

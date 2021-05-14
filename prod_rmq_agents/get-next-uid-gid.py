@@ -18,9 +18,8 @@ args = rc_util.get_args()
 # Logger
 logger = rc_util.get_logger()
 
+
 # Account creation
-
-
 def create_account(msg):
 
     logger.info(f"Account creation request received: {msg}")
