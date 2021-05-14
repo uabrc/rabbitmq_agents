@@ -17,9 +17,7 @@ def log_user_reg_events(ch, method, properties, body):
     routing_key = method.routing_key
     action = routing_key.split(".")[0]
     user = routing_key.split(".")[1]
-    print(
-        f"Got a {action} message for {user} with routing key: {routing_key}"
-    )
+    print(f"Got a {action} message for {user} with routing key: {routing_key}")
     print(msg)
 
     # Acknowledge message

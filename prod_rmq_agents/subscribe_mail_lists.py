@@ -32,8 +32,10 @@ def mail_list_subscription(ch, method, properties, body):
     mail_list_bcc = rcfg.Mail_list_bcc
     server = rcfg.Mail_server
 
-    listserv_cmd = f"QUIET ADD hpc-announce {email} {fullname} \
-                   \nQUIET ADD hpc-users {email} {fullname}"
+    listserv_cmd = (
+        f"QUIET ADD hpc-announce {email} {fullname}\n"
+        f"QUIET ADD hpc-users {email} {fullname}"
+    )
 
     logger.info("Adding user{} to mail list".format(username))
     msg["success"] = False
@@ -78,7 +80,7 @@ rc_rmq.start_consume(
     {
         "queue": task,  # Define your Queue name
         "routing_key": "verify.*",  # Define your routing key
-        "cb": mail_list_subscription,  # Pass in callback function you just define
+        "cb": mail_list_subscription,  # Pass callback function you just define
     }
 )
 

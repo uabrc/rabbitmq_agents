@@ -32,7 +32,8 @@ def create_account(msg):
 
     # Bright command to create user
     cmd = "/cm/local/apps/cmd/bin/cmsh -c "
-    cmd += f'"user; add {username}; set id {uid}; set email {email}; set commonname \\"{fullname}\\"; '
+    cmd += f'"user; add {username}; set id {uid}; set email {email};'
+    cmd += f'set commonname \\"{fullname}\\"; '
     cmd += 'commit;"'
 
     if not args.dry_run:
@@ -61,13 +62,19 @@ def resolve_uid_gid(ch, method, properties, body):
             msg["gid"] = user_exists.split(":")[3]
 
         else:
-            cmd_uid = "/usr/bin/getent passwd | \
-                awk -F: 'BEGIN { maxuid=10000 } ($3>10000) && ($3<20000) && ($3>maxuid) { maxuid=$3; } END { print maxuid+1; }'"
+            cmd_uid = (
+                "/usr/bin/getent passwd | awk -F: 'BEGIN { maxuid=10000 }"
+                " ($3>10000) && ($3<20000) && ($3>maxuid) { maxuid=$3; } END {"
+                " print maxuid+1; }'"
+            )
             msg["uid"] = popen(cmd_uid).read().rstrip()
             logger.info(f"UID query: {cmd_uid}")
 
-            cmd_gid = "/usr/bin/getent group | \
-                awk -F: 'BEGIN { maxgid=10000 } ($3>10000) && ($3<20000) && ($3>maxgid) { maxgid=$3; } END { print maxgid+1; }'"
+            cmd_gid = (
+                "/usr/bin/getent group | awk -F: 'BEGIN { maxgid=10000 }"
+                " ($3>10000) && ($3<20000) && ($3>maxgid) { maxgid=$3; } END {"
+                " print maxgid+1; }'"
+            )
             msg["gid"] = popen(cmd_gid).read().rstrip()
             logger.info(f"GID query: {cmd_gid}")
 
@@ -76,9 +83,10 @@ def resolve_uid_gid(ch, method, properties, body):
         msg["success"] = True
     except Exception as exception:
         msg["success"] = False
-        msg[
-            "errmsg"
-        ] = f"Exception raised during account creation, check logs for stack trace"
+        msg["errmsg"] = (
+            "Exception raised during account creation, check logs for stack"
+            " trace"
+        )
         logger.error("", exc_info=True)
 
     # Acknowledge message

@@ -13,9 +13,7 @@ parser.add_argument(
 parser.add_argument(
     "reason", nargs="?", default="", help="Reason of requesting"
 )
-parser.add_argument(
-    "--domain", default="localhost", help="domain of email"
-)
+parser.add_argument("--domain", default="localhost", help="domain of email")
 parser.add_argument(
     "-v", "--verbose", action="store_true", help="verbose output"
 )

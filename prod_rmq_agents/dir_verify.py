@@ -44,15 +44,12 @@ def dir_verify(ch, method, properties, body):
                     mask = oct(status.st_mode)[-3:]
                     uid = str(status.st_uid)
                     gid = str(status.st_gid)
-                    if (
-                        mask != "700"
-                        or uid != msg["uid"]
-                        or gid != msg["gid"]
-                    ):
+                    if mask != "700" or uid != msg["uid"] or gid != msg["gid"]:
                         msg["success"] = False
-                        msg[
-                            "errmsg"
-                        ] = f"Error: dir {path} permissions or ownership are wrong"
+                        msg["errmsg"] = (
+                            f"Error: dir {path} permissions or ownership are"
+                            " wrong"
+                        )
 
     except Exception as exception:
         msg["success"] = False

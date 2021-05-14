@@ -63,7 +63,8 @@ def notify_user(ch, method, properties, body):
                     f"smtp.sendmail({rcfg.Sender}, {receivers}, message)"
                 )
                 logger.info(
-                    f"table.update({{'username': {username}, 'count': 1, 'sent_at': datetime.now()}}, ['username'])"
+                    f"table.update({{'username': {username}, 'count': 1,"
+                    " 'sent_at': datetime.now()}}, ['username'])"
                 )
 
             else:

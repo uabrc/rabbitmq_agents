@@ -123,10 +123,7 @@ class RCRMQ(object):
 
         if self.DEBUG:
             print(
-                "Queue: "
-                + self.QUEUE
-                + "\nRouting_key: "
-                + self.ROUTING_KEY
+                "Queue: " + self.QUEUE + "\nRouting_key: " + self.ROUTING_KEY
             )
 
         if self._connection is None:
@@ -134,9 +131,7 @@ class RCRMQ(object):
 
         self.bind_queue()
 
-        self._consumer_tag = self._channel.basic_consume(
-            self.QUEUE, obj["cb"]
-        )
+        self._consumer_tag = self._channel.basic_consume(self.QUEUE, obj["cb"])
         self._consuming = True
         try:
             self._channel.start_consuming()
