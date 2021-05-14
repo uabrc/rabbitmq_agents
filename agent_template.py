@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import sys
 import json
 from rc_rmq import RCRMQ
 

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import os
-import sys
 import json
-import shutil
 import rc_util
 from pathlib import Path
 from rc_rmq import RCRMQ

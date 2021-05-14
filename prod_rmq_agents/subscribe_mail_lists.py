@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-import sys
 import json
 import smtplib
-import logging
-import argparse
 import rc_util
 from email.message import EmailMessage
 from rc_rmq import RCRMQ

@@ -1,10 +1,6 @@
 #!/usr/bin/env python
-import sys
 import json
-import ldap
 import time
-import logging
-import argparse
 import rc_util
 from os import popen
 from rc_rmq import RCRMQ

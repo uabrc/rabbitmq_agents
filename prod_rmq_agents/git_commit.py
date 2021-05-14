@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import sh
-import sys
 import json
 import rc_util
 from rc_rmq import RCRMQ
