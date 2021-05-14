@@ -80,7 +80,7 @@ def resolve_uid_gid(ch, method, properties, body):
             create_account(msg)
         msg["task"] = task
         msg["success"] = True
-    except Exception as exception:
+    except Exception:
         msg["success"] = False
         msg["errmsg"] = (
             "Exception raised during account creation, check logs for stack"

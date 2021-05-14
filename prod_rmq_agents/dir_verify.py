@@ -51,7 +51,7 @@ def dir_verify(ch, method, properties, body):
                             " wrong"
                         )
 
-    except Exception as exception:
+    except Exception:
         msg["success"] = False
         msg["errmsg"] = "Exception raised, check the logs for stack trace"
         logger.error("", exc_info=True)

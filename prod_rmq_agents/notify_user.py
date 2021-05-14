@@ -87,7 +87,7 @@ def notify_user(ch, method, properties, body):
                 logger.debug(f"User {username} inserted into database")
 
         msg["success"] = True
-    except Exception as exception:
+    except Exception:
         logger.error("", exc_info=True)
         msg["errmsg"] = errmsg if errmsg else "Unexpected error"
 

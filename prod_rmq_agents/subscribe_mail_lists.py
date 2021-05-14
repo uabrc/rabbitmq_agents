@@ -61,7 +61,7 @@ def mail_list_subscription(ch, method, properties, body):
         s.quit()
         msg["task"] = task
         msg["success"] = True
-    except Exception as exception:
+    except Exception:
         logger.error("", exc_info=True)
 
     # Acknowledge message

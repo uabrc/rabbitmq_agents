@@ -259,7 +259,7 @@ def task_manager(ch, method, properties, body):
 
             logger.debug(f"Notify level {task_name}? {success}")
 
-    except Exception as exception:
+    except Exception:
         logger.error("", exc_info=True)
 
     if send:

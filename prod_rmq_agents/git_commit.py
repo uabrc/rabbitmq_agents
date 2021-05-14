@@ -111,7 +111,7 @@ def git_commit(ch, method, properties, body):
             logger.info("Added ldif files and committed to git repo")
 
         msg["success"] = True
-    except Exception as exception:
+    except Exception:
         logger.error("", exc_info=True)
 
     # Send confirm message

@@ -13,9 +13,11 @@ def on_message(ch, method, properties, body):
 
     # Retrieve routing key
     routing_key = method.routing_key
+    print(routing_key)
 
     # Retrieve message
     msg = json.loads(body)
+    print(msg)
 
     # Do Something
     print("[{}]: Callback called.".format(task))
