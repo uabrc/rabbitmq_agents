@@ -55,7 +55,7 @@ def mail_list_subscription(ch, method, properties, body):
         email_msg.set_content(listserv_cmd)
         if not args.dry_run:
             s.send_message(email_msg)
-        logging.info(
+        logger.info(
             f"This email will add user {username} to listserv \n{email_msg}"
         )
 
