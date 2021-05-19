@@ -85,11 +85,11 @@ def get_logger(args=None):
 
     logger_lvl = logging.WARNING
 
-    if args.verbose:
-        logger_lvl = logging.DEBUG
-
     if args.dry_run:
         logger_lvl = logging.INFO
+
+    if args.verbose:
+        logger_lvl = logging.DEBUG
 
     logging.basicConfig(format=logger_fmt, level=logger_lvl)
     return logging.getLogger(__name__)
