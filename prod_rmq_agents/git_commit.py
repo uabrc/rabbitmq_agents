@@ -6,6 +6,7 @@ import rc_util
 from rc_rmq import RCRMQ
 import rabbit_config as rmq_cfg
 import time
+import logging
 
 task = "git_commit"
 
@@ -19,6 +20,10 @@ groups_dir = repo_location + "/groups"
 
 args = rc_util.get_args()
 logger = rc_util.get_logger(args)
+
+# Disable logging messages for others
+logging.getLogger("sh").setLevel(logging.WARNING)
+logging.getLogger("pika").setLevel(logging.WARNING)
 
 if not args.dry_run:
     git = sh.git.bake(
