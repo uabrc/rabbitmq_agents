@@ -25,6 +25,10 @@ logger = rc_util.get_logger(args)
 logging.getLogger("sh").setLevel(logging.WARNING)
 logging.getLogger("pika").setLevel(logging.WARNING)
 
+if args.verbose:
+    logging.getLogger("sh").setLevel(logging.INFO)
+    logging.getLogger("pika").setLevel(logging.INFO)
+
 if not args.dry_run:
     git = sh.git.bake(
         "--git-dir", repo_location + "/.git", "--work-tree", repo_location
