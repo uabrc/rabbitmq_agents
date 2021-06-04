@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import sys
 import json
 from rc_rmq import RCRMQ
 
@@ -7,6 +6,7 @@ task = "user_reg_event_log"
 
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
+
 
 # Define your callback function
 def log_user_reg_events(ch, method, properties, body):
@@ -18,9 +18,7 @@ def log_user_reg_events(ch, method, properties, body):
     routing_key = method.routing_key
     action = routing_key.split(".")[0]
     user = routing_key.split(".")[1]
-    print(
-        f"Got a {action} message for {user} with routing key: {routing_key}"
-    )
+    print(f"Got a {action} message for {user} with routing key: {routing_key}")
     print(msg)
 
     # Acknowledge message

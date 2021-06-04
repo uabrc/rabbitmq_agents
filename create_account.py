@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import json
-import sys
 import rc_util
 import argparse
 import signal
@@ -14,9 +13,7 @@ parser.add_argument(
 parser.add_argument(
     "reason", nargs="?", default="", help="Reason of requesting"
 )
-parser.add_argument(
-    "--domain", default="localhost", help="domain of email"
-)
+parser.add_argument("--domain", default="localhost", help="domain of email")
 parser.add_argument(
     "-v", "--verbose", action="store_true", help="verbose output"
 )

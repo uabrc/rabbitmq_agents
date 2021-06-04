@@ -63,7 +63,8 @@ def notify_user(ch, method, properties, body):
                     f"smtp.sendmail({rcfg.Sender}, {receivers}, message)"
                 )
                 logger.info(
-                    f"table.update({{'username': {username}, 'count': 1, 'sent_at': datetime.now()}}, ['username'])"
+                    f"table.update({{'username': {username}, 'count': 1,"
+                    " 'sent_at': datetime.now()}}, ['username'])"
                 )
 
             else:
@@ -86,7 +87,7 @@ def notify_user(ch, method, properties, body):
                 logger.debug(f"User {username} inserted into database")
 
         msg["success"] = True
-    except Exception as exception:
+    except Exception:
         logger.error("", exc_info=True)
         msg["errmsg"] = errmsg if errmsg else "Unexpected error"
 

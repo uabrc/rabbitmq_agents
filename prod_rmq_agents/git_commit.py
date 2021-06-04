@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import sh
-import sys
 import json
 import rc_util
 from rc_rmq import RCRMQ
@@ -38,8 +37,12 @@ def git_commit(ch, method, properties, body):
     username = msg["username"]
     msg["task"] = task
     msg["success"] = False
-    branch_name = "issue-add-users-" + \
-        username.lower() + "-" + time.strftime("%Y%m%d_%H%M%S")
+    branch_name = (
+        "issue-add-users-"
+        + username.lower()
+        + "-"
+        + time.strftime("%Y%m%d_%H%M%S")
+    )
     user_ldif = users_dir + f"/{username}.ldif"
     group_ldif = groups_dir + f"/{username}.ldif"
 
@@ -56,14 +59,13 @@ def git_commit(ch, method, properties, body):
         if not branch_exists:
             logger.debug("git checkout -b %s", branch_name)
             git.checkout("-b", branch_name)
-            logger.debug(
-                "open(%s, 'w'), open(%s, 'w')", user_ldif, group_ldif
-            )
+            logger.debug("open(%s, 'w'), open(%s, 'w')", user_ldif, group_ldif)
             with open(user_ldif, "w") as ldif_u, open(
                 group_ldif, "w"
             ) as ldif_g:
                 logger.debug(
-                    f"ldapsearch -LLL -x -H ldaps://ldapserver -b 'dc=cm,dc=cluster' uid={username} > {user_ldif}"
+                    "ldapsearch -LLL -x -H ldaps://ldapserver -b 'dc=cm,dc=clu"
+                    f"ster' uid={username} > {user_ldif}"
                 )
                 ldapsearch(
                     "-LLL",
@@ -76,7 +78,8 @@ def git_commit(ch, method, properties, body):
                     _out=ldif_u,
                 )
                 logger.debug(
-                    f"ldapsearch -LLL -x -H ldapserver -b 'ou=Group,dc=cm,dc=cluster' cn={username} > {group_ldif}"
+                    "ldapsearch -LLL -x -H ldapserver -b 'ou=Group,dc=cm,dc=cl"
+                    f"uster' cn={username} > {group_ldif}"
                 )
                 ldapsearch(
                     "-LLL",
@@ -94,9 +97,7 @@ def git_commit(ch, method, properties, body):
             git.add(user_ldif)
             logger.debug("git add %s", group_ldif)
             git.add(group_ldif)
-            logger.debug(
-                "git commit -m 'Added new cheaha user: %s'", username
-            )
+            logger.debug("git commit -m 'Added new cheaha user: %s'", username)
             git.commit(m="Added new cheaha user: " + username)
             logger.debug("git checkout master")
             git.checkout("master")
@@ -110,7 +111,7 @@ def git_commit(ch, method, properties, body):
             logger.info("Added ldif files and committed to git repo")
 
         msg["success"] = True
-    except Exception as exception:
+    except Exception:
         logger.error("", exc_info=True)
 
     # Send confirm message

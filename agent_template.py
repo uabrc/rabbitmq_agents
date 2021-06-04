@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import sys
 import json
 from rc_rmq import RCRMQ
 
@@ -8,14 +7,17 @@ task = "task_name"
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 
+
 # Define your callback function
 def on_message(ch, method, properties, body):
 
     # Retrieve routing key
     routing_key = method.routing_key
+    print(routing_key)
 
     # Retrieve message
     msg = json.loads(body)
+    print(msg)
 
     # Do Something
     print("[{}]: Callback called.".format(task))

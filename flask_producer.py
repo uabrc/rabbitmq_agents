@@ -38,9 +38,7 @@ channel.basic_publish(
 print(" [x] Sent {}: {}".format(node, json.dumps(message)))
 
 # creates a named queue
-result = channel.queue_declare(
-    queue=user_name, exclusive=False, durable=True
-)
+result = channel.queue_declare(queue=user_name, exclusive=False, durable=True)
 
 # bind the queue with exchange
 channel.queue_bind(
@@ -50,10 +48,7 @@ channel.queue_bind(
 
 def work(ch, method, properties, body):
     msg = json.loads(body)
-    print(
-        "Received message from {}: \n\t{}".format(method.routing_key, msg)
-    )
-    # queue_unbind(queue, exchange=None, routing_key=None, arguments=None, callback=None)
+    print("Received message from {}: \n\t{}".format(method.routing_key, msg))
     channel.queue_delete(method.routing_key)
 
 

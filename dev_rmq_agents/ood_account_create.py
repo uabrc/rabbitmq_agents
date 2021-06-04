@@ -18,15 +18,13 @@ def ood_account_create(ch, method, properties, body):
     user_gid = str(msg["gid"])
     success = False
     try:
-        subprocess.call(
-            ["sudo", "groupadd", "-r", "-g", user_gid, username]
-        )
+        subprocess.call(["sudo", "groupadd", "-r", "-g", user_gid, username])
         subprocess.call(
             ["sudo", "useradd", "-u", user_uid, "-g", user_gid, username]
         )
         print("[{}]: User {} has been added".format(task, username))
         success = True
-    except:
+    except Exception:
         e = sys.exc_info()[0]
         print("[{}]: Error: {}".format(task, e))
 

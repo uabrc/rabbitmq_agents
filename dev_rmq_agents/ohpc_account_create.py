@@ -20,7 +20,7 @@ def ohpc_account_create(ch, method, properties, body):
         subprocess.call(["sudo", "useradd", username])
         print("[{}]: User {} has been added".format(task, username))
         success = True
-    except:
+    except Exception:
         e = sys.exc_info()[0]
         print("[{}]: Error: {}".format(task, e))
 
@@ -38,9 +38,7 @@ def ohpc_account_create(ch, method, properties, body):
 
     if success:
         # send create message to other agent
-        rc_rmq.publish_msg(
-            {"routing_key": "create." + username, "msg": msg}
-        )
+        rc_rmq.publish_msg({"routing_key": "create." + username, "msg": msg})
 
 
 print("Start Listening to queue: {}".format(task))
