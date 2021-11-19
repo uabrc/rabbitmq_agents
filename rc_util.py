@@ -48,7 +48,7 @@ def timeout(seconds=30, error_message=os.strerror(errno.ETIME)):
     return decorator
 
 
-def add_account(username, queuename, email, full="", reason=""):
+def add_account(username, queuename, email, full="", reason="", aup=False):
     rc_rmq.publish_msg(
         {
             "routing_key": "request." + queuename,
@@ -58,10 +58,12 @@ def add_account(username, queuename, email, full="", reason=""):
                 "fullname": full,
                 "reason": reason,
                 "queuename": queuename,
+                "aup": aup,
             },
         }
     )
     rc_rmq.disconnect()
+
 
 def certify_account(username, queuename, state="ok", service="all"):
     rc_rmq.publish_msg(
@@ -76,6 +78,7 @@ def certify_account(username, queuename, state="ok", service="all"):
         }
     )
     rc_rmq.disconnect()
+
 
 def worker(ch, method, properties, body):
     msg = json.loads(body)
