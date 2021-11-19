@@ -16,7 +16,7 @@ tasks = {
 logger_fmt = "%(asctime)s [%(module)s] - %(message)s"
 
 
-def add_account(username, queuename, email, full="", reason=""):
+def add_account(username, queuename, email, full="", reason="", aup=False):
     rc_rmq.publish_msg(
         {
             "routing_key": "request." + queuename,
@@ -26,6 +26,7 @@ def add_account(username, queuename, email, full="", reason=""):
                 "fullname": full,
                 "reason": reason,
                 "queuename": queuename,
+                "aup": aup
             },
         }
     )
