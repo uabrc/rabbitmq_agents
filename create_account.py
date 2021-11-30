@@ -3,6 +3,7 @@ import json
 import rc_util
 import argparse
 import signal
+import sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument("username", help="username that will be created")
@@ -12,6 +13,9 @@ parser.add_argument(
 )
 parser.add_argument(
     "reason", nargs="?", default="", help="Reason of requesting"
+)
+parser.add_argument(
+    "-A", "--accept", action="store_true", help="Accept user policy"
 )
 parser.add_argument("--domain", default="localhost", help="domain of email")
 parser.add_argument(
@@ -25,6 +29,12 @@ args = parser.parse_args()
 timeout = 60
 
 queuename = rc_util.encode_name(args.username)
+
+if not args.accept:
+    question = "Attention: User Policy is not accepted, continue?"
+    reply = str(raw_input(question+' (y/n): ')).lower().strip()
+    if reply[0] != 'y':
+        sys.exit(0)
 
 if args.email == "":
     args.email = args.username
@@ -59,6 +69,7 @@ rc_util.add_account(
     email=args.email,
     full=args.full_name,
     reason=args.reason,
+    aup=args.accept,
 )
 print(f"Account for {args.username} requested.")
 
