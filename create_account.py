@@ -32,8 +32,8 @@ queuename = rc_util.encode_name(args.username)
 
 if not args.accept:
     question = "Attention: User Policy is not accepted, continue?"
-    reply = str(raw_input(question+' (y/n): ')).lower().strip()
-    if reply[0] != 'y':
+    reply = str(input(question + " (y/n): ")).lower().strip()
+    if reply[0] != "y":
         sys.exit(0)
 
 if args.email == "":
