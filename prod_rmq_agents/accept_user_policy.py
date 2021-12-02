@@ -30,7 +30,7 @@ def accept_user_policy(ch, method, properties, body):
         table.insert(
             {
                 "username": username,
-                "accepted": msg.get("aup", False),
+                "active": msg.get("aup", False),
                 "date": datetime.now(),
             }
         )
