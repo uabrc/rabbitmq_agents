@@ -29,6 +29,7 @@ record = {
     "last_update": datetime.now(),
     "errmsg": None,
     "waiting": set(),
+    "accept_use_policy": None,
     "request": {"create_account": None},
     "verify": {
         "git_commit": None,
@@ -67,6 +68,7 @@ def notify_admin(username, user_record):
     message += f""" \n
     User Creation Report for user {username}
     uid: {user_record["uid"]}, gid: {user_record["gid"]}
+    aup: {user_record["aup"]}
     Tasks:
     'create_account':      {user_record["request"]["create_account"]}
     'git_commit':          {user_record["verify"]["git_commit"]}
@@ -110,6 +112,7 @@ def insert_db(username, msg):
                 "email": msg.get("email", ""),
                 "reason": msg.get("reason", ""),
                 "fullname": msg.get("fullname", ""),
+                "accept_use_policy": msg.get("aup", False),
                 "create_account": None,
                 "git_commit": None,
                 "dir_verify": None,
@@ -134,6 +137,7 @@ def task_manager(ch, method, properties, body):
     username = msg["username"]
     task_name = msg["task"]
     success = msg["success"]
+    aup = msg.get("aup", False)
     send = completed = terminated = False
     routing_key = ""
 
@@ -154,6 +158,9 @@ def task_manager(ch, method, properties, body):
         current["reason"] = user_db["reason"] if user_db else msg["reason"]
         current["fullname"] = (
             user_db["fullname"] if user_db else msg["fullname"]
+        )
+        current["accept_use_policy"] = (
+            user_db["accept_use_policy"] if user_db else None
         )
 
         if user_db:
@@ -185,10 +192,11 @@ def task_manager(ch, method, properties, body):
     current["last_update"] = datetime.now()
 
     # Update Database
-    update_db(
-        username,
-        {task_name: success, "last_update": current["last_update"]},
-    )
+    if task_name != "accept_user_policy":
+        update_db(
+            username,
+            {task_name: success, "last_update": current["last_update"]},
+        )
 
     # Save error message if the task was failed
     if not success:
@@ -267,6 +275,14 @@ def task_manager(ch, method, properties, body):
         rc_rmq.publish_msg({"routing_key": routing_key, "msg": message})
 
         logger.debug(f"Trigger message '{routing_key}' sent")
+
+        # Send aup message
+        if current["accept_use_policy"] is None:
+            rc_rmq.publish_msg(
+                {"routing_key": "aup." + queuename, "msg": message}
+            )
+            current["accept_user_policy"] = aup
+            logger.debug(f"Trigger message 'aup.{queuename}' sent")
 
         logger.debug("Previous level messages acknowledged")
 
