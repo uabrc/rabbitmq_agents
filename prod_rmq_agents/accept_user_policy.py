@@ -26,7 +26,7 @@ def accept_user_policy(ch, method, properties, body):
     msg["success"] = False
 
     try:
-        # Inactivate old record
+        # Deactivate old records
         inactivate_data = dict(username=username, active=False)
         table.update(inactivate_data, ["username"])
 
