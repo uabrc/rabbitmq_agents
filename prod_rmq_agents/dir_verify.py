@@ -23,6 +23,14 @@ def dir_verify(ch, method, properties, body):
     msg["success"] = True
 
     missing_dirs = []
+    
+    access = 0o777
+    parent_user_dir = "/data/user"
+    path = os.path.join(parent_user_dir, username )
+    os.mkdir(path, access)
+    parent_scratch_dir = "/data/scratch"
+    path = os.path.join(parent_scratch_dir, username )
+    os.mkdir(path, access)
 
     try:
         for d in dirs:
