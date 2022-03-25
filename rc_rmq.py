@@ -13,9 +13,6 @@ class RCRMQ(object):
     VHOST = "/"
     EXCHANGE = ""
     EXCHANGE_TYPE = "direct"
-    QUEUE = None
-    DURABLE = True
-    ROUTING_KEY = None
     DEBUG = False
 
     def __init__(self, config=None, debug=False):
@@ -83,12 +80,12 @@ class RCRMQ(object):
             durable=True,
         )
 
-    def bind_queue(self):
-        self._channel.queue_declare(queue=self.QUEUE, durable=self.DURABLE)
+    def bind_queue(self, queue="", routing_key=None, durable=True):
+        self._channel.queue_declare(queue=queue, durable=durable)
         self._channel.queue_bind(
             exchange=self.EXCHANGE,
-            queue=self.QUEUE,
-            routing_key=self.ROUTING_KEY,
+            queue=queue,
+            routing_key=routing_key,
         )
 
     def disconnect(self):
@@ -96,42 +93,35 @@ class RCRMQ(object):
         self._connection.close()
         self._connection = None
 
-    def delete_queue(self):
-        self._channel.queue_delete(self.QUEUE)
+    def delete_queue(self, queue):
+        self._channel.queue_delete(queue)
 
     def publish_msg(self, obj):
-        if "routing_key" in obj:
-            self.ROUTING_KEY = obj["routing_key"]
+        routing_key = obj.get("routing_key")
 
         if self._connection is None:
             self.connect()
 
         self._channel.basic_publish(
             exchange=self.EXCHANGE,
-            routing_key=self.ROUTING_KEY,
+            routing_key=routing_key,
             body=json.dumps(obj["msg"]),
         )
 
     def start_consume(self, obj):
-        if "queue" in obj:
-            self.QUEUE = obj["queue"]
-            self.ROUTING_KEY = (
-                obj["routing_key"] if "routing_key" in obj else self.QUEUE
-            )
-        if "durable" in obj:
-            self.DURABLE = obj["durable"]
-
-        if self.DEBUG:
-            print(
-                "Queue: " + self.QUEUE + "\nRouting_key: " + self.ROUTING_KEY
-            )
+        queue = obj.get("queue", "")
+        routing_key = obj.get("routing_key", queue or None)
+        durable = obj.get("durable", True)
 
         if self._connection is None:
             self.connect()
 
-        self.bind_queue()
+        self.bind_queue(queue, routing_key, durable)
 
-        self._consumer_tag = self._channel.basic_consume(self.QUEUE, obj["cb"])
+        if self.DEBUG:
+            print("Queue: " + queue + "\nRouting_key: " + routing_key)
+
+        self._consumer_tag = self._channel.basic_consume(queue, obj["cb"])
         self._consuming = True
         try:
             self._channel.start_consuming()
