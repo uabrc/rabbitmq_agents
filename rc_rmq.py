@@ -84,6 +84,9 @@ class RCRMQ(object):
         self, queue="", routing_key=None, durable=True, exclusive=False
     ):
 
+        if self._connection is None:
+            self.connect()
+
         self._channel.queue_declare(
             queue=queue, durable=durable, exclusive=exclusive
         )
