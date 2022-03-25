@@ -80,8 +80,14 @@ class RCRMQ(object):
             durable=True,
         )
 
-    def bind_queue(self, queue="", routing_key=None, durable=True):
-        self._channel.queue_declare(queue=queue, durable=durable)
+    def bind_queue(
+        self, queue="", routing_key=None, durable=True, exclusive=False
+    ):
+
+        self._channel.queue_declare(
+            queue=queue, durable=durable, exclusive=exclusive
+        )
+
         self._channel.queue_bind(
             exchange=self.EXCHANGE,
             queue=queue,
@@ -112,11 +118,12 @@ class RCRMQ(object):
         queue = obj.get("queue", "")
         routing_key = obj.get("routing_key", queue or None)
         durable = obj.get("durable", True)
+        exclusive = obj.get("exclusive", False)
 
         if self._connection is None:
             self.connect()
 
-        self.bind_queue(queue, routing_key, durable)
+        self.bind_queue(queue, routing_key, durable, exclusive)
 
         if self.DEBUG:
             print("Queue: " + queue + "\nRouting_key: " + routing_key)
