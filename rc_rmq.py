@@ -124,11 +124,13 @@ class RCRMQ(object):
         routing_key = obj.get("routing_key", queue or None)
         durable = obj.get("durable", True)
         exclusive = obj.get("exclusive", False)
+        bind = obj.get("bind", True)
 
         if self._connection is None:
             self.connect()
 
-        self.bind_queue(queue, routing_key, durable, exclusive)
+        if bind:
+            self.bind_queue(queue, routing_key, durable, exclusive)
 
         if self.DEBUG:
             print("Queue: " + queue + "\nRouting_key: " + routing_key)
