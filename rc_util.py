@@ -16,6 +16,7 @@ tasks = {
     "notify_user": None,
 }
 logger_fmt = "%(asctime)s [%(module)s] - %(message)s"
+VALID_STATE = ["ok", "blocked", "certification"]
 
 
 def add_account(username, queuename, email, full="", reason=""):
@@ -153,3 +154,50 @@ def check_state(username, debug=False):
     )
 
     return result
+
+
+def update_state(username, state, debug=False):
+
+    if state not in VALID_STATE:
+        print(f"Invalid state '{state}'")
+        return
+
+    corr_id = str(uuid.uuid4())
+
+    rpc_queue = "user_state"
+
+    def handler(ch, method, properties, body):
+        if debug:
+            print("Message received:")
+            print(body)
+
+        nonlocal corr_id
+        msg = json.loads(body)
+
+        if corr_id == properties.correlation_id:
+            if not msg["success"]:
+                print("Something's wrong, please try again.")
+
+            rc_rmq.stop_consume()
+            rc_rmq.disconnect()
+
+    callback_queue = rc_rmq.bind_queue(exclusive=True)
+
+    rc_rmq.publish_msg(
+        {
+            "routing_key": rpc_queue,
+            "props": pika.BasicProperties(
+                reply_to=callback_queue, correlation_id=corr_id
+            ),
+            "msg": {"op": "post", "username": username, "state": state},
+        }
+    )
+
+    rc_rmq.start_consume(
+        {
+            "queue": callback_queue,
+            "exclusive": True,
+            "bind": False,
+            "cb": handler,
+        }
+    )
