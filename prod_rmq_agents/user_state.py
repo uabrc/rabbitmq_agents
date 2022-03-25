@@ -39,6 +39,8 @@ def user_state(ch, method, properties, body):
                 logger.debug(
                     f'The latest state of {username} is {msg["state"]}'
                 )
+            else:
+                msg["state"] = "no-account"
 
         elif op == "post":
             state = msg["state"]
