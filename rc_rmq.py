@@ -87,15 +87,17 @@ class RCRMQ(object):
         if self._connection is None:
             self.connect()
 
-        self._channel.queue_declare(
+        result = self._channel.queue_declare(
             queue=queue, durable=durable, exclusive=exclusive
         )
 
         self._channel.queue_bind(
             exchange=self.EXCHANGE,
-            queue=queue,
+            queue=result.method.queue,
             routing_key=routing_key,
         )
+
+        return result.method.queue
 
     def disconnect(self):
         self._channel.close()
