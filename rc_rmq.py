@@ -109,6 +109,7 @@ class RCRMQ(object):
 
     def publish_msg(self, obj):
         routing_key = obj.get("routing_key")
+        props = obj.get("props")
 
         if self._connection is None:
             self.connect()
@@ -116,6 +117,7 @@ class RCRMQ(object):
         self._channel.basic_publish(
             exchange=self.EXCHANGE,
             routing_key=routing_key,
+            properties=props,
             body=json.dumps(obj["msg"]),
         )
 
