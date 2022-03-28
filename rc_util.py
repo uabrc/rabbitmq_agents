@@ -6,6 +6,7 @@ from rc_rmq import RCRMQ
 import json
 from urllib.parse import quote
 from time import sleep
+import rabbit_config as rcfg
 
 rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 tasks = {
@@ -16,7 +17,6 @@ tasks = {
     "notify_user": None,
 }
 logger_fmt = "%(asctime)s [%(module)s] - %(message)s"
-VALID_STATE = ["ok", "blocked", "certification"]
 
 
 def add_account(username, queuename, email, full="", reason=""):
@@ -158,7 +158,7 @@ def check_state(username, debug=False):
 
 def update_state(username, state, debug=False):
 
-    if state not in VALID_STATE:
+    if state not in rcfg.Valid_state:
         print(f"Invalid state '{state}'")
         return
 
