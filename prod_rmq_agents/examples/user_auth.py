@@ -21,6 +21,7 @@ else:
     if migration:
         rc = subprocess.run(["getent", "passwd", remote_user]).returncode
         if rc == 0:
+            rc_util.update_user(remote_user, "ok")
             print(remote_user)
             sys.exit()
     print()
