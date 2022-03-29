@@ -26,7 +26,8 @@ def user_state(ch, method, properties, body):
     msg["success"] = False
     errmsg = ""
 
-    props = pika.BasicProperties(correlation_id=properties.correlation_id)
+    corr_id = properties.correlation_id
+    reply_to = properties.reply_to
 
     try:
 
@@ -56,9 +57,11 @@ def user_state(ch, method, properties, body):
         msg["errmsg"] = errmsg if errmsg else "Unexpected error"
 
     # Send response
-    rc_rmq.publish_msg(
-        {"routing_key": properties.reply_to, "msg": msg, "props": props}
-    )
+    if reply_to:
+        props = pika.BasicProperties(correlation_id=corr_id)
+        rc_rmq.publish_msg(
+            {"routing_key": reply_to, "msg": msg, "props": props}
+        )
 
     # Acknowledge the message
     ch.basic_ack(delivery_tag=method.delivery_tag)
