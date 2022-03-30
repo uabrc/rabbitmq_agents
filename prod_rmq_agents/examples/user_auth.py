@@ -17,7 +17,7 @@ migration = True
 # migration = False  # uncomment after migration's done
 remote_user = sys.argv[1]
 
-result = rc_util.check_user(remote_user)
+result = rc_util.check_state(remote_user)
 
 if result == "ok":
     print(remote_user)
@@ -25,7 +25,7 @@ else:
     if migration:
         rc = subprocess.run(["getent", "passwd", remote_user]).returncode
         if rc == 0:
-            rc_util.update_user(remote_user, "ok")
+            rc_util.update_state(remote_user, "ok")
             print(remote_user)
             sys.exit()
     print()
