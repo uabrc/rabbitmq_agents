@@ -18,7 +18,7 @@ result = rc_util.check_state(remote_user)
 if result == "ok":
     print(remote_user)
 else:
-    if migration:
+    if migration and result == "no-account":
         rc = subprocess.run(["getent", "passwd", remote_user]).returncode
         if rc == 0:
             rc_util.update_state(remote_user, "ok")
