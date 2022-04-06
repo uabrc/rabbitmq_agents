@@ -4,10 +4,6 @@ import sys
 import subprocess
 
 sys.path.insert(1, os.path.join(sys.path[0], "../.."))
-# for package from venv
-sys.path.insert(
-    1, os.path.join(sys.path[0], "../../venv/lib/python3.6/site-packages/")
-)
 import rc_util
 
 
