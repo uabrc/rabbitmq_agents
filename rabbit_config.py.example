@@ -5,6 +5,8 @@ VHost = '/'
 Server = 'ohpc'
 Port = 5672
 
+Valid_state = ["ok", "blocked", "certification"]
+
 # time delay to let account creation finish
 # to avoid concurrency with downstream agents
 Delay = 5
