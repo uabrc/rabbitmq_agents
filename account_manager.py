@@ -5,6 +5,8 @@ import argparse
 import signal
 import uuid
 import rc_util
+from rc_rmq import RCRMQ
+import rabbit_config as rcfg
 
 parser = argparse.ArgumentParser(description = "Account management driver script")
 parser.add_argument("username", help="Username that should be locked/unlocked")
@@ -26,6 +28,9 @@ state = args.state
 service = args.service
 
 corr_id = str(uuid.uuid4())
+
+# Instantiate rabbitmq object
+rc_rmq = RCRMQ({"exchange": rcfg.Exchange, "exchange_type": "topic"})
 callback_queue = rc_rmq.bind_queue(exclusive=True)
 
 msg = {}
