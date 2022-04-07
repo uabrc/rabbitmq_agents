@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
-import os
 import sys
-import subprocess
-
-sys.path.insert(1, os.path.join(sys.path[0], "../.."))
 import rc_util
-
+import subprocess
 
 # During migration of this new script for ood
 # e.g. not all of users are in the db
