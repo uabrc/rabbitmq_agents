@@ -65,10 +65,10 @@ def timeout_handler(signum, frame):
 def callback(channel, method, properties, body):
     msg = json.loads(body)
     username = msg["username"]
-    msg["success"] = false
 
     if msg["success"]:
-        print(f"Account for {username} has been blocked :.")
+        print(f"Account for {username} has been blocked.\n Updating the user state in DB")
+        rc_util.update_state(username, state)
     else:
         print(f"There's some issue in account management agents for {username}")
         errmsg = msg.get("errmsg", [])
