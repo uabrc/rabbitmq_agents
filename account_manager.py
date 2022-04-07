@@ -30,7 +30,7 @@ callback_queue = rc_rmq.bind_queue(exclusive=True)
 
 msg = {}
 
-if state == 'block' or state == 'certify':
+if state == 'blocked' or state == 'certification':
     action = lock
 elif state == 'ok':
     action = unlock
