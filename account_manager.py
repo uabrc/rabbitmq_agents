@@ -4,11 +4,11 @@ import rc_util
 import argparse
 import signal
 import uuid
-import  
+import rc_util
 
 parser = argparse.ArgumentParser(description = "Account management driver script")
 parser.add_argument("username", help="Username that should be locked/unlocked")
-parser.add_argument("action", help="Choose lock or unlock action to be taken")
+parser.add_argument("state", help="Choose from states (ok,block,certify) to put the user in")
 parser.add_argument("service", nargs='*', help="List one or more services to be blocked")
 parser.add_argument(
     "-a", "--all", help="Block all services")
@@ -22,13 +22,20 @@ args = parser.parse_args()
 timeout = 60
 
 username = args.username
-action = args.action
+state = args.state
 service = args.service
 
 corr_id = str(uuid.uuid4())
 callback_queue = rc_rmq.bind_queue(exclusive=True)
 
 msg = {}
+
+if state == 'block' or state == 'certify':
+    action = lock
+elif state == 'ok':
+    action = unlock
+else:
+    print("Invalid state provided. Check the help menu.")
 
 if args.all is not None:
     # send a broadcast message to all agents
@@ -40,26 +47,15 @@ if args.all is not None:
         )
 else:
     for each_service in service:
-        if action == 'lock':
-            rc_rmq.publish_msg(
-                {
-                    "routing_key": f"{service}.{username}",
-                    "props": pika.BasicProperties(
-                             correlation_id=corr_id, reply_to=callback_queue
-                             ),
-                    "msg":  {"username": username, "action": action, "service": service},
-                }
-            )
-        elif action == 'unlock':
-            rc_rmq.publish_msg(
-                {
-                    "routing_key": f"{service}.{username}",
-                    "props": pika.BasicProperties(
-                             correlation_id=corr_id, reply_to=callback_queue
-                             ),
-                    "msg":  {"username": username, "action": action, "service": service},
-                }
-            )
+        rc_rmq.publish_msg(
+            {
+                "routing_key": f"{service}.{username}",
+                "props": pika.BasicProperties(
+                         correlation_id=corr_id, reply_to=callback_queue
+                         ),
+                "msg":  {"username": username, "action": action, "service": service},
+            }
+        )
 
 def timeout_handler(signum, frame):
     print("Process timeout, there's some issue with agents")
