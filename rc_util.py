@@ -1,9 +1,12 @@
 import logging
 import argparse
+import pika
+import uuid
 from rc_rmq import RCRMQ
 import json
 from urllib.parse import quote
 from time import sleep
+import rabbit_config as rcfg
 
 rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 tasks = {
@@ -100,3 +103,101 @@ def encode_name(uname):
     if "." in uname_quote:
         uname_quote = uname_quote.replace(".", "%2E")
     return uname_quote
+
+
+def check_state(username, debug=False):
+    corr_id = str(uuid.uuid4())
+    result = ""
+    rpc_queue = "user_state"
+
+    def handler(ch, method, properties, body):
+        if debug:
+            print("Message received:")
+            print(body)
+
+        nonlocal corr_id
+        nonlocal result
+        msg = json.loads(body)
+
+        if corr_id == properties.correlation_id:
+            if not msg["success"]:
+                print("Something's wrong, please try again.")
+            else:
+                result = msg.get("state")
+
+            rc_rmq.stop_consume()
+            rc_rmq.disconnect()
+
+    callback_queue = rc_rmq.bind_queue(exclusive=True)
+
+    if debug:
+        print(f"Checking state of user {username}")
+        print(f"Callback queue: {callback_queue}, correlation_id: {corr_id}")
+
+    rc_rmq.publish_msg(
+        {
+            "routing_key": rpc_queue,
+            "props": pika.BasicProperties(
+                correlation_id=corr_id, reply_to=callback_queue
+            ),
+            "msg": {"op": "get", "username": username},
+        }
+    )
+
+    rc_rmq.start_consume(
+        {
+            "queue": callback_queue,
+            "exclusive": True,
+            "bind": False,
+            "cb": handler,
+        }
+    )
+
+    return result
+
+
+def update_state(username, state, debug=False):
+
+    if state not in rcfg.Valid_state:
+        print(f"Invalid state '{state}'")
+        return
+
+    corr_id = str(uuid.uuid4())
+
+    rpc_queue = "user_state"
+
+    def handler(ch, method, properties, body):
+        if debug:
+            print("Message received:")
+            print(body)
+
+        nonlocal corr_id
+        msg = json.loads(body)
+
+        if corr_id == properties.correlation_id:
+            if not msg["success"]:
+                print("Something's wrong, please try again.")
+
+            rc_rmq.stop_consume()
+            rc_rmq.disconnect()
+
+    callback_queue = rc_rmq.bind_queue(exclusive=True)
+
+    rc_rmq.publish_msg(
+        {
+            "routing_key": rpc_queue,
+            "props": pika.BasicProperties(
+                reply_to=callback_queue, correlation_id=corr_id
+            ),
+            "msg": {"op": "post", "username": username, "state": state},
+        }
+    )
+
+    rc_rmq.start_consume(
+        {
+            "queue": callback_queue,
+            "exclusive": True,
+            "bind": False,
+            "cb": handler,
+        }
+    )
