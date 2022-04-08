@@ -14,7 +14,7 @@ args = rc_util.get_args()
 logger = rc_util.get_logger(args)
 
 # Instantiate rabbitmq object
-rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
+rc_rmq = RCRMQ({"exchange": rcfg.Exchange, "exchange_type": "topic"})
 
 
 def new_jobs(ch, method, properties, body):
