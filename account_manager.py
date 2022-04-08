@@ -4,6 +4,7 @@ import rc_util
 import argparse
 import signal
 import uuid
+import pika
 import rc_util
 from rc_rmq import RCRMQ
 import rabbit_config as rcfg
