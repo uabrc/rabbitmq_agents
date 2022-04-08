@@ -44,10 +44,14 @@ else:
     print("Invalid state provided. Check the help menu.")
 
 if args.all is not None:
+if args.service == 'all':
     # send a broadcast message to all agents
         rc_rmq.publish_msg(
             {
                 "routing_key": f"{action}.{username}",
+                "props": pika.BasicProperties(
+                         correlation_id=corr_id, reply_to=callback_queue
+                         ),
                 "msg":  {"username": username, "action": action, "service": service},
             }
         )
