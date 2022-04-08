@@ -88,7 +88,7 @@ def callback(channel, method, properties, body):
     rc_util.rc_rmq.disconnect()
 
 
-print(f"{args.action} action for {args.username} requested.")
+print(f"{action} action for {args.username} requested.")
 
 # Set initial timeout timer
 signal.signal(signal.SIGALRM, timeout_handler)
