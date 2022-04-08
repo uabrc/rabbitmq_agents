@@ -43,7 +43,6 @@ elif state == 'ok':
 else:
     print("Invalid state provided. Check the help menu.")
 
-if args.all is not None:
 if args.service == 'all':
     # send a broadcast message to all agents
         rc_rmq.publish_msg(
