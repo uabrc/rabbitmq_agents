@@ -12,7 +12,7 @@ import rabbit_config as rcfg
 parser = argparse.ArgumentParser(description = "Account management driver script")
 parser.add_argument("username", help="Username that should be locked/unlocked")
 parser.add_argument("state", help="Choose from states (ok,block,certify) to put the user in")
-parser.add_argument("service", nargs='*', help="List one or more services to be blocked")
+parser.add_argument("-s", "--service", nargs='+', default='all', choices=['ssh', 'newjobs', 'all'], help="List one or more services to be blocked (default: %(default)s)")
 parser.add_argument(
     "-a", "--all", help="Block all services")
 parser.add_argument(
