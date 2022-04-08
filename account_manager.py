@@ -37,9 +37,9 @@ callback_queue = rc_rmq.bind_queue(exclusive=True)
 msg = {}
 
 if state == 'blocked' or state == 'certification':
-    action = lock
+    action = "lock"
 elif state == 'ok':
-    action = unlock
+    action = "unlock"
 else:
     print("Invalid state provided. Check the help menu.")
 
