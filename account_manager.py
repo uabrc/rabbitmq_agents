@@ -58,7 +58,7 @@ else:
     for each_service in service:
         rc_rmq.publish_msg(
             {
-                "routing_key": f"{service}.{username}",
+                "routing_key": f"{each_service}.{username}",
                 "props": pika.BasicProperties(
                          correlation_id=corr_id, reply_to=callback_queue
                          ),
