@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 import os
 import json
+import pika
 import rc_util
+from os import popen
 from pathlib import Path
 from rc_rmq import RCRMQ
 import rabbit_config as rcfg
