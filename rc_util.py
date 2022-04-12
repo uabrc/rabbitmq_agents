@@ -160,10 +160,10 @@ def update_state(username, state, debug=False):
 
     if state not in rcfg.Valid_state:
         print(f"Invalid state '{state}'")
-        return
+        return False
 
     corr_id = str(uuid.uuid4())
-
+    result = ""
     rpc_queue = "user_state"
 
     def handler(ch, method, properties, body):
@@ -172,12 +172,14 @@ def update_state(username, state, debug=False):
             print(body)
 
         nonlocal corr_id
+        nonlocal result
         msg = json.loads(body)
 
         if corr_id == properties.correlation_id:
             if not msg["success"]:
                 print("Something's wrong, please try again.")
 
+            result = msg["success"]
             rc_rmq.stop_consume()
             rc_rmq.disconnect()
 
@@ -201,3 +203,5 @@ def update_state(username, state, debug=False):
             "cb": handler,
         }
     )
+
+    return result
