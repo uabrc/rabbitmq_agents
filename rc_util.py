@@ -134,6 +134,7 @@ def encode_name(uname):
     return uname_quote
 
 
+@timeout(30)
 def check_state(username, debug=False):
     corr_id = str(uuid.uuid4())
     result = ""
@@ -185,6 +186,7 @@ def check_state(username, debug=False):
     return result
 
 
+@timeout(30)
 def update_state(username, state, debug=False):
 
     if state not in rcfg.Valid_state:
