@@ -69,7 +69,7 @@ else:
 
 def timeout_handler(signum, frame):
     print("Process timeout, there's some issue with agents")
-    rc_util.rc_rmq.stop_consume()
+    rc_rmq.stop_consume()
 
 
 def callback(channel, method, properties, body):
@@ -85,9 +85,8 @@ def callback(channel, method, properties, body):
         for err in errmsg:
             print(err)
 
-    rc_util.rc_rmq.stop_consume()
-    rc_util.rc_rmq.disconnect()
-
+    rc_rmq.stop_consume()
+    rc_rmq.disconnect()
 
 print(f"{action} action for {args.username} requested.")
 
