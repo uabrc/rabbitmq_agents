@@ -77,7 +77,7 @@ def callback(channel, method, properties, body):
     username = msg["username"]
 
     if msg["success"]:
-        print(f"Account for {username} has been blocked.\n Updating the user state in DB")
+        print(f"Account for {username} has been {action}ed.\n Updating the user state in DB")
         rc_util.update_state(username, state)
     else:
         print(f"There's some issue in account management agents for {username}")
