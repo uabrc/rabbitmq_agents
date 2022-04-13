@@ -51,7 +51,15 @@ def worker(ch, method, properties, body):
     rc_rmq.delete_queue()
 
 
-def consume(queuename, routing_key="", callback=worker, debug=False):
+def consume(
+    queuename,
+    routing_key="",
+    callback=worker,
+    bind=True,
+    durable=True,
+    exclusive=False,
+    debug=False,
+):
     if routing_key == "":
         routing_key = "complete." + queuename
 
@@ -62,6 +70,9 @@ def consume(queuename, routing_key="", callback=worker, debug=False):
             {
                 "queue": queuename,
                 "routing_key": routing_key,
+                "bind": bind,
+                "durable": durable,
+                "exclusive": exclusive,
                 "cb": callback,
             }
         )
