@@ -77,7 +77,15 @@ def callback(channel, method, properties, body):
     msg = json.loads(body)
     username = msg["username"]
 
-    if msg["success"]:
+    # Check if each task returned success
+    for each_task in msg["success"].values():
+        if each_task == True:
+            success=True
+        else:
+            success=False
+            break
+
+    if success:
         print(f"Account for {username} has been {action}ed.\n Updating the user state in DB")
         rc_util.update_state(username, state)
     else:
