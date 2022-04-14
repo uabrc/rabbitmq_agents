@@ -21,7 +21,8 @@ def ssh_access(ch, method, properties, body):
     msg = json.loads(body)
     username = msg["username"]
     action = msg["action"]
-    msg["success"] = False
+    msg["success"] = {}
+    msg["success"][task] = False
 
     corr_id = properties.correlation_id
     reply_to = properties.reply_to
@@ -35,10 +36,11 @@ def ssh_access(ch, method, properties, body):
         elif action == 'unlock':
             unblock_ssh = popen(unblock_ssh_cmd).read().rstrip()
 
-        msg["success"] = True
+        msg["success"][task] = True
+        logger.info(f"User {username} is added to nossh group")
 
     except Exception:
-        msg["success"] = False
+        msg["success"][task] = False
         msg["errmsg"] = "Exception raised, while blocking user's ssh access, check the logs for stack trace"
         logger.error("", exc_info=True)
 
