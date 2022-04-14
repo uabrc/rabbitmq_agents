@@ -21,7 +21,8 @@ def new_jobs(ch, method, properties, body):
     msg = json.loads(body)
     username = msg["username"]
     action = msg["action"]
-    msg["success"] = False
+    msg["success"] = {}
+    msg["success"][task] = False
 
     corr_id = properties.correlation_id
     reply_to = properties.reply_to
@@ -35,10 +36,11 @@ def new_jobs(ch, method, properties, body):
         elif action == 'unlock':
             unblock_new_jobs = popen(unblock_new_jobs_cmd).read().rstrip()
 
-        msg["success"] = True
+        msg["success"][task] = True
+        logger.info(f"Succeeded in blocking {username}'s jobs getting to run state")
 
     except Exception:
-        msg["success"] = False
+        msg["success"][task] = False
         msg["errmsg"] = "Exception raised while setting maxjobs that can enter run state, check the logs for stack trace"
         logger.error("", exc_info=True)
 
