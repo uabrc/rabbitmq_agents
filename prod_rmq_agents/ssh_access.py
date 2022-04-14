@@ -58,8 +58,6 @@ def ssh_access(ch, method, properties, body):
 
 
 logger.info(f"Start listening to queue: {task}")
-rc_rmq.bind_queue(queue=task, routing_key='lock.*', durable=True)
-rc_rmq.bind_queue(queue=task, routing_key='unlock.*', durable=True)
 rc_rmq.bind_queue(queue=task, routing_key='ssh.*', durable=True)
 
 rc_rmq.start_consume(
