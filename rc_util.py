@@ -37,7 +37,7 @@ def add_account(username, queuename, email, full="", reason=""):
 def certify_account(username, queuename, state="ok", service="all"):
     rc_rmq.publish_msg(
         {
-            "routing_key": "acctmgr." + queuename,
+            "routing_key": "acctmgr.request." + queuename,
             "msg": {
                 "username": username,
                 "service": service,
