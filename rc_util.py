@@ -34,6 +34,21 @@ def add_account(username, queuename, email, full="", reason=""):
     )
     rc_rmq.disconnect()
 
+def certify_account(username, queuename, state="ok", service="all"):
+    rc_rmq.publish_msg(
+        {
+            "routing_key": "acctmgr." + queuename,
+            "msg": {
+                "username": username,
+                "service": service,
+                "state": state,
+                "queuename": queuename,
+            },
+        }
+    )
+    rc_rmq.disconnect()
+
+
 
 def worker(ch, method, properties, body):
     msg = json.loads(body)
