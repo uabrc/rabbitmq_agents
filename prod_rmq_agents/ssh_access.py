@@ -21,9 +21,7 @@ def ssh_access(ch, method, properties, body):
     msg = json.loads(body)
     username = msg["username"]
     action = msg["action"]
-    msg["success"] = {}
-    msg["success"][task] = False
-
+    msg["task"] = task
     corr_id = properties.correlation_id
     reply_to = properties.reply_to
 
@@ -36,23 +34,21 @@ def ssh_access(ch, method, properties, body):
         elif action == 'unlock':
             unblock_ssh = popen(unblock_ssh_cmd).read().rstrip()
 
-        msg["success"][task] = True
+        msg["success"] = True
         logger.info(f"User {username} is added to nossh group")
 
     except Exception:
-        msg["success"][task] = False
+        msg["success"] = False
         msg["errmsg"] = "Exception raised, while blocking user's ssh access, check the logs for stack trace"
         logger.error("", exc_info=True)
 
     # send response to callback queue with it's correlation ID
-    if reply_to:
-        rc_rmq.publish_msg(
-            {"routing_key": reply_to,
-             "props": pika.BasicProperties(
-                         correlation_id=corr_id,
-                          ),
-             "msg": msg}
-        )
+    rc_rmq.publish_msg(
+        {
+         "routing_key": f'acctmgr.done.{queuename}',
+         "msg": msg
+        }
+    )
 
     logger.debug(f"User {username} confirmation sent for {action}ing {task}")
 
