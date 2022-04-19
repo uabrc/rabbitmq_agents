@@ -100,9 +100,10 @@ class RCRMQ(object):
         return result.method.queue
 
     def disconnect(self):
-        self._channel.close()
-        self._connection.close()
-        self._connection = None
+        if self._connection:
+            self._channel.close()
+            self._connection.close()
+            self._connection = None
 
     def delete_queue(self, queue):
         self._channel.queue_delete(queue)
