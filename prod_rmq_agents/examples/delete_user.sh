@@ -26,6 +26,9 @@ if id "$username" &>/dev/null; then
   echo "sqlite3  $path_to_db \"delete from users where username=\"$username\""
   sqlite3 $path_to_db "delete from users where username=\"$username\""
 
+  echo "sqlite3 $path_to_db \"delete from user_state where username=\"$username\""
+  sqlite3 $path_to_db "delete from user_state where username=\"$username\""
+
   echo "rm -r /data/user/${username}"
   rm -rf "/data/user/${username}"
 
