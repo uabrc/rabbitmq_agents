@@ -7,6 +7,9 @@ Port = 5672
 
 Valid_state = ["ok", "blocked", "certification"]
 
+# Default timeout to 30 second
+Timeout = 30
+
 # time delay to let account creation finish
 # to avoid concurrency with downstream agents
 Delay = 5
