@@ -59,7 +59,6 @@ def callback(ch, method, properties, body):
     msg = json.loads(body)
     username = msg["username"]
 
-    print(msg)
     if msg["success"]:
         print(f"Account for {username} has been {msg['action']}ed.\n Updating the user state in DB")
     else:
