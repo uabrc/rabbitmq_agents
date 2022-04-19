@@ -47,11 +47,18 @@ def worker(ch, method, properties, body):
         for err in errmsg:
             print(err)
 
-    rc_rmq.stop_consume()
-    rc_rmq.delete_queue()
+    rc_rmq.disconnect()
 
 
-def consume(queuename, routing_key="", callback=worker, debug=False):
+def consume(
+    queuename,
+    routing_key="",
+    callback=worker,
+    bind=True,
+    durable=True,
+    exclusive=False,
+    debug=False,
+):
     if routing_key == "":
         routing_key = "complete." + queuename
 
@@ -62,10 +69,12 @@ def consume(queuename, routing_key="", callback=worker, debug=False):
             {
                 "queue": queuename,
                 "routing_key": routing_key,
+                "bind": bind,
+                "durable": durable,
+                "exclusive": exclusive,
                 "cb": callback,
             }
         )
-        rc_rmq.disconnect()
 
     return {"success": True}
 

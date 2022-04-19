@@ -34,7 +34,7 @@ if args.email == "":
 
 def timeout_handler(signum, frame):
     print("Process timeout, there's might some issue with agents")
-    rc_util.rc_rmq.stop_consume()
+    rc_util.rc_rmq.disconnect()
 
 
 def callback(channel, method, properties, body):
@@ -49,8 +49,7 @@ def callback(channel, method, properties, body):
         for err in errmsg:
             print(err)
 
-    rc_util.rc_rmq.stop_consume()
-    rc_util.rc_rmq.delete_queue()
+    rc_util.rc_rmq.disconnect()
 
 
 rc_util.add_account(
@@ -68,5 +67,8 @@ signal.setitimer(signal.ITIMER_REAL, timeout)
 
 print("Waiting for completion...")
 rc_util.consume(
-    queuename, routing_key=f"complete.{queuename}", callback=callback
+    queuename,
+    routing_key=f"complete.{queuename}",
+    exclusive=True,
+    callback=callback,
 )
