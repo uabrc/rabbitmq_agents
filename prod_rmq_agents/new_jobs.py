@@ -21,11 +21,8 @@ def new_jobs(ch, method, properties, body):
     msg = json.loads(body)
     username = msg["username"]
     action = msg["action"]
-    msg["success"] = {}
-    msg["success"][task] = False
-
-    corr_id = properties.correlation_id
-    reply_to = properties.reply_to
+    msg["task"] = task
+    queuename = msg["queuename"]
 
     try:
         block_new_jobs_cmd = f"/cm/shared/apps/slurm/19.05.5/bin/sacctmgr --immediate update user {username} set maxjobs=0"
@@ -36,23 +33,19 @@ def new_jobs(ch, method, properties, body):
         elif action == 'unlock':
             unblock_new_jobs = popen(unblock_new_jobs_cmd).read().rstrip()
 
-        msg["success"][task] = True
+        msg["success"] = True
         logger.info(f"Succeeded in blocking {username}'s jobs getting to run state")
 
     except Exception:
-        msg["success"][task] = False
+        msg["success"] = False
         msg["errmsg"] = "Exception raised while setting maxjobs that can enter run state, check the logs for stack trace"
         logger.error("", exc_info=True)
 
-    # send response to callback queue with it's correlation ID
-    if reply_to:
-        rc_rmq.publish_msg(
-            {"routing_key": reply_to, 
-             "props": pika.BasicProperties(
-                      correlation_id=corr_id,
-                      ),
-             "msg": msg}
-        )
+
+    rc_rmq.publish_msg(
+        {"routing_key": f'acctmgr.done.{queuename}', 
+         "msg": msg}
+    )
 
     logger.debug(f"User {username} confirmation sent for {action}ing {task}")
 
