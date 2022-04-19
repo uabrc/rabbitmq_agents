@@ -68,5 +68,8 @@ signal.setitimer(signal.ITIMER_REAL, timeout)
 
 print("Waiting for completion...")
 rc_util.consume(
-    queuename, routing_key=f"complete.{queuename}", callback=callback
+    queuename,
+    routing_key=f"complete.{queuename}",
+    exclusive=True,
+    callback=callback,
 )
