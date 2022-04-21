@@ -20,19 +20,19 @@ fi
 if id "$username" &>/dev/null; then
   echo "Deleting user: ${username}"
 
-  echo "cmsh -c 'user use ${username}; remove -d; commit;'"
+  echo "Remove user via cmsh"
   cmsh -c "user use ${username}; remove -d; commit;"
 
-  echo "sqlite3  $path_to_db \"delete from users where username=\"$username\""
+  echo "Remove user from sqlite db users table"
   sqlite3 $path_to_db "delete from users where username=\"$username\""
 
-  echo "sqlite3 $path_to_db \"delete from user_state where username=\"$username\""
+  echo "Remove user from sqlite db user_state table"
   sqlite3 $path_to_db "delete from user_state where username=\"$username\""
 
-  echo "rm -r /data/user/${username}"
+  echo "Remove /data/user"
   rm -rf "/data/user/${username}"
 
-  echo "rm -r /data/scratch/${username}"
+  echo "Remove /data/scratch"
   rm -rf "/data/scratch/${username}"
 
 else
