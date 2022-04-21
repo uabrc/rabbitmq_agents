@@ -89,7 +89,8 @@ def worker(ch, method, properties, body):
         for err in errmsg:
             print(err)
 
-    rc_rmq.disconnect()
+    rc_rmq.stop_consume()
+    rc_rmq.delete_queue()
 
 
 def consume(
@@ -117,6 +118,7 @@ def consume(
                 "cb": callback,
             }
         )
+        rc_rmq.disconnect()
 
     return {"success": True}
 
