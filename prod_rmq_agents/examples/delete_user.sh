@@ -32,6 +32,10 @@ if id "$username" &>/dev/null; then
   echo "Remove user from sqlite db user_state table"
   sqlite3 $path_to_db "delete from user_state where username=\"$username\""
 
+  echo "Remove user from sacctmgr"
+  sacctmgr -i delete user $username
+  sacctmgr -i delete account $username
+
   echo "Remove /data/user"
   rm -rf "/data/user/${username}"
 
