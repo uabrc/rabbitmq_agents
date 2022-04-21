@@ -20,6 +20,9 @@ fi
 if id "$username" &>/dev/null; then
   echo "Deleting user: ${username}"
 
+  echo "Clean PUN process on loginnode"
+  ssh login001 "/opt/ood/nginx_stage/sbin/nginx_stage nginx_clean --force --user $username"
+
   echo "Remove user via cmsh"
   cmsh -c "user use ${username}; remove -d; commit;"
 
