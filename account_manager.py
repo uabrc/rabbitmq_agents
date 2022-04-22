@@ -35,20 +35,8 @@ service = args.service
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({"exchange": rcfg.Exchange, "exchange_type": "topic"})
 
-msg = {}
-msg["username"] = username
-msg["state"] = state
-msg["service"] = service
-msg["queuename"] = queuename
-
-# publish msg with acctmgr.{uname} routing key.
-rc_rmq.publish_msg(
-    {
-        "routing_key": f'acctmgr.request.{queuename}',
-        "msg": msg,
-    }
-)
-
+rc_util.certify_account(username, queuename, state, service)
+print(f"Request {username} account state set to {state}")
 
 def timeout_handler(signum, frame):
     print("Process timeout, there's some issue with agents")
@@ -72,7 +60,6 @@ def callback(ch, method, properties, body):
     rc_rmq.stop_consume()
     rc_rmq.delete_queue(queuename)
 
-print(f"Request {username} account state set to {state}.")
 
 # Set initial timeout timer
 signal.signal(signal.SIGALRM, timeout_handler)
