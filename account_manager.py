@@ -26,7 +26,7 @@ args = parser.parse_args()
 
 timeout = 60
 
-queuename = rc_util.encode_name(args.username)
+queuename = rc_util.encode_name('acctmgr-'+args.username)
 
 username = args.username
 state = args.state
