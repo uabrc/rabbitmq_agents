@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(description = "Account management driver script
 parser.add_argument(
     "username", help="Username that should be locked/unlocked")
 parser.add_argument(
-    "state", help="Choose from states (ok,block,certify) to put the user in")
+    "state", choices=['ok', 'block', 'certification'], help="Choose from states (ok,blocked,certification)")
 parser.add_argument(
     "-s", "--service", nargs='+', default='all', choices=['ssh', 'newjobs', 'expiration', 'all'], help="List one or more services to be blocked (default: %(default)s)")
 parser.add_argument(
