@@ -14,6 +14,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 default_state = "ok"
+today = datetime.now()
 
 # Chunk size for insert into db
 size = 1000
@@ -34,7 +35,6 @@ users = subprocess.run(
 # Insert many
 if len(users) > 50:
     start = 0
-    today = datetime.now()
     while start < len(users):
         end = start + size if start + size < len(users) else len(users)
         data = [
@@ -52,6 +52,4 @@ for user in users:
     if args.dry_run:
         print(f"Table insert user: {user}, state: {default_state}")
     else:
-        table.insert(
-            {"username": user, "state": default_state, "date": datetime.now()}
-        )
+        table.insert({"username": user, "state": default_state, "date": today})
