@@ -15,6 +15,9 @@ args = parser.parse_args()
 
 default_state = "ok"
 
+# Chunk size for insert into db
+size = 1000
+
 db = dataset.connect(f"sqlite:///prod_rmq_agents/{rcfg.db_path}/user_reg.db")
 table = db["user_state"]
 
@@ -28,6 +31,23 @@ users = subprocess.run(
 ).stdout.split()
 
 # Update user_state table
+# Insert many
+if len(users) > 50:
+    start = 0
+    today = datetime.now()
+    while start < len(users):
+        end = start + size if start + size < len(users) else len(users)
+        data = [
+            dict(username=user, state=default_state, date=today)
+            for user in users[start:end]
+        ]
+        if args.dry_run:
+            print(f"Table insert many from {start} to {end - 1}")
+        else:
+            table.insert_many(data, chunk_size=size)
+        start = end
+
+# Insert one by one
 for user in users:
     if args.dry_run:
         print(f"Table insert user: {user}, state: {default_state}")
