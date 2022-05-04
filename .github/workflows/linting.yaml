@@ -21,6 +21,11 @@ jobs:
         uses: harupy/find-trailing-whitespace@master
       - name: Run black
         uses: psf/black@stable
+        with:
+          # Default value
+          #options: "--check --diff"
+          #src: "."
+          version: "22.3.0"
       - name: Install flake8
         run: |
           python -m pip install --upgrade pip
