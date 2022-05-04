@@ -1,4 +1,4 @@
 [tool.black]
 line-length=79
 target-version=['py36']
-experimental_string_processing=true
+preview=true
