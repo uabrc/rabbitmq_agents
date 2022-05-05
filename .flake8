@@ -3,3 +3,7 @@ count = True
 max-line-length = 79
 show-source = True
 statistics = True
+exclude =
+    .git,
+    __pycache__,
+    venv
