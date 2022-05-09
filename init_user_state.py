@@ -48,8 +48,11 @@ if len(users) > 50:
         start = end
 
 # Insert one by one
-for user in users:
-    if args.dry_run:
-        print(f"Table insert user: {user}, state: {default_state}")
-    else:
-        table.insert({"username": user, "state": default_state, "date": today})
+else:
+    for user in users:
+        if args.dry_run:
+            print(f"Table insert user: {user}, state: {default_state}")
+        else:
+            table.insert(
+                {"username": user, "state": default_state, "date": today}
+            )
