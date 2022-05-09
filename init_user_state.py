@@ -19,7 +19,7 @@ today = datetime.now()
 # Chunk size for insert into db
 size = 1000
 
-db = dataset.connect(f"sqlite:///prod_rmq_agents/{rcfg.db_path}/user_reg.db")
+db = dataset.connect(f"sqlite:///{rcfg.db_path}/user_reg.db")
 table = db["user_state"]
 
 if table.__len__() > 0 and not args.force:
