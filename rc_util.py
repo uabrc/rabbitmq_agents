@@ -5,6 +5,7 @@ import signal
 import logging
 import argparse
 import pika
+import pwd
 import uuid
 from rc_rmq import RCRMQ
 import json
@@ -63,6 +64,7 @@ def add_account(username, queuename, email, full="", reason=""):
     )
     rc_rmq.disconnect()
 
+
 def certify_account(username, queuename, state="ok", service="all"):
     rc_rmq.publish_msg(
         {
@@ -76,6 +78,7 @@ def certify_account(username, queuename, state="ok", service="all"):
         }
     )
     rc_rmq.disconnect()
+
 
 def worker(ch, method, properties, body):
     msg = json.loads(body)
@@ -260,3 +263,7 @@ def update_state(username, state, debug=False):
     )
 
     return result
+
+
+def get_caller_info():
+    return f"{pwd.getpwuid(os.getuid()).pw_name}@{os.uname().nodename}"
