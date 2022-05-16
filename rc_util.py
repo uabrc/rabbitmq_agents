@@ -214,7 +214,7 @@ def check_state(username, debug=False):
 
 
 @timeout(rcfg.Function_timeout)
-def update_state(username, state, debug=False):
+def update_state(username, state, updated_by=None, debug=False):
 
     if state not in rcfg.Valid_state:
         print(f"Invalid state '{state}'")
@@ -249,7 +249,12 @@ def update_state(username, state, debug=False):
             "props": pika.BasicProperties(
                 reply_to=callback_queue, correlation_id=corr_id
             ),
-            "msg": {"op": "post", "username": username, "state": state},
+            "msg": {
+                "op": "post",
+                "username": username,
+                "state": state,
+                "updated_by": updated_by,
+            },
         }
     )
 
