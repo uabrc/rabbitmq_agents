@@ -25,6 +25,7 @@ args = parser.parse_args()
 timeout = 60
 
 queuename = rc_util.encode_name(args.username)
+updated_by = rc_util.get_caller_info()
 
 if args.email == "":
     args.email = args.username
@@ -58,6 +59,7 @@ rc_util.add_account(
     email=args.email,
     full=args.full_name,
     reason=args.reason,
+    updated_by=updated_by,
 )
 print(f"Account for {args.username} requested.")
 

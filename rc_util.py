@@ -49,7 +49,9 @@ def timeout(seconds=30, error_message=os.strerror(errno.ETIME)):
     return decorator
 
 
-def add_account(username, queuename, email, full="", reason=""):
+def add_account(
+    username, queuename, email, full="", reason="", updated_by=None
+):
     rc_rmq.publish_msg(
         {
             "routing_key": "request." + queuename,
@@ -59,6 +61,7 @@ def add_account(username, queuename, email, full="", reason=""):
                 "fullname": full,
                 "reason": reason,
                 "queuename": queuename,
+                "updated_by": updated_by,
             },
         }
     )
