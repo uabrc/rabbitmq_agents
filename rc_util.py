@@ -68,7 +68,9 @@ def add_account(
     rc_rmq.disconnect()
 
 
-def certify_account(username, queuename, state="ok", service="all"):
+def certify_account(
+    username, queuename, state="ok", service="all", updated_by=None
+):
     rc_rmq.publish_msg(
         {
             "routing_key": "acctmgr.request." + queuename,
@@ -77,6 +79,7 @@ def certify_account(username, queuename, state="ok", service="all"):
                 "service": service,
                 "state": state,
                 "queuename": queuename,
+                "updated_by": updated_by,
             },
         }
     )
