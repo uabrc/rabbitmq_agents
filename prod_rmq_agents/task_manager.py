@@ -37,6 +37,7 @@ record = {
     },
     "notify": {"notify_user": None},
     "reported": False,
+    "aup": False,
 }
 
 # Currently tracking users
@@ -117,6 +118,7 @@ def insert_db(username, msg):
                 "notify_user": None,
                 "sent": None,
                 "reported": False,
+                "aup": msg.get("aup", False),
                 "last_update": datetime.now(),
                 "queuename": msg.get("queuename", ""),
             }
@@ -150,6 +152,7 @@ def task_manager(ch, method, properties, body):
         )
         current["uid"] = user_db["uid"] if user_db else msg["uid"]
         current["gid"] = user_db["gid"] if user_db else msg["gid"]
+        current["aup"] = user_db["aup"] if user_db else msg["aup"]
         current["email"] = user_db["email"] if user_db else msg["email"]
         current["reason"] = user_db["reason"] if user_db else msg["reason"]
         current["fullname"] = (
@@ -202,6 +205,7 @@ def task_manager(ch, method, properties, body):
         "queuename": queuename,
         "uid": current["uid"],
         "gid": current["gid"],
+        "aup": current["aup"],
         "email": current["email"],
         "reason": current["reason"],
         "fullname": current["fullname"],
@@ -277,7 +281,10 @@ def task_manager(ch, method, properties, body):
 
         update_db(username, {"reported": True})
 
-        rc_util.update_state(username, "ok")
+        if current["aup"]:
+            rc_util.update_state(username, "ok")
+        else:
+            rc_util.update_state(username, "certification")
 
         tracking.pop(username)
 

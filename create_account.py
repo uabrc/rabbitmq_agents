@@ -58,6 +58,7 @@ rc_util.add_account(
     email=args.email,
     full=args.full_name,
     reason=args.reason,
+    aup=False,
 )
 print(f"Account for {args.username} requested.")
 
