@@ -50,7 +50,7 @@ def timeout(seconds=30, error_message=os.strerror(errno.ETIME)):
 
 
 def add_account(
-    username, queuename, email, full="", reason="", updated_by=None
+    username, queuename, email, full="", reason="", updated_by=None, host=""
 ):
     rc_rmq.publish_msg(
         {
@@ -62,6 +62,7 @@ def add_account(
                 "reason": reason,
                 "queuename": queuename,
                 "updated_by": updated_by,
+                "host": host,
             },
         }
     )
@@ -69,7 +70,7 @@ def add_account(
 
 
 def certify_account(
-    username, queuename, state="ok", service="all", updated_by=None
+    username, queuename, state="ok", service="all", updated_by=None, host=""
 ):
     rc_rmq.publish_msg(
         {
@@ -80,6 +81,7 @@ def certify_account(
                 "state": state,
                 "queuename": queuename,
                 "updated_by": updated_by,
+                "host": host,
             },
         }
     )
@@ -220,7 +222,7 @@ def check_state(username, debug=False):
 
 
 @timeout(rcfg.Function_timeout)
-def update_state(username, state, updated_by=None, debug=False):
+def update_state(username, state, updated_by=None, host="", debug=False):
 
     if state not in rcfg.Valid_state:
         print(f"Invalid state '{state}'")
@@ -260,6 +262,7 @@ def update_state(username, state, updated_by=None, debug=False):
                 "username": username,
                 "state": state,
                 "updated_by": updated_by,
+                "host": host,
             },
         }
     )
@@ -277,4 +280,6 @@ def update_state(username, state, updated_by=None, debug=False):
 
 
 def get_caller_info():
-    return f"{pwd.getpwuid(os.getuid()).pw_name}@{os.uname().nodename}"
+    username = pwd.getpwuid(os.getuid()).pw_name
+    hostname = os.uname().nodename
+    return (username, hostname)
