@@ -40,7 +40,7 @@ msg["username"] = username
 msg["state"] = state
 msg["service"] = service
 msg["queuename"] = queuename
-msg["updated_by"] = rc_util.get_caller_info()
+msg["updated_by"], msg["host"] = rc_util.get_caller_info()
 
 # publish msg with acctmgr.{uname} routing key.
 rc_rmq.publish_msg(

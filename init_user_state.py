@@ -16,7 +16,7 @@ args = parser.parse_args()
 
 default_state = "ok"
 today = datetime.now()
-updated_by = rc_util.get_caller_info()
+updated_by, host = rc_util.get_caller_info()
 
 # Chunk size for insert into db
 size = 1000
@@ -45,6 +45,7 @@ if len(users) > 50:
                 state=default_state,
                 date=today,
                 updated_by=updated_by,
+                host=host,
             )
             for user in users[start:end]
         ]
@@ -66,5 +67,6 @@ else:
                     "state": default_state,
                     "date": today,
                     "updated_by": updated_by,
+                    "host": host,
                 }
             )

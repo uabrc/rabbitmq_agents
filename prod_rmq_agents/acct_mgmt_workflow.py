@@ -70,7 +70,9 @@ def manage_acct(ch, method, properties, body):
                 done = False
 
         if done:
-            rc_util.update_state(username, state, msg.get("updated_by"))
+            rc_util.update_state(
+                username, state, msg.get("updated_by"), msg.get("host")
+            )
 
             # Send done msg to account_manager.py
             rc_rmq.publish_msg(
