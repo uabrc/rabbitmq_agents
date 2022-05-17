@@ -50,7 +50,7 @@ def timeout(seconds=30, error_message=os.strerror(errno.ETIME)):
 
 
 def add_account(
-    username, queuename, email, full="", reason="", updated_by=None, host=""
+    username, queuename, email, full="", reason="", updated_by="", host=""
 ):
     rc_rmq.publish_msg(
         {
@@ -70,7 +70,7 @@ def add_account(
 
 
 def certify_account(
-    username, queuename, state="ok", service="all", updated_by=None, host=""
+    username, queuename, state="ok", service="all", updated_by="", host=""
 ):
     rc_rmq.publish_msg(
         {
@@ -222,7 +222,7 @@ def check_state(username, debug=False):
 
 
 @timeout(rcfg.Function_timeout)
-def update_state(username, state, updated_by=None, host="", debug=False):
+def update_state(username, state, updated_by="", host="", debug=False):
 
     if state not in rcfg.Valid_state:
         print(f"Invalid state '{state}'")
