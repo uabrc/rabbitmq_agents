@@ -1,6 +1,6 @@
 [tool.black]
-line-length=79
-target-version=['py36']
-preview=true
+line-length = 79
+target-version = ['py36']
+preview = true
 [tool.pylint.format]
 max-line-length = 79
