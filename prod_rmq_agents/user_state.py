@@ -22,6 +22,8 @@ rc_rmq = RCRMQ({"exchange": rcfg.Exchange, "exchange_type": "topic"})
 def user_state(ch, method, properties, body):
     msg = json.loads(body)
     username = msg["username"]
+    updated_by = msg.get("updated_by")
+    host = msg.get("host")
     op = msg["op"]
     msg["success"] = False
     errmsg = ""
@@ -47,7 +49,13 @@ def user_state(ch, method, properties, body):
             state = msg["state"]
             errmsg = "Updating state of {username} to {state}"
             table.insert(
-                {"username": username, "state": state, "date": datetime.now()}
+                {
+                    "username": username,
+                    "state": state,
+                    "date": datetime.now(),
+                    "updated_by": updated_by,
+                    "host": host,
+                }
             )
             logger.debug(f"User {username} state updates to {state}")
 

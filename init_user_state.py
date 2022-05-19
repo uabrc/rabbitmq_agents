@@ -4,6 +4,7 @@ import dataset
 import sys
 import subprocess
 import rabbit_config as rcfg
+import rc_util
 from datetime import datetime
 
 parser = argparse.ArgumentParser()
@@ -15,6 +16,7 @@ args = parser.parse_args()
 
 default_state = "ok"
 today = datetime.now()
+updated_by, host = rc_util.get_caller_info()
 
 # Chunk size for insert into db
 size = 1000
@@ -38,7 +40,13 @@ if len(users) > 50:
     while start < len(users):
         end = start + size if start + size < len(users) else len(users)
         data = [
-            dict(username=user, state=default_state, date=today)
+            dict(
+                username=user,
+                state=default_state,
+                date=today,
+                updated_by=updated_by,
+                host=host,
+            )
             for user in users[start:end]
         ]
         if args.dry_run:
@@ -54,5 +62,11 @@ else:
             print(f"Table insert user: {user}, state: {default_state}")
         else:
             table.insert(
-                {"username": user, "state": default_state, "date": today}
+                {
+                    "username": user,
+                    "state": default_state,
+                    "date": today,
+                    "updated_by": updated_by,
+                    "host": host,
+                }
             )
