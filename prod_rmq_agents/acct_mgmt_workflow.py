@@ -32,7 +32,7 @@ def manage_acct(ch, method, properties, body):
             current =  tracking[username] = {}
 
         if op == 'request':
-            if state == 'blocked' or state == 'certification':
+            if state == 'hold' or state == 'certification':
                 msg["action"] = "lock"
             elif state == 'ok':
                 msg["action"] = "unlock"
