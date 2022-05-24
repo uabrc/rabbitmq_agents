@@ -42,4 +42,4 @@ jobs:
       - name: Lint with pylint
         if: always()
         run: |
-          pylint app *.py
+          pylint prod_rmq_agents/*.py dev_rmq_agents/*.py *.py
