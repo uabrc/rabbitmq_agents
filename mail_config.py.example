@@ -26,4 +26,3 @@ Whole_mail = Head + Body
 UserReportHead = f"""From: {rcfg.Sender_alias} <{rcfg.Sender}>
 To: <{rcfg.Admin_email}>
 Subject: [{{{{ result }}}}]RC Account Creation Report: {{{{ fullname }}}}, {{{{ username }}}} """
-

@@ -89,4 +89,3 @@ print("Waiting for completion...")
 rc_rmq.start_consume(
     {"queue": task, "cb": manage_acct}
 )
-
