@@ -37,7 +37,7 @@ def manage_acct(ch, method, properties, body):
             msg["action"] = "unlock"
         else:
             print("Invalid state provided. Check the help menu.")
-        
+
         if service == 'all':
             current["new_jobs"] = None
             current["expire_account"] = None
@@ -54,7 +54,7 @@ def manage_acct(ch, method, properties, body):
                 rc_rmq.publish_msg(
                     {
                         "routing_key": f"{each_service}.{queuename}",
-                        "msg": msg 
+                        "msg": msg
                     }
                 )
 
@@ -71,7 +71,7 @@ def manage_acct(ch, method, properties, body):
 
         if done:
             rc_util.update_state(username, state)
-    
+
             # Send done msg to account_manager.py
             rc_rmq.publish_msg(
                 {
