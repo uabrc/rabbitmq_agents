@@ -33,7 +33,7 @@ def manage_acct(ch, method, properties, body):
     if op == 'request':
         if state == 'hold' or state == 'certification':
             msg["action"] = "lock"
-        elif state == 'ok':
+        elif state == 'ok' or state == 'pre_certification':
             msg["action"] = "unlock"
         else:
             print("Invalid state provided. Check the help menu.")
