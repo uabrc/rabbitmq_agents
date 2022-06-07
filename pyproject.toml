@@ -3,6 +3,6 @@ line-length = 79
 target-version = ['py36']
 preview = true
 [tool.pylint.main]
-disable = ["invalid-name", "logging-fstring-interpolation"]
+disable = ["invalid-name", "logging-fstring-interpolation", "unused-argument"]
 [tool.pylint.format]
 max-line-length = 79
