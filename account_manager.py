@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-import json
-import rc_util
 import argparse
+import json
 import signal
+import time
 import uuid
+
 import pika
+
+import rabbit_config as rcfg
 import rc_util
 from rc_rmq import RCRMQ
-import rabbit_config as rcfg
-import time
 
 parser = argparse.ArgumentParser(description = "Account management driver script")
 parser.add_argument(

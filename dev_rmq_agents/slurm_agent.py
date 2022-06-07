@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import sys
 import json
 import subprocess
+import sys
+
 from rc_rmq import RCRMQ
 
 task = "slurm_account"

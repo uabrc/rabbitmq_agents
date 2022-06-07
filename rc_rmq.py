@@ -1,6 +1,8 @@
 import json
-import pika
 import socket
+
+import pika
+
 import rabbit_config as rcfg
 
 

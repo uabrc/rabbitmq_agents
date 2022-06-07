@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 import json
+from datetime import datetime
+
 import dataset
+
+import rabbit_config as rcfg
 import rc_util
 from rc_rmq import RCRMQ
-from datetime import datetime
-import rabbit_config as rcfg
 
 # Define queue name
 task = "reg_logger"

@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 import json
-import time
-import rc_util
-from os import popen
-from rc_rmq import RCRMQ
-import rabbit_config as rcfg
-from subprocess import run
 import shlex
+import time
+from os import popen
+from subprocess import run
+
+import rabbit_config as rcfg
+import rc_util
+from rc_rmq import RCRMQ
 
 task = "create_account"
 

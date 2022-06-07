@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-import pika
-import sys
-import socket
 import json
+import socket
+import sys
+
+import pika
+
 import rabbit_config as rcfg
 
 if len(sys.argv) < 3:

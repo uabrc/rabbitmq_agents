@@ -1,10 +1,11 @@
 #!/usr/bin/env python
-import os
 import json
-import rc_util
+import os
 from pathlib import Path
-from rc_rmq import RCRMQ
+
 import rabbit_config as rcfg
+import rc_util
+from rc_rmq import RCRMQ
 
 task = "dir_verify"
 dirs = rcfg.User_dirs

@@ -1,12 +1,14 @@
 #!/usr/bin/env python
-import os
 import json
-import pika
-import rc_util
+import os
 from os import popen
 from pathlib import Path
-from rc_rmq import RCRMQ
+
+import pika
+
 import rabbit_config as rcfg
+import rc_util
+from rc_rmq import RCRMQ
 
 task = "new_jobs"
 

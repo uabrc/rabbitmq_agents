@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import json
-import rc_util
 import argparse
+import json
 import signal
+
+import rc_util
 
 parser = argparse.ArgumentParser()
 parser.add_argument("username", help="username that will be created")

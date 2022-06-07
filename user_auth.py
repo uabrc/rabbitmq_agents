@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-import sys
-import rc_util
 import subprocess
+import sys
+
+import rc_util
 
 # During migration of this new script for ood
 # e.g. not all of users are in the db

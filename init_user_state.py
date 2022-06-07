@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import argparse
-import dataset
-import sys
 import subprocess
+import sys
+from datetime import datetime
+
+import dataset
+
 import rabbit_config as rcfg
 import rc_util
-from datetime import datetime
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--force", action="store_true", help="force update")

@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import json
 import smtplib
-import rc_util
 from email.message import EmailMessage
-from rc_rmq import RCRMQ
+
 import rabbit_config as rcfg
+import rc_util
+from rc_rmq import RCRMQ
 
 task = "subscribe_mail_list"
 

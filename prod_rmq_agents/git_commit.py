@@ -1,11 +1,13 @@
 #!/usr/bin/env python
-import os
-import sh
 import json
+import os
+import time
+
+import sh
+
+import rabbit_config as rmq_cfg
 import rc_util
 from rc_rmq import RCRMQ
-import rabbit_config as rmq_cfg
-import time
 
 task = "git_commit"
 

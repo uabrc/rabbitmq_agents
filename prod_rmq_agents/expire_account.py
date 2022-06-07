@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-import os
 import json
-import pika
-import rc_util
+import os
+from datetime import date, timedelta
 from os import popen
 from pathlib import Path
-from rc_rmq import RCRMQ
+
+import pika
+
 import rabbit_config as rcfg
-from datetime import date, timedelta
+import rc_util
+from rc_rmq import RCRMQ
 
 task = "expire_account"
 

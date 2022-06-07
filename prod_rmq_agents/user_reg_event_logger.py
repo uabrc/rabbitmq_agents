@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import json
+
 from rc_rmq import RCRMQ
 
 task = "user_reg_event_log"

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import json
+
 from rc_rmq import RCRMQ
 
 task = "task_name"
