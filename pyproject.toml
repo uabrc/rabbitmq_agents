@@ -2,5 +2,7 @@
 line-length = 79
 target-version = ['py36']
 preview = true
+[tool.pylint.main]
+disable = ["invalid-name"]
 [tool.pylint.format]
 max-line-length = 79
