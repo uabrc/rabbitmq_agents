@@ -28,12 +28,18 @@ def ssh_access(ch, method, properties, body):
     reply_to = properties.reply_to
 
     try:
-        block_ssh_cmd = f'/cm/local/apps/cmd/bin/cmsh -n -c "group; use nossh; append members {username}; commit;"'
-        unblock_ssh_cmd = f'/cm/local/apps/cmd/bin/cmsh -n -c "group; use nossh; removefrom members {username}; commit;"'
+        block_ssh_cmd = (
+            '/cm/local/apps/cmd/bin/cmsh -n -c "group; use nossh; append'
+            f' members {username}; commit;"'
+        )
+        unblock_ssh_cmd = (
+            '/cm/local/apps/cmd/bin/cmsh -n -c "group; use nossh; removefrom'
+            f' members {username}; commit;"'
+        )
 
-        if action == 'lock':
+        if action == "lock":
             block_ssh = popen(block_ssh_cmd).read().rstrip()
-        elif action == 'unlock':
+        elif action == "unlock":
             unblock_ssh = popen(unblock_ssh_cmd).read().rstrip()
 
         msg["success"] = True
@@ -41,15 +47,15 @@ def ssh_access(ch, method, properties, body):
 
     except Exception:
         msg["success"] = False
-        msg["errmsg"] = "Exception raised, while blocking user's ssh access, check the logs for stack trace"
+        msg["errmsg"] = (
+            "Exception raised, while blocking user's ssh access, check the"
+            " logs for stack trace"
+        )
         logger.error("", exc_info=True)
 
     # send response to callback queue with it's correlation ID
     rc_rmq.publish_msg(
-        {
-         "routing_key": f'acctmgr.done.{queuename}',
-         "msg": msg
-        }
+        {"routing_key": f"acctmgr.done.{queuename}", "msg": msg}
     )
 
     logger.debug(f"User {username} confirmation sent for {action}ing {task}")
@@ -58,11 +64,9 @@ def ssh_access(ch, method, properties, body):
 
 
 logger.info(f"Start listening to queue: {task}")
-rc_rmq.bind_queue(queue=task, routing_key='ssh.*', durable=True)
+rc_rmq.bind_queue(queue=task, routing_key="ssh.*", durable=True)
 
-rc_rmq.start_consume(
-    {"queue": task, "cb": ssh_access}
-)
+rc_rmq.start_consume({"queue": task, "cb": ssh_access})
 
 logger.info("Disconnected")
 rc_rmq.disconnect()
