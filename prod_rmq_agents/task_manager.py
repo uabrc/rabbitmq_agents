@@ -277,7 +277,9 @@ def task_manager(ch, method, properties, body):
 
         update_db(username, {"reported": True})
 
-        rc_util.update_state(username, "ok")
+        rc_util.update_state(
+            username, "ok", msg.get("updated_by"), msg.get("host")
+        )
 
         tracking.pop(username)
 
