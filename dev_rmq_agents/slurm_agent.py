@@ -13,7 +13,7 @@ rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 
 def slurm_account_create(ch, method, properties, body):
     msg = json.loads(body)
-    print("Message received {}".format(msg))
+    print(f"Message received {msg}")
     username = msg["username"]
     success = False
     try:
@@ -39,11 +39,11 @@ def slurm_account_create(ch, method, properties, body):
                 "-i",
             ]
         )
-        print("SLURM account for user {} has been added".format(username))
+        print(f"SLURM account for user {username} has been added")
         success = True
     except Exception:
         e = sys.exc_info()[0]
-        print("[{}]: Error: {}".format(task, e))
+        print(f"[{task}]: Error: {e}")
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -56,7 +56,7 @@ def slurm_account_create(ch, method, properties, body):
     )
 
 
-print("Start listening to queue: {}".format(task))
+print(f"Start listening to queue: {task}")
 rc_rmq.start_consume(
     {"queue": task, "routing_key": "create.*", "cb": slurm_account_create}
 )

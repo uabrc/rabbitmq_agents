@@ -23,7 +23,7 @@ def mail_list_subscription(ch, method, properties, body):
 
     # Retrieve message
     msg = json.loads(body)
-    logger.info("Received msg {}".format(msg))
+    logger.info(f"Received msg {msg}")
     username = msg["username"]
     fullname = msg["fullname"]
     email = msg["email"]
@@ -38,7 +38,7 @@ def mail_list_subscription(ch, method, properties, body):
         f"QUIET ADD hpc-users {email} {fullname}"
     )
 
-    logger.info("Adding user{} to mail list".format(username))
+    logger.info(f"Adding user {username} to mail list")
     msg["success"] = False
     try:
         # Create a text/plain message
@@ -76,7 +76,7 @@ def mail_list_subscription(ch, method, properties, body):
     logger.info("confirmation sent")
 
 
-logger.info("Start listening to queue: {}".format(task))
+logger.info(f"Start listening to queue: {task}")
 rc_rmq.start_consume(
     {
         "queue": task,  # Define your Queue name

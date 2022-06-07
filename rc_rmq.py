@@ -35,22 +35,15 @@ class RCRMQ(object):
 
         if self.DEBUG:
             print(
-                """
+                f"""
             Created RabbitMQ instance with:
-              Exchange name: {},
-              Exchange type: {},
-              Host: {},
-              User: {},
-              VHost: {},
-              Port: {}
-            """.format(
-                    self.EXCHANGE,
-                    self.EXCHANGE_TYPE,
-                    self.HOST,
-                    self.USER,
-                    self.VHOST,
-                    self.PORT,
-                )
+              Exchange name: {self.EXCHANGE},
+              Exchange type: {self.EXCHANGE_TYPE},
+              Host: {self.HOST},
+              User: {self.USER},
+              VHost: {self.VHOST},
+              Port: {self.PORT}
+            """
             )
 
         self._consumer_tag = None

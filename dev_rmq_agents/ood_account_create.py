@@ -13,7 +13,7 @@ rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 
 def ood_account_create(ch, method, properties, body):
     msg = json.loads(body)
-    print("Message received {}".format(msg))
+    print(f"Message received {msg}")
     username = msg["username"]
     user_uid = str(msg["uid"])
     user_gid = str(msg["gid"])
@@ -23,11 +23,11 @@ def ood_account_create(ch, method, properties, body):
         subprocess.call(
             ["sudo", "useradd", "-u", user_uid, "-g", user_gid, username]
         )
-        print("[{}]: User {} has been added".format(task, username))
+        print(f"[{task}]: User {username} has been added")
         success = True
     except Exception:
         e = sys.exc_info()[0]
-        print("[{}]: Error: {}".format(task, e))
+        print(f"[{task}]: Error: {e}")
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -40,7 +40,7 @@ def ood_account_create(ch, method, properties, body):
     )
 
 
-print("Start listening to queue: {}".format(task))
+print(f"Start listening to queue: {task}")
 rc_rmq.start_consume(
     {"queue": task, "routing_key": "create.*", "cb": ood_account_create}
 )

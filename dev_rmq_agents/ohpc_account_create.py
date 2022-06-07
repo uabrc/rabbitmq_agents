@@ -14,16 +14,16 @@ rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 
 def ohpc_account_create(ch, method, properties, body):
     msg = json.loads(body)
-    print("Message received {}".format(msg))
+    print(f"Message received {msg}")
     username = msg["username"]
     success = False
     try:
         subprocess.call(["sudo", "useradd", username])
-        print("[{}]: User {} has been added".format(task, username))
+        print(f"[{task}]: User {username} has been added")
         success = True
     except Exception:
         e = sys.exc_info()[0]
-        print("[{}]: Error: {}".format(task, e))
+        print(f"[{task}]: Error: {e}")
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
     msg["uid"] = getpwnam(username).pw_uid
@@ -42,7 +42,7 @@ def ohpc_account_create(ch, method, properties, body):
         rc_rmq.publish_msg({"routing_key": "create." + username, "msg": msg})
 
 
-print("Start Listening to queue: {}".format(task))
+print(f"Start Listening to queue: {task}")
 rc_rmq.start_consume(
     {"queue": task, "routing_key": "request.*", "cb": ohpc_account_create}
 )

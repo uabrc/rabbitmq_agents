@@ -26,7 +26,7 @@ def log_user_reg_events(ch, method, properties, body):
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
-print("Start listening to queue: {}".format(task))
+print(f"Start listening to queue: {task}")
 rc_rmq.start_consume(
     {
         "queue": task,  # Define your Queue name

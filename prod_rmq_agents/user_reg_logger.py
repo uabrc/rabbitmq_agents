@@ -36,7 +36,7 @@ def log_registration(ch, method, properties, body):
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
-logger.info("Start listening to queue: {}".format(task))
+logger.info(f"Start listening to queue: {task}")
 
 # Start consuming messages from queue with callback function
 rc_rmq.start_consume(
