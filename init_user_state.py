@@ -26,7 +26,7 @@ size = 1000
 db = dataset.connect(f"sqlite:///{rcfg.db_path}/user_reg.db")
 table = db["user_state"]
 
-if table.__len__() > 0 and not args.force:
+if len(table) > 0 and not args.force:
     print("table user_state not empty, abort.")
     sys.exit()
 
