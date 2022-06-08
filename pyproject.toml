@@ -6,3 +6,5 @@ preview = true
 disable = ["invalid-name", "import-error", "logging-fstring-interpolation", "unused-argument", "broad-except"]
 [tool.pylint.format]
 max-line-length = 79
+[tool.pylint.TYPECHECK]
+generated-members = "sh"
