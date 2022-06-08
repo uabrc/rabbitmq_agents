@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 import json
-import os
 from datetime import date, timedelta
 from os import popen
-from pathlib import Path
-
-import pika
 
 import rabbit_config as rcfg
 import rc_util

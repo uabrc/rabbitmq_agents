@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-import argparse
 import json
-import signal
-import time
-import uuid
-
-import pika
 
 import rabbit_config as rcfg
 import rc_util
