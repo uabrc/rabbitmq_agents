@@ -6,7 +6,7 @@ import pika
 import rabbit_config as rcfg
 
 
-class RCRMQ(object):
+class RCRMQ:
 
     USER = "guest"
     PASSWORD = "guest"
