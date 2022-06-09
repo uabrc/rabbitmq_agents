@@ -9,7 +9,7 @@ import rabbit_config as rcfg
 
 if len(sys.argv) < 3:
     sys.stderr.write(f"Usage: {sys.argv[0]} TAG USERNAME ")
-    exit(1)
+    sys.exit(1)
 
 node = sys.argv[1]
 user_name = sys.argv[2]
