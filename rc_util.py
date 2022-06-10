@@ -26,10 +26,6 @@ tasks = {
 logger_fmt = "%(asctime)s [%(module)s] - %(message)s"
 
 
-class TimeoutError(Exception):
-    pass
-
-
 # From https://stackoverflow.com/questions/2281850
 def timeout(seconds=30, error_message=os.strerror(errno.ETIME)):
     def decorator(func):
