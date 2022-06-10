@@ -42,6 +42,7 @@ def manage_acct(ch, method, properties, body):
             if service == 'all':
                 current["new_jobs"] = None
                 current["expire_account"] = None
+                current["ssh_access"] = None
                 # send a broadcast message to all agents
                 rc_rmq.publish_msg(
                     {
