@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import argparse
-import dataset
-import sys
 import subprocess
+import sys
+from datetime import datetime
+
+import dataset
+
 import rabbit_config as rcfg
 import rc_util
-from datetime import datetime
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--force", action="store_true", help="force update")
@@ -24,7 +26,7 @@ size = 1000
 db = dataset.connect(f"sqlite:///{rcfg.db_path}/user_reg.db")
 table = db["user_state"]
 
-if table.__len__() > 0 and not args.force:
+if len(table) > 0 and not args.force:
     print("table user_state not empty, abort.")
     sys.exit()
 

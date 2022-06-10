@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import json
+
 from rc_rmq import RCRMQ
 
 task = "task_name"
@@ -20,13 +21,13 @@ def on_message(ch, method, properties, body):
     print(msg)
 
     # Do Something
-    print("[{}]: Callback called.".format(task))
+    print(f"[{task}]: Callback called.")
 
     # Acknowledge message
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
-print("Start listening to queue: {}".format(task))
+print(f"Start listening to queue: {task}")
 rc_rmq.start_consume(
     {
         "queue": task,  # Define your Queue name

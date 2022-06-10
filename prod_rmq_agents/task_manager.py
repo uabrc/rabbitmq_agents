@@ -2,14 +2,16 @@
 import copy
 import json
 import signal
-import dataset
-import rc_util
 import smtplib
-from rc_rmq import RCRMQ
-from jinja2 import Template
 from datetime import datetime
+
+import dataset
 import mail_config as mail_cfg
+from jinja2 import Template
+
 import rabbit_config as rcfg
+import rc_util
+from rc_rmq import RCRMQ
 
 task = "task_manager"
 timeout = 30

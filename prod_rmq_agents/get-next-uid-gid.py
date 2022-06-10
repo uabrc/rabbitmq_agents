@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 import json
-import time
-import rc_util
-from os import popen
-from rc_rmq import RCRMQ
-import rabbit_config as rcfg
-from subprocess import run
 import shlex
+import time
+from os import popen
+from subprocess import run
+
+import rabbit_config as rcfg
+import rc_util
+from rc_rmq import RCRMQ
 
 task = "create_account"
 
@@ -30,7 +31,7 @@ def create_account(msg):
     msg["success"] = False
 
     # Bright command to create user
-    if str(rcfg.bright_cm_version).split(".")[0] == "8":
+    if str(rcfg.bright_cm_version).split(".", maxsplit=1)[0] == "8":
         cmd = "/cm/local/apps/cmd/bin/cmsh -c "
         cmd += f'"user; add {username}; set userid {uid}; set email {email};'
         cmd += f'set commonname \\"{fullname}\\"; '
@@ -52,7 +53,7 @@ def resolve_uid_gid(ch, method, properties, body):
 
     # Retrieve message
     msg = json.loads(body)
-    logger.info("Received {}".format(msg))
+    logger.info(f"Received {msg}")
     username = msg["username"]
     msg["success"] = False
 
@@ -62,7 +63,7 @@ def resolve_uid_gid(ch, method, properties, body):
         user_exists = popen(user_exists_cmd).read().rstrip()
 
         if user_exists:
-            logger.info("The user, {} already exists".format(username))
+            logger.info(f"The user, {username} already exists")
             msg["uid"] = user_exists.split(":")[2]
             msg["gid"] = user_exists.split(":")[3]
 
@@ -105,7 +106,7 @@ def resolve_uid_gid(ch, method, properties, body):
     logger.info("confirmation sent")
 
 
-logger.info("Start listening to queue: {}".format(task))
+logger.info(f"Start listening to queue: {task}")
 rc_rmq.start_consume(
     {"queue": task, "routing_key": "request.*", "cb": resolve_uid_gid}
 )

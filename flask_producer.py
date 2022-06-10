@@ -1,13 +1,15 @@
 #!/usr/bin/env python
-import pika
-import sys
-import socket
 import json
+import socket
+import sys
+
+import pika
+
 import rabbit_config as rcfg
 
 if len(sys.argv) < 3:
-    sys.stderr.write("Usage: {} TAG USERNAME ".format(sys.argv[0]))
-    exit(1)
+    sys.stderr.write(f"Usage: {sys.argv[0]} TAG USERNAME ")
+    sys.exit(1)
 
 node = sys.argv[1]
 user_name = sys.argv[2]
@@ -35,7 +37,7 @@ channel.exchange_declare(exchange=rcfg.Exchange, exchange_type="direct")
 channel.basic_publish(
     exchange=rcfg.Exchange, routing_key=node, body=json.dumps(message)
 )
-print(" [x] Sent {}: {}".format(node, json.dumps(message)))
+print(f" [x] Sent {node}: {json.dumps(message)}")
 
 # creates a named queue
 result = channel.queue_declare(queue=user_name, exclusive=False, durable=True)
@@ -48,7 +50,7 @@ channel.queue_bind(
 
 def work(ch, method, properties, body):
     msg = json.loads(body)
-    print("Received message from {}: \n\t{}".format(method.routing_key, msg))
+    print(f"Received message from {method.routing_key}: \n\t{msg}")
     channel.queue_delete(method.routing_key)
 
 
@@ -56,7 +58,7 @@ def work(ch, method, properties, body):
 channel.basic_consume(
     queue=sys.argv[2], on_message_callback=work, auto_ack=True
 )
-print("Subscribing to queue: {}".format(sys.argv[2]))
+print(f"Subscribing to queue: {sys.argv[2]}")
 
 # initiate message ingestion
 try:

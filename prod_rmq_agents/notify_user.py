@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 import json
-import rc_util
 import smtplib
-import dataset
-from rc_rmq import RCRMQ
-from jinja2 import Template
 from datetime import datetime
-import rabbit_config as rcfg
+
+import dataset
 import mail_config as mail_cfg
+from jinja2 import Template
+
+import rabbit_config as rcfg
+import rc_util
+from rc_rmq import RCRMQ
 
 task = "notify_user"
 

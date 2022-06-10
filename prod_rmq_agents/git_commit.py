@@ -1,11 +1,13 @@
 #!/usr/bin/env python
-import os
-import sh
 import json
+import os
+import time
+
+import sh
+
+import rabbit_config as rmq_cfg
 import rc_util
 from rc_rmq import RCRMQ
-import rabbit_config as rmq_cfg
-import time
 
 task = "git_commit"
 
@@ -60,8 +62,8 @@ def git_commit(ch, method, properties, body):
             logger.debug("git checkout -b %s", branch_name)
             git.checkout("-b", branch_name)
             logger.debug("open(%s, 'w'), open(%s, 'w')", user_ldif, group_ldif)
-            with open(user_ldif, "w") as ldif_u, open(
-                group_ldif, "w"
+            with open(user_ldif, "w", encoding="utf-8") as ldif_u, open(
+                group_ldif, "w", encoding="utf-8"
             ) as ldif_g:
                 logger.debug(
                     "ldapsearch -LLL -x -H ldaps://ldapserver -b 'dc=cm,dc=clu"

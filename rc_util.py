@@ -1,17 +1,19 @@
+import argparse
 import errno
 import functools
-import os
-import signal
-import logging
-import argparse
-import pika
-import pwd
-import uuid
-from rc_rmq import RCRMQ
 import json
-from urllib.parse import quote
+import logging
+import os
+import pwd
+import signal
+import uuid
 from time import sleep
+from urllib.parse import quote
+
+import pika
+
 import rabbit_config as rcfg
+from rc_rmq import RCRMQ
 
 rc_rmq = RCRMQ({"exchange": "RegUsr", "exchange_type": "topic"})
 tasks = {
@@ -22,10 +24,6 @@ tasks = {
     "notify_user": None,
 }
 logger_fmt = "%(asctime)s [%(module)s] - %(message)s"
-
-
-class TimeoutError(Exception):
-    pass
 
 
 # From https://stackoverflow.com/questions/2281850

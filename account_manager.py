@@ -1,24 +1,32 @@
 #!/usr/bin/env python3
-import json
-import rc_util
 import argparse
+import json
 import signal
-import uuid
-import pika
+
+import rabbit_config as rcfg
 import rc_util
 from rc_rmq import RCRMQ
-import rabbit_config as rcfg
-import time
 
-parser = argparse.ArgumentParser(description = "Account management driver script")
+parser = argparse.ArgumentParser(
+    description="Account management driver script"
+)
+parser.add_argument("username", help="Username that should be locked/unlocked")
 parser.add_argument(
-    "username", help="Username that should be locked/unlocked")
+    "state",
+    choices=["ok", "hold", "certification", "pre_certification"],
+    help="Choose from states (ok,hold,certification,pre_certification)",
+)
 parser.add_argument(
-    "state", choices=['ok', 'hold', 'certification', 'pre_certification'], help="Choose from states (ok,hold,certification,pre_certification)")
+    "-s",
+    "--service",
+    nargs="+",
+    default="all",
+    choices=["ssh", "newjobs", "expiration", "all"],
+    help="List one or more services to be blocked (default: %(default)s)",
+)
 parser.add_argument(
-    "-s", "--service", nargs='+', default='all', choices=['ssh', 'newjobs', 'expiration', 'all'], help="List one or more services to be blocked (default: %(default)s)")
-parser.add_argument(
-    "-v", "--verbose", action="store_true", help="verbose output")
+    "-v", "--verbose", action="store_true", help="verbose output"
+)
 parser.add_argument(
     "-n", "--dry-run", action="store_true", help="enable dry run mode"
 )
@@ -45,7 +53,7 @@ msg["updated_by"], msg["host"] = rc_util.get_caller_info()
 # publish msg with acctmgr.{uname} routing key.
 rc_rmq.publish_msg(
     {
-        "routing_key": f'acctmgr.request.{queuename}',
+        "routing_key": f"acctmgr.request.{queuename}",
         "msg": msg,
     }
 )
@@ -61,17 +69,22 @@ def callback(ch, method, properties, body):
     username = msg["username"]
 
     if msg["success"]:
-        print(f"Account for {username} has been {msg['action']}ed.\n Updating the user state in DB")
+        print(
+            f"Account for {username} has been {msg['action']}ed.\n Updating"
+            " the user state in DB"
+        )
     else:
-        print(f"There's some issue in account management agents for {username}")
+        print(
+            f"There's some issue in account management agents for {username}"
+        )
         errmsg = msg.get("errmsg", [])
         for err in errmsg:
             print(err)
 
-
     ch.basic_ack(delivery_tag=method.delivery_tag)
     rc_rmq.stop_consume()
     rc_rmq.delete_queue(queuename)
+
 
 print(f"Request {username} account state set to {state}.")
 
@@ -83,7 +96,7 @@ print("Waiting for completion...")
 rc_rmq.start_consume(
     {
         "queue": queuename,
-        "routing_key": f'certified.{queuename}',
+        "routing_key": f"certified.{queuename}",
         "cb": callback,
     }
 )

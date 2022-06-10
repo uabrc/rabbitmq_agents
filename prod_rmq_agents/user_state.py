@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 import json
-import rc_util
+from datetime import datetime
+
 import dataset
 import pika
-from rc_rmq import RCRMQ
-from datetime import datetime
+
 import rabbit_config as rcfg
+import rc_util
+from rc_rmq import RCRMQ
 
 task = "user_state"
 
