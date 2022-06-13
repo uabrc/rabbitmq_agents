@@ -7,6 +7,9 @@ import rabbit_config as rcfg
 
 
 class RCRMQ:
+    """
+    Main RC rabbitmq class that handles connection
+    """
 
     USER = "guest"
     PASSWORD = "guest"
