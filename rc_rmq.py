@@ -11,11 +11,6 @@ class RCRMQ:
     Main RC rabbitmq class that handles connection
     """
 
-    USER = "guest"
-    PASSWORD = "guest"
-    HOST = "localhost"
-    PORT = 5672
-    VHOST = "/"
     EXCHANGE = ""
     EXCHANGE_TYPE = "direct"
     DEBUG = False
@@ -29,11 +24,11 @@ class RCRMQ:
 
         hostname = socket.gethostname().split(".", 1)[0]
 
-        self.HOST = rcfg.Server if hostname != rcfg.Server else "localhost"
-        self.USER = rcfg.User
-        self.PASSWORD = rcfg.Password
-        self.VHOST = rcfg.VHost
-        self.PORT = rcfg.Port
+        host = rcfg.Server if hostname != rcfg.Server else "localhost"
+        user = rcfg.User
+        password = rcfg.Password
+        vhost = rcfg.VHost
+        port = rcfg.Port
         self.DEBUG = debug
 
         if self.DEBUG:
@@ -42,10 +37,10 @@ class RCRMQ:
             Created RabbitMQ instance with:
               Exchange name: {self.EXCHANGE},
               Exchange type: {self.EXCHANGE_TYPE},
-              Host: {self.HOST},
-              User: {self.USER},
-              VHost: {self.VHOST},
-              Port: {self.PORT}
+              Host: {host},
+              User: {user},
+              VHost: {vhost},
+              Port: {port}
             """
             )
 
@@ -54,10 +49,10 @@ class RCRMQ:
         self._consuming = False
         self._channel = None
         self._parameters = pika.ConnectionParameters(
-            self.HOST,
-            self.PORT,
-            self.VHOST,
-            pika.PlainCredentials(self.USER, self.PASSWORD),
+            host,
+            port,
+            vhost,
+            pika.PlainCredentials(user, password),
         )
 
     def connect(self):

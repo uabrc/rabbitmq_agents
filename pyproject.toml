@@ -8,3 +8,5 @@ disable = ["invalid-name", "import-error", "logging-fstring-interpolation", "unu
 max-line-length = 79
 [tool.pylint.TYPECHECK]
 generated-members = "sh"
+[tool.pylint.DESIGN]
+max-attributes = 12
