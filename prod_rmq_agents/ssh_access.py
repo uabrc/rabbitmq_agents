@@ -49,38 +49,44 @@ def ssh_access(ch, method, properties, body):
         else:
             corr_id = str(uuid.uuid4())
             print(f'corr_id generated: {corr_id}')
+            msg["groups"] = {}
 
+            proc = Popen(['/usr/bin/groups', username], stdout=PIPE, stderr=PIPE)
+            out,err = proc.communicate()
+
+            user_group_list = out.decode().strip().split(":")[1].split()
+            lock_groups = rcfg.lock_groups
+            """
+              Filter the lock group a user is in and assign to spl
+              lambda function returns common elements between two lists. For all
+              the true values by returned lambda function for common elements
+              corresponding values are included as a list by filter function.
+            """
+            spl_groups = list(filter(lambda x:x in list(lock_groups.values()),user_group_list))
+
+            # Depending on state add user to the group corresponding to state.
+            # Remove user from lock_groups they are already part of.
             if state == 'certification':
-                msg["action"] = "add"
-                msg["groupnames"] = [lock_groups[state]]
+                # eg: {"groups": { "add":[a,b,c], "remove":[d,e,f] }
+                msg["groups"]["add"] = [lock_groups[state]]
+                msg["groups"]["remove"] = spl_groups
 
             elif state == 'hold':
-                msg["action"] = "add"
-                msg["groupnames"] = [lock_groups[state]]
+                # eg: {"groups": { "add":[a,b,c], "remove":[d,e,f] }
+                msg["groups"]["add"] = [lock_groups[state]]
+                msg["groups"]["remove"] = spl_groups
 
             elif state == 'pre_certification':
-                msg["action"] = "add"
-                msg["groupnames"] = [lock_groups[state]]
+                # eg: {"groups": { "add":[a,b,c], "remove":[d,e,f] }
+                msg["groups"]["add"] = [lock_groups[state]]
+                msg["groups"]["remove"] = spl_groups
 
             elif state == 'ok':
-                msg["action"] = "remove"
-                proc = Popen(['/usr/bin/groups', username], stdout=PIPE, stderr=PIPE)
-                out,err = proc.communicate()
+                msg["groups"]["remove"] = spl_groups
  
-                user_group_list = out.decode().strip().split(":")[1].split()
- 
-                """
-                  Filter the lock group a user is in and assign to msg["groupnames"]
-                  lambda function returns common elements between two lists. For all
-                  the true values by returned lambda function for common elements 
-                  corresponding values are included as a list by filter function.
-                """
-                msg["groupnames"] = list(filter(lambda x:x in list(lock_groups.values()),user_group_list))
- 
-            #msg["success"] = True
  
             # send a message to group_member.py agent
-            logger.info(f"Request sent to add user {username} to {msg['groupnames']} group")
+            logger.info(f"Request sent to add/remove user {username} to spl groups")
             print(f"sending msg to group agent {msg}")
             rc_rmq.publish_msg(
                 {
