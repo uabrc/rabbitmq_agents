@@ -26,26 +26,34 @@ def group_member(ch, method, properties, body):
     state = msg["state"]
 
     try:
+        if 'remove' in msg["groups"]:
+            for each_group in msg["groups"]["remove"]:
+                logger.debug(f'Removing user {username} from group {each_group}')
+                if str(rcfg.bright_cm_version).split(".")[0] == "8":
+                    grp_remove_user_cmd = f'/cm/local/apps/cmd/bin/cmsh -n -c "group; removefrom {each_group} groupmembers {username}; commit;"'
+                else:
+                    grp_remove_user_cmd = f'/cm/local/apps/cmd/bin/cmsh -n -c "group; removefrom {each_group} members {username}; commit;"'
 
-        if action == 'add':
-            for each_group in msg["groupnames"]:
+                proc = Popen(shlex.split(grp_remove_user_cmd), stdout=PIPE, stderr=PIPE)
+                out,err = proc.communicate()
+                logger.info(f'Running command: {grp_remove_user_cmd}')
+                logger.debug(f'Result: {err}')
+                logger.info(f'User {username} is removed from {each_group} group')
+
+        if 'add' in msg["groups"]:
+            for each_group in msg["groups"]["add"]:
                 logger.debug(f'Adding user {username} to group {each_group}')
-                grp_add_user_cmd = f'/cm/local/apps/cmd/bin/cmsh -n -c "group; append {each_group} members {username}; commit;"'
+                if str(rcfg.bright_cm_version).split(".")[0] == "8":
+                    grp_add_user_cmd = f'/cm/local/apps/cmd/bin/cmsh -n -c "group; append {each_group} groupmembers {username}; commit;"'
+                else:
+                    grp_add_user_cmd = f'/cm/local/apps/cmd/bin/cmsh -n -c "group; append {each_group} members {username}; commit;"'
+
                 proc = Popen(shlex.split(grp_add_user_cmd), stdout=PIPE, stderr=PIPE)
                 logger.info(f'Running command: {grp_add_user_cmd}')
                 out,err = proc.communicate()
                 logger.debug(f'Result: {err}')
                 logger.info(f'User {username} is added to {each_group} group')
 
-        elif action == 'remove':
-            for each_group in msg["groupnames"]:
-                logger.debug(f'Removing user {username} from group {each_group}')
-                grp_remove_user_cmd = f'/cm/local/apps/cmd/bin/cmsh -n -c "group; removefrom {each_group} members {username}; commit;"'
-                proc = Popen(shlex.split(grp_remove_user_cmd), stdout=PIPE, stderr=PIPE)
-                out,err = proc.communicate()
-                logger.info(f'Running command: {grp_remove_user_cmd}')
-                logger.debug(f'Result: {err}')
-                logger.info(f'User {username} is removed from {each_group} group')
 
         msg["success"] = True
 
