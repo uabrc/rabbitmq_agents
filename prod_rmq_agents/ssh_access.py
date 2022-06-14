@@ -27,7 +27,6 @@ def ssh_access(ch, method, properties, body):
     msg["task"] = task
     queuename = msg["queuename"]
     state = msg["state"]
-    lock_groups = rcfg.lock_groups
 
     global corr_id
     try:
