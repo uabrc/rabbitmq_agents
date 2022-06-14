@@ -17,7 +17,6 @@ logger = rc_util.get_logger(args)
 # Instantiate rabbitmq object
 rc_rmq = RCRMQ({"exchange": rcfg.Exchange, "exchange_type": "topic"})
 
-print("ssh_agent entered")
 
 def ssh_access(ch, method, properties, body):
     msg = json.loads(body)
@@ -32,10 +31,9 @@ def ssh_access(ch, method, properties, body):
     try:
     # check if it's a response from group_member_agent
         if routing_key == task:
-            print("routing_key matches")
-            print(f"corr_id sent by group_member agent: {properties.correlation_id}")
+            logger.debug(f"corr_id sent by group_member agent: {properties.correlation_id}")
             if corr_id == properties.correlation_id:
-                print(f'group_member agent confirmation msg["success"]: {msg["success"]}')
+                logger.debug(f'group_member agent confirmation msg["success"]: {msg["success"]}')
                 # forward confirmation response to acct_mgmt_workflow agent
                 rc_rmq.publish_msg(
                    {
@@ -47,7 +45,7 @@ def ssh_access(ch, method, properties, body):
                 
         else:
             corr_id = str(uuid.uuid4())
-            print(f'corr_id generated: {corr_id}')
+            logger.debug(f'corr_id generated: {corr_id}')
             msg["groups"] = {}
 
             proc = Popen(['/usr/bin/groups', username], stdout=PIPE, stderr=PIPE)
@@ -65,28 +63,24 @@ def ssh_access(ch, method, properties, body):
 
             # Depending on state add user to the group corresponding to state.
             # Remove user from lock_groups they are already part of.
+            # eg: {"groups": { "add":[a,b,c], "remove":[d,e,f] }
             if state == 'certification':
-                # eg: {"groups": { "add":[a,b,c], "remove":[d,e,f] }
                 msg["groups"]["add"] = [lock_groups[state]]
                 msg["groups"]["remove"] = spl_groups
 
             elif state == 'hold':
-                # eg: {"groups": { "add":[a,b,c], "remove":[d,e,f] }
                 msg["groups"]["add"] = [lock_groups[state]]
                 msg["groups"]["remove"] = spl_groups
 
             elif state == 'pre_certification':
-                # eg: {"groups": { "add":[a,b,c], "remove":[d,e,f] }
                 msg["groups"]["add"] = [lock_groups[state]]
                 msg["groups"]["remove"] = spl_groups
 
             elif state == 'ok':
                 msg["groups"]["remove"] = spl_groups
  
- 
             # send a message to group_member.py agent
-            logger.info(f"Request sent to add/remove user {username} to spl groups")
-            print(f"sending msg to group agent {msg}")
+            logger.debug(f"sending msg to group agent: {msg}")
             rc_rmq.publish_msg(
                 {
                    "routing_key": f'group_member.{queuename}',
@@ -97,6 +91,7 @@ def ssh_access(ch, method, properties, body):
                    "msg": msg
                 }
             )
+            logger.info(f"Request sent to add/remove user {username} to/from spl groups")
  
     except Exception:
         msg["success"] = False
