@@ -34,9 +34,9 @@ def group_member(ch, method, properties, body):
                 else:
                     grp_remove_user_cmd = f'/cm/local/apps/cmd/bin/cmsh -n -c "group; removefrom {each_group} members {username}; commit;"'
 
+                logger.info(f'Running command: {grp_remove_user_cmd}')
                 proc = Popen(shlex.split(grp_remove_user_cmd), stdout=PIPE, stderr=PIPE)
                 out,err = proc.communicate()
-                logger.info(f'Running command: {grp_remove_user_cmd}')
                 logger.debug(f'Result: {err}')
                 logger.info(f'User {username} is removed from {each_group} group')
 
@@ -48,8 +48,8 @@ def group_member(ch, method, properties, body):
                 else:
                     grp_add_user_cmd = f'/cm/local/apps/cmd/bin/cmsh -n -c "group; append {each_group} members {username}; commit;"'
 
-                proc = Popen(shlex.split(grp_add_user_cmd), stdout=PIPE, stderr=PIPE)
                 logger.info(f'Running command: {grp_add_user_cmd}')
+                proc = Popen(shlex.split(grp_add_user_cmd), stdout=PIPE, stderr=PIPE)
                 out,err = proc.communicate()
                 logger.debug(f'Result: {err}')
                 logger.info(f'User {username} is added to {each_group} group')
