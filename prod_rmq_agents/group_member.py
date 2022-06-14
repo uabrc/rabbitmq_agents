@@ -81,7 +81,7 @@ def group_member(ch, method, properties, body):
     else:
         print("Error: no reply_to")
 
-    logger.debug(f'User {username} confirmation sent for {action}ing {task}')
+    logger.debug(f'User {username} confirmation sent from {task}')
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
