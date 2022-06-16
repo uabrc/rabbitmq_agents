@@ -51,33 +51,33 @@ def ssh_access(ch, method, properties, body):
             proc = Popen(['/usr/bin/groups', username], stdout=PIPE, stderr=PIPE)
             out,err = proc.communicate()
 
-            user_group_list = out.decode().strip().split(":")[1].split()
-            lock_groups = rcfg.lock_groups
+            user_groups = out.decode().strip().split(":")[1].split()
+            state_groups = rcfg.state_groups
             """
               Filter the lock group a user is in and assign to spl
               lambda function returns common elements between two lists. For all
               the true values by returned lambda function for common elements
               corresponding values are included as a list by filter function.
             """
-            spl_groups = list(filter(lambda x:x in list(lock_groups.values()),user_group_list))
+            user_state_groups = list(filter(lambda x:x in list(rcfg.state_groups.values()),user_groups))
 
             # Depending on state add user to the group corresponding to state.
-            # Remove user from lock_groups they are already part of.
+            # Remove user from user_state_groups they are already part of.
             # eg: {"groups": { "add":[a,b,c], "remove":[d,e,f] }
             if state == 'certification':
-                msg["groups"]["add"] = [lock_groups[state]]
-                msg["groups"]["remove"] = spl_groups
+                msg["groups"]["add"] = [state_groups[state]]
+                msg["groups"]["remove"] = user_state_groups
 
             elif state == 'hold':
-                msg["groups"]["add"] = [lock_groups[state]]
-                msg["groups"]["remove"] = spl_groups
+                msg["groups"]["add"] = [state_groups[state]]
+                msg["groups"]["remove"] = user_state_groups
 
             elif state == 'pre_certification':
-                msg["groups"]["add"] = [lock_groups[state]]
-                msg["groups"]["remove"] = spl_groups
+                msg["groups"]["add"] = [state_groups[state]]
+                msg["groups"]["remove"] = user_state_groups
 
             elif state == 'ok':
-                msg["groups"]["remove"] = spl_groups
+                msg["groups"]["remove"] = user_state_groups
  
             # send a message to group_member.py agent
             logger.debug(f"sending msg to group agent: {msg}")
