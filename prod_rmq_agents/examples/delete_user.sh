@@ -20,16 +20,26 @@ fi
 if id "$username" &>/dev/null; then
   echo "Deleting user: ${username}"
 
-  echo "cmsh -c 'user use ${username}; remove -d; commit;'"
+  echo "Clean PUN process on loginnode"
+  ssh login001 "/opt/ood/nginx_stage/sbin/nginx_stage nginx_clean --force --user $username"
+
+  echo "Remove user via cmsh"
   cmsh -c "user use ${username}; remove -d; commit;"
 
-  echo "sqlite3  $path_to_db \"delete from users where username=\"$username\""
+  echo "Remove user from sqlite db users table"
   sqlite3 $path_to_db "delete from users where username=\"$username\""
 
-  echo "rm -r /data/user/${username}"
+  echo "Remove user from sqlite db user_state table"
+  sqlite3 $path_to_db "delete from user_state where username=\"$username\""
+
+  echo "Remove user from sacctmgr"
+  sacctmgr -i delete user $username
+  sacctmgr -i delete account $username
+
+  echo "Remove /data/user"
   rm -rf "/data/user/${username}"
 
-  echo "rm -r /data/scratch/${username}"
+  echo "Remove /data/scratch"
   rm -rf "/data/scratch/${username}"
 
 else

@@ -1,6 +1,11 @@
+import errno
+import functools
+import os
+import signal
 import logging
 import argparse
 import pika
+import pwd
 import uuid
 from rc_rmq import RCRMQ
 import json
@@ -19,7 +24,34 @@ tasks = {
 logger_fmt = "%(asctime)s [%(module)s] - %(message)s"
 
 
-def add_account(username, queuename, email, full="", reason=""):
+class TimeoutError(Exception):
+    pass
+
+
+# From https://stackoverflow.com/questions/2281850
+def timeout(seconds=30, error_message=os.strerror(errno.ETIME)):
+    def decorator(func):
+        def _handle_timeout(signum, frame):
+            raise TimeoutError(error_message)
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, _handle_timeout)
+            signal.alarm(seconds)
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                signal.alarm(0)
+            return result
+
+        return wrapper
+
+    return decorator
+
+
+def add_account(
+    username, queuename, email, full="", reason="", updated_by="", host=""
+):
     rc_rmq.publish_msg(
         {
             "routing_key": "request." + queuename,
@@ -29,6 +61,27 @@ def add_account(username, queuename, email, full="", reason=""):
                 "fullname": full,
                 "reason": reason,
                 "queuename": queuename,
+                "updated_by": updated_by,
+                "host": host,
+            },
+        }
+    )
+    rc_rmq.disconnect()
+
+
+def certify_account(
+    username, queuename, state="ok", service="all", updated_by="", host=""
+):
+    rc_rmq.publish_msg(
+        {
+            "routing_key": "acctmgr.request." + queuename,
+            "msg": {
+                "username": username,
+                "service": service,
+                "state": state,
+                "queuename": queuename,
+                "updated_by": updated_by,
+                "host": host,
             },
         }
     )
@@ -66,7 +119,15 @@ def worker(ch, method, properties, body):
     rc_rmq.delete_queue()
 
 
-def consume(queuename, routing_key="", callback=worker, debug=False):
+def consume(
+    queuename,
+    routing_key="",
+    callback=worker,
+    bind=True,
+    durable=True,
+    exclusive=False,
+    debug=False,
+):
     if routing_key == "":
         routing_key = "complete." + queuename
 
@@ -77,6 +138,9 @@ def consume(queuename, routing_key="", callback=worker, debug=False):
             {
                 "queue": queuename,
                 "routing_key": routing_key,
+                "bind": bind,
+                "durable": durable,
+                "exclusive": exclusive,
                 "cb": callback,
             }
         )
@@ -120,6 +184,7 @@ def encode_name(uname):
     return uname_quote
 
 
+@timeout(rcfg.Function_timeout)
 def check_state(username, debug=False):
     corr_id = str(uuid.uuid4())
     result = ""
@@ -171,14 +236,15 @@ def check_state(username, debug=False):
     return result
 
 
-def update_state(username, state, debug=False):
+@timeout(rcfg.Function_timeout)
+def update_state(username, state, updated_by="", host="", debug=False):
 
     if state not in rcfg.Valid_state:
         print(f"Invalid state '{state}'")
-        return
+        return False
 
     corr_id = str(uuid.uuid4())
-
+    result = ""
     rpc_queue = "user_state"
 
     def handler(ch, method, properties, body):
@@ -187,12 +253,14 @@ def update_state(username, state, debug=False):
             print(body)
 
         nonlocal corr_id
+        nonlocal result
         msg = json.loads(body)
 
         if corr_id == properties.correlation_id:
             if not msg["success"]:
                 print("Something's wrong, please try again.")
 
+            result = msg["success"]
             rc_rmq.stop_consume()
             rc_rmq.disconnect()
 
@@ -204,7 +272,13 @@ def update_state(username, state, debug=False):
             "props": pika.BasicProperties(
                 reply_to=callback_queue, correlation_id=corr_id
             ),
-            "msg": {"op": "post", "username": username, "state": state},
+            "msg": {
+                "op": "post",
+                "username": username,
+                "state": state,
+                "updated_by": updated_by,
+                "host": host,
+            },
         }
     )
 
@@ -216,3 +290,11 @@ def update_state(username, state, debug=False):
             "cb": handler,
         }
     )
+
+    return result
+
+
+def get_caller_info():
+    username = pwd.getpwuid(os.getuid()).pw_name
+    hostname = os.uname().nodename
+    return (username, hostname)
