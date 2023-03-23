@@ -42,7 +42,6 @@ def ssh_access(ch, method, properties, body):
                    }
                 )
                 logger.debug(f'User {username} confirmation sent for {action}ing {task}')
-                
         else:
             corr_id = str(uuid.uuid4())
             logger.debug(f'corr_id generated: {corr_id}')
