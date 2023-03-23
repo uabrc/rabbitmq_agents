@@ -94,5 +94,4 @@ rc_rmq.start_consume(
 )
 
 logger.info("Disconnected")
-rc_rmq.disconnect()      
-
+rc_rmq.disconnect()

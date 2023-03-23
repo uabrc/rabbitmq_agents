@@ -43,7 +43,7 @@ def new_jobs(ch, method, properties, body):
 
 
     rc_rmq.publish_msg(
-        {"routing_key": f'acctmgr.done.{queuename}', 
+        {"routing_key": f'acctmgr.done.{queuename}',
          "msg": msg}
     )
 
