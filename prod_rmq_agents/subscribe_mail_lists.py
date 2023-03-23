@@ -27,7 +27,7 @@ def mail_list_subscription(ch, method, properties, body):
     fullname = msg["fullname"]
     email = msg["email"]
 
-    mail_list_admin = rcfg.Sender
+    mail_list_admin = rcfg.Sender_subscription
     mail_list = rcfg.Mail_list
     mail_list_bcc = rcfg.Mail_list_bcc
     server = rcfg.Mail_server
