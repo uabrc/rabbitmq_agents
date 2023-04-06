@@ -70,7 +70,7 @@ def notify_user(ch, method, properties, body):
             else:
                 errmsg = "Sending email to user"
                 smtp = smtplib.SMTP(rcfg.Mail_server)
-                smtp.sendmail(rcfg.Sender, receivers, message)
+                smtp.sendmail(rcfg.Sender_notification, receivers, message)
 
                 logger.debug(f"Email sent to: {user_email}")
 

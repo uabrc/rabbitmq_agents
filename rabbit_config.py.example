@@ -25,6 +25,7 @@ db_path = ".agent_db"
 Mail_server = 'localhost'
 Admin_email = 'root@localhost'
 Sender = 'ROOT@LOCALHOST'
+Sender_notification = 'NOTIFY@LOCALHOST'
 Sender_subscription = 'SUBSCRIBE_EMAIL@LOCALHOST'
 Sender_alias = 'Services'
 Subject = 'New User Account'
