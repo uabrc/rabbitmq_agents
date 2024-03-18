@@ -118,6 +118,7 @@ def insert_db(username, msg):
                 "sent": None,
                 "reported": False,
                 "last_update": datetime.now(),
+                "created": datetime.now(),
                 "queuename": msg.get("queuename", ""),
             }
         )
